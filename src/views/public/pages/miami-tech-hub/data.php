@@ -1,4 +1,5 @@
 <?php
+use App\Repositories\MiamiTechShowsRepository;
 $route = trim((string)($GLOBALS['miami_tech_route'] ?? ''), '/');
 $section = explode('/', $route)[0] ?: 'home';
 $pages = [
@@ -20,4 +21,26 @@ $pages = [
  'media'=>['Media','Miami builders in motion.','Shows, event galleries, speaker stories, community moments and behind-the-scenes work.',['Shows','Events','Speakers','Behind the Scenes']],
 ];
 $page = $pages[$section] ?? ['Miami Tech Lab','Miami’s operating system for technology and business.','Shows, events, software and a serious community for people who build.',['Shows','Events','Software','Community']];
-return compact('route','section','page','pages');
+$shows = [];
+$show = false;
+$contentWarning = null;
+if ($section === 'shows') {
+    try {
+        $repository = new MiamiTechShowsRepository();
+        $parts = explode('/', $route);
+        if (!empty($parts[1])) {
+            $show = $repository->publishedShow($parts[1]);
+            if ($show) {
+                $page = [$show->title, $show->title, $show->tagline ?: $show->description, []];
+            } else {
+                http_response_code(404);
+            }
+        } else {
+            $shows = $repository->publishedShows();
+        }
+    } catch (Throwable $e) {
+        error_log('Miami Tech Lab shows are unavailable: ' . $e->getMessage());
+        $contentWarning = 'The show library is being prepared. Check back soon.';
+    }
+}
+return compact('route','section','page','pages','shows','show','contentWarning');
