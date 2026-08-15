@@ -1,0 +1,488 @@
+{% extends "templates/base.twig" %}
+
+{% block title %}
+    {{ category.meta_title ?: category.name ~ ' | VNV Events' }}
+{% endblock %}
+
+{% block meta_description %}
+    {{ category.meta_description ?: category.description ?: 'Explore products and services by category' }}
+{% endblock %}
+
+{% block body %}
+<style>
+    :root{
+        --pc-primary:#111827;
+        --pc-primary-dark:#1f2937;
+        --pc-accent:#bfa46f;
+        --pc-accent-soft:#ead8b0;
+        --pc-cream:#f8fafc;
+        --pc-soft:#f3f4f6;
+        --pc-dark:#0f172a;
+        --pc-dark-soft:#161c1d;
+        --pc-text:#111827;
+        --pc-muted:#6b7280;
+        --pc-border:rgba(17,24,39,.10);
+        --pc-shadow:0 18px 44px rgba(15,23,42,.08);
+        --pc-gold-gradient:linear-gradient(135deg, #bf953f 0%, #fcf6ba 45%, #b38728 100%);
+    }
+
+    body{
+        background:#f8fafc;
+        color:var(--pc-text);
+    }
+
+    .pc-wrap{
+        padding:42px 0 64px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .pc-wrap::before,
+    .pc-wrap::after{
+        content:"";
+        position:absolute;
+        border-radius:999px;
+        pointer-events:none;
+        filter:blur(2px);
+    }
+
+    .pc-wrap::before{
+        width:380px;
+        height:380px;
+        top:-120px;
+        right:-140px;
+        background:radial-gradient(circle, rgba(17,24,39,.08), transparent 65%);
+    }
+
+    .pc-wrap::after{
+        width:320px;
+        height:320px;
+        left:-120px;
+        bottom:40px;
+        background:radial-gradient(circle, rgba(191,164,111,.10), transparent 70%);
+    }
+
+    .pc-container{
+        max-width:1220px;
+        margin:0 auto;
+        padding:0 16px;
+        position:relative;
+        z-index:2;
+    }
+
+    .pc-breadcrumb{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-bottom:14px;
+        font-size:.88rem;
+        color:var(--pc-muted);
+    }
+
+    .pc-breadcrumb a{
+        color:var(--pc-primary-dark);
+        text-decoration:none;
+        font-weight:800;
+    }
+
+    .pc-breadcrumb strong{
+        color:var(--pc-text);
+    }
+
+    .pc-badge{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        background:#fff;
+        border:1px solid rgba(17,24,39,.10);
+        border-radius:999px;
+        padding:8px 13px;
+        font-size:.78rem;
+        font-weight:900;
+        color:var(--pc-primary-dark);
+        letter-spacing:.05em;
+        text-transform:uppercase;
+        margin-bottom:14px;
+        box-shadow:0 10px 24px rgba(15,23,42,.04);
+    }
+
+    .pc-meta{
+        margin-top:16px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+    }
+
+    .pc-meta-chip{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        background:#fff;
+        border:1px solid rgba(17,24,39,.08);
+        border-radius:999px;
+        padding:8px 12px;
+        font-size:.8rem;
+        font-weight:800;
+        color:#475569;
+    }
+
+    .pc-hero{
+        padding:38px;
+        border:1px solid var(--pc-border);
+        border-radius:28px;
+        background:
+            radial-gradient(circle at top right, rgba(17,24,39,.06), transparent 28%),
+            radial-gradient(circle at bottom left, rgba(191,164,111,.08), transparent 24%),
+            linear-gradient(135deg,#ffffff 0%, #f8fafc 100%);
+        box-shadow:var(--pc-shadow);
+        margin-bottom:22px;
+    }
+
+    .pc-hero h1{
+        margin:0 0 10px;
+        font-size:clamp(2rem,4vw,3rem);
+        font-weight:900;
+        line-height:1.05;
+        color:var(--pc-dark);
+        letter-spacing:-.4px;
+    }
+
+    .pc-hero p{
+        margin:0;
+        color:var(--pc-muted);
+        max-width:840px;
+        line-height:1.7;
+    }
+
+    .pc-section{
+        margin-bottom:20px;
+        border:1px solid rgba(17,24,39,.08);
+        border-radius:24px;
+        background:#fff;
+        box-shadow:var(--pc-shadow);
+        padding:22px;
+    }
+
+    .pc-section h2{
+        font-size:1.45rem;
+        font-weight:900;
+        margin-bottom:12px;
+        color:var(--pc-dark);
+    }
+
+    .pc-content{
+        color:#4b5563;
+        line-height:1.8;
+        font-size:1rem;
+    }
+
+    .pc-image{
+        width:100%;
+        border-radius:16px;
+        border:1px solid rgba(17,24,39,.08);
+        box-shadow:0 12px 28px rgba(15,23,42,.06);
+    }
+
+    .pc-grid{
+        display:grid;
+        gap:14px;
+    }
+
+    .pc-grid.cols-1{grid-template-columns:repeat(1,minmax(0,1fr));}
+    .pc-grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .pc-grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .pc-grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+
+    .pc-card{
+        border:1px solid rgba(17,24,39,.08);
+        border-radius:22px;
+        background:#fff;
+        overflow:hidden;
+        display:flex;
+        flex-direction:column;
+        box-shadow:0 10px 20px rgba(15,23,42,.05);
+        transition:transform .22s ease, box-shadow .22s ease;
+        position:relative;
+        text-decoration:none;
+        color:inherit;
+    }
+
+    .pc-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 22px 38px rgba(15,23,42,.10);
+    }
+
+    .pc-card-badge{
+        position:absolute;
+        top:10px;
+        left:10px;
+        background:rgba(15,23,42,.84);
+        color:#fff;
+        border:1px solid rgba(255,255,255,.14);
+        border-radius:999px;
+        padding:6px 9px;
+        font-size:.72rem;
+        font-weight:800;
+        letter-spacing:.03em;
+        text-transform:uppercase;
+        z-index:2;
+    }
+
+    .pc-card img{
+        width:100%;
+        height:205px;
+        object-fit:cover;
+        background:#eef2f3;
+    }
+
+    .pc-card-body{
+        padding:14px;
+        display:flex;
+        flex-direction:column;
+        height:100%;
+    }
+
+    .pc-card-title{
+        font-size:1.04rem;
+        font-weight:900;
+        color:var(--pc-dark);
+        margin-bottom:6px;
+        line-height:1.3;
+    }
+
+    .pc-card-desc{
+        font-size:.92rem;
+        color:var(--pc-muted);
+        line-height:1.5;
+        min-height:44px;
+    }
+
+    .pc-card-price{
+        font-size:1.2rem;
+        font-weight:900;
+        color:var(--pc-primary-dark);
+        margin-top:10px;
+    }
+
+    .pc-card-action{
+        margin-top:12px;
+        width:100%;
+        border:1px solid rgba(17,24,39,.08);
+        border-radius:999px;
+        padding:10px 12px;
+        background:#f8fafc;
+        color:var(--pc-dark);
+        font-size:.85rem;
+        font-weight:900;
+        text-align:center;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        transition:all .2s ease;
+    }
+
+    .pc-card-action:hover{
+        background:var(--pc-gold-gradient);
+        color:#19120b;
+        transform:translateY(-1px);
+    }
+
+    .pc-empty{
+        padding:30px;
+        border:1px dashed rgba(17,24,39,.14);
+        border-radius:18px;
+        text-align:center;
+        color:var(--pc-muted);
+        background:#fbfcfc;
+    }
+
+    .pc-cta{
+        padding:24px;
+        border-radius:22px;
+        background:
+            radial-gradient(circle at top right, rgba(191,164,111,.14), transparent 30%),
+            linear-gradient(145deg, #101617 0%, #0b0f10 100%);
+        color:#fff;
+    }
+
+    .pc-cta h3{
+        margin:0 0 8px;
+        font-size:1.35rem;
+        font-weight:900;
+    }
+
+    .pc-cta p{
+        margin:0 0 16px;
+        color:rgba(255,255,255,.74);
+        line-height:1.7;
+    }
+
+    .pc-btn{
+        display:inline-block;
+        text-decoration:none;
+        padding:10px 17px;
+        border-radius:999px;
+        background:var(--pc-gold-gradient);
+        color:#17110b;
+        font-weight:900;
+        border:1px solid rgba(255,255,255,.12);
+    }
+
+    .pc-divider{
+        height:1px;
+        background:linear-gradient(90deg, transparent, rgba(17,24,39,.12), transparent);
+        margin:8px 0 16px;
+    }
+
+    @media (max-width: 991px){
+        .pc-grid.cols-3,
+        .pc-grid.cols-4{
+            grid-template-columns:repeat(2,minmax(0,1fr));
+        }
+    }
+
+    @media (max-width: 640px){
+        .pc-wrap{
+            padding-top:24px;
+        }
+
+        .pc-hero{
+            padding:22px;
+            border-radius:20px;
+        }
+
+        .pc-section{
+            padding:16px;
+            border-radius:18px;
+        }
+
+        .pc-meta-chip{
+            font-size:.75rem;
+        }
+
+        .pc-grid.cols-2,
+        .pc-grid.cols-3,
+        .pc-grid.cols-4{
+            grid-template-columns:repeat(1,minmax(0,1fr));
+        }
+    }
+</style>
+
+<section class="pc-wrap">
+    <div class="pc-container">
+        <div class="pc-breadcrumb">
+            <a href="{{ path('') }}">Home</a>
+            <span>/</span>
+            <a href="{{ path('/store-categories/') }}">Store Categories</a>
+            <span>/</span>
+            <strong>{{ category.name }}</strong>
+        </div>
+
+        {% for b in blocks %}
+            {% set type = b.type|default('text') %}
+
+            {% if type == 'hero' %}
+                <section class="pc-hero">
+                    <span class="pc-badge">VNV Events Category</span>
+                    <h1>{{ b.title ?: category.name }}</h1>
+                    {% if b.subtitle or category.description %}
+                        <p>{{ b.subtitle ?: category.description }}</p>
+                    {% endif %}
+                    <div class="pc-meta">
+                        <span class="pc-meta-chip">Curated category selection</span>
+                        <span class="pc-meta-chip">{{ products|length }} items available</span>
+                        <span class="pc-meta-chip">South Florida event catalog</span>
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if type == 'text' %}
+                <section class="pc-section">
+                    {% if b.title %}<h2>{{ b.title }}</h2>{% endif %}
+                    <div class="pc-content">{{ b.content|raw }}</div>
+                </section>
+            {% endif %}
+
+            {% if type == 'image' %}
+                <section class="pc-section">
+                    {% if b.title %}<h2>{{ b.title }}</h2>{% endif %}
+                    {% if b.image_url %}
+                        <img class="pc-image" src="{{ b.image_url }}" alt="{{ b.title ?: category.name }}">
+                    {% endif %}
+                </section>
+            {% endif %}
+
+            {% if type == 'product_grid' %}
+                {% set limit = b.limit|default(24) %}
+                {% set columns = b.columns|default(3) %}
+                <section class="pc-section">
+                    <h2>{{ b.title ?: 'Category Items' }}</h2>
+                    <div class="pc-divider"></div>
+
+                    {% if products|length > 0 %}
+                        <div class="pc-grid cols-{{ columns }}">
+                            {% for p in products|slice(0, limit) %}
+                                <article class="pc-card">
+                                    {% if p.is_featured %}
+                                        <span class="pc-card-badge">Featured</span>
+                                    {% endif %}
+
+                                    {% if p.main_image %}
+                                        <img src="{{ p.main_image }}" alt="{{ p.name }}">
+                                    {% endif %}
+
+                                    <div class="pc-card-body">
+                                        <div class="pc-card-title">{{ p.name }}</div>
+                                        <div class="pc-card-desc">{{ p.short_description ?: 'Explore this item inside this category.' }}</div>
+
+                                        <div class="pc-card-price">
+                                            {% if p.product_type is defined and p.product_type == 'VARIABLE' %}
+                                                {% if p.min_price is defined and p.max_price is defined and p.min_price != p.max_price %}
+                                                    From ${{ p.min_price|number_format(2, '.', ',') }}
+                                                {% elseif p.min_price is defined %}
+                                                    ${{ p.min_price|number_format(2, '.', ',') }}
+                                                {% else %}
+                                                    ${{ p.price|number_format(2, '.', ',') }}
+                                                {% endif %}
+                                            {% else %}
+                                                {% if p.display_price is defined %}
+                                                    ${{ p.display_price|number_format(2, '.', ',') }}
+                                                {% else %}
+                                                    ${{ p.price|number_format(2, '.', ',') }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+
+                                        <a class="pc-card-action" href="{{ path('product/' ~ p.slug) }}">
+                                            View Product
+                                        </a>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="pc-empty">No items have been added to this category yet.</div>
+                    {% endif %}
+                </section>
+            {% endif %}
+
+            {% if type == 'cta' %}
+                <section class="pc-section">
+                    <div class="pc-cta">
+                        <h3>{{ b.title ?: 'Ready to continue?' }}</h3>
+                        {% if b.content %}
+                            <p>{{ b.content }}</p>
+                        {% endif %}
+                        {% if b.button_text and b.button_url %}
+                            <a class="pc-btn" href="{{ b.button_url }}">{{ b.button_text }}</a>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

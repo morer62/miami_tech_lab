@@ -1,0 +1,11 @@
+{% extends 'templates/base.admin.twig' %}
+
+{% block body %}
+<section class="container py-5">
+  <div class="p-4 bg-white rounded-4 shadow-sm text-center">
+    <h1 class="h3 fw-bold mb-2">Team Dashboard</h1>
+    <p class="text-muted mb-4">Use your dashboard to access the clock, contracts and assigned events.</p>
+    <a href="{{ path('panel/home') }}" class="btn btn-primary fw-bold">Go to Team Home</a>
+  </div>
+</section>
+{% endblock %}

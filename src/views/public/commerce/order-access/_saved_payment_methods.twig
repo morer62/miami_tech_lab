@@ -1,0 +1,106 @@
+{% if supports_future_payment_methods %}
+    <input type="hidden" name="payment_token_type" id="payment-token-type" value="new_card">
+    <input type="hidden" name="card_brand" id="payment-card-brand">
+    <input type="hidden" name="card_last4" id="payment-card-last4">
+    <input type="hidden" name="card_exp_month" id="payment-card-exp-month">
+    <input type="hidden" name="card_exp_year" id="payment-card-exp-year">
+
+    {% if can_use_saved_payment_methods and saved_payment_methods|length > 0 %}
+        <div class="mb-3" id="saved-payment-method-section">
+            <label class="form-label fw-bold">Saved payment method</label>
+            <select name="saved_payment_method_id" id="saved-payment-method-id" class="form-select form-select-lg">
+                <option value="">Use a new card</option>
+                {% for method in saved_payment_methods %}
+                    <option value="{{ method.id }}">
+                        {{ method.brand|default(method.payment_provider|capitalize) }} **** {{ method.last4|default('----') }}
+                        {% if method.exp_month and method.exp_year %} - {{ "%02d"|format(method.exp_month) }}/{{ method.exp_year }}{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="form-text">Only methods saved for this business and active provider are shown.</div>
+        </div>
+    {% endif %}
+
+    <div class="border rounded p-3 mb-3 bg-light" id="new-payment-method-options">
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" value="1" id="save-payment-method" name="save_payment_method">
+            <label class="form-check-label" for="save-payment-method">
+                Save this payment method for future purchases/payments.
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="1" id="auto-charge-consent" name="auto_charge_consent">
+            <label class="form-check-label" for="auto-charge-consent">
+                {{ payment_consent_text }}
+            </label>
+        </div>
+        <small class="text-muted d-block mt-2">Consent version {{ payment_consent_version }}. Both options are optional and unchecked by default.</small>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const savedSelect = document.getElementById('saved-payment-method-id');
+        const tokenTypeInput = document.getElementById('payment-token-type');
+        const cardWrap = document.getElementById('payment-card-container')?.closest('.mb-4')
+            || document.getElementById('card-section')
+            || document.getElementById('cardSection');
+        const billingZipWrap = document.getElementById('payment-billing-zip-wrap');
+        const billingZipInput = document.getElementById('payment-billing-zip');
+        const customerTokenInput = document.getElementById('payment-customer-token') || document.getElementById('customer_token');
+        const saveInput = document.getElementById('save-payment-method');
+        const consentInput = document.getElementById('auto-charge-consent');
+        const form = savedSelect ? savedSelect.closest('form') : null;
+        let submittingSavedMethod = false;
+
+        function syncSavedMethodMode() {
+            const usesSaved = !!(savedSelect && savedSelect.value);
+            if (tokenTypeInput) tokenTypeInput.value = usesSaved ? 'stored_card' : 'new_card';
+            if (customerTokenInput && usesSaved) customerTokenInput.value = '';
+            if (cardWrap) cardWrap.style.display = usesSaved ? 'none' : '';
+            if (billingZipWrap) billingZipWrap.style.display = usesSaved ? 'none' : '';
+            if (billingZipInput) billingZipInput.required = !usesSaved;
+            if (saveInput) {
+                saveInput.disabled = usesSaved;
+                if (usesSaved) saveInput.checked = false;
+            }
+            if (consentInput && usesSaved) {
+                consentInput.disabled = false;
+            }
+        }
+
+        if (savedSelect) {
+            savedSelect.addEventListener('change', syncSavedMethodMode);
+            syncSavedMethodMode();
+        }
+
+        if (consentInput && saveInput) {
+            consentInput.addEventListener('change', function () {
+                if (consentInput.checked && !saveInput.disabled) {
+                    saveInput.checked = true;
+                }
+            });
+        }
+
+        if (form && savedSelect) {
+            form.addEventListener('submit', function (event) {
+                if (!savedSelect.value) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                if (submittingSavedMethod) {
+                    return false;
+                }
+                if (window.VnvOrderAccessPayment && !window.VnvOrderAccessPayment.begin()) {
+                    return false;
+                }
+
+                submittingSavedMethod = true;
+                if (customerTokenInput) customerTokenInput.value = '';
+                form.submit();
+            }, true);
+        }
+    });
+    </script>
+{% endif %}

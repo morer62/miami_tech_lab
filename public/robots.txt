@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /panel/
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /storage/private/
+
+Sitemap: https://vnvevents.com/sitemap.xml

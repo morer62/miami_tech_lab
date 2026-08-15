@@ -1,0 +1,348 @@
+{% extends "templates/base.twig" %}
+
+{% block title %}Locations | VNV Events{% endblock %}
+{% block meta_description %}Explore VNV Events service locations and city pages across South Florida.{% endblock %}
+
+{% block body %}
+{% include "templates/layout/publicHeaderVnv.html.twig" %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap');
+    :root{
+        --loc-primary:#5EC6C4;
+        --loc-primary-deep:#3da9a6;
+        --loc-gold:#c5a059;
+        --loc-gold-soft:rgba(197,160,89,.22);
+        --loc-gold-gradient:linear-gradient(135deg,#bf953f 0%,#fcf6ba 45%,#b38728 100%);
+        --loc-dark:#0a0d0e;
+        --loc-muted:#6a7276;
+        --loc-bg:#eef2f4;
+        --loc-bg2:#e4eaed;
+    }
+    .loc-page{
+        --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        background-color:var(--loc-bg);
+        background-image:
+            radial-gradient(ellipse 120% 80% at 50% -20%, rgba(94,198,196,.14), transparent 55%),
+            radial-gradient(ellipse 70% 50% at 100% 40%, var(--loc-gold-soft), transparent 50%),
+            radial-gradient(ellipse 60% 45% at 0% 80%, rgba(15,20,22,.06), transparent 45%),
+            var(--grain);
+        padding:48px 0 88px;
+        font-family:'Plus Jakarta Sans',sans-serif;
+        min-height:72vh;
+    }
+    .loc-container{max-width:1180px;margin:0 auto;padding:0 18px;}
+    .loc-head{
+        position:relative;border-radius:28px;padding:38px 40px 34px;
+        background:
+            linear-gradient(155deg,rgba(255,255,255,.06) 0%,transparent 42%),
+            linear-gradient(165deg,#0c1012 0%,#151c1f 48%,#0f1416 100%);
+        color:#fff;
+        box-shadow:0 28px 70px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.06);
+        margin-bottom:28px;overflow:hidden;
+    }
+    .loc-head::before{
+        content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;z-index:0;
+        background:linear-gradient(135deg,rgba(197,160,89,.55),rgba(94,198,196,.25),transparent 55%,rgba(197,160,89,.2));
+        -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+        mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+        -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+    }
+    .loc-head::after{
+        content:'';position:absolute;top:-40%;right:-15%;width:55%;height:120%;z-index:0;
+        background:radial-gradient(circle,rgba(94,198,196,.12) 0%,transparent 62%);
+        pointer-events:none;
+    }
+    .loc-head-inner{position:relative;z-index:1;}
+    .loc-eyebrow{
+        display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;
+        letter-spacing:.22em;text-transform:uppercase;color:rgba(197,160,89,.95);margin-bottom:12px;
+    }
+    .loc-eyebrow i{font-size:.65rem;opacity:.85;}
+    .loc-head h1{
+        font-family:'Playfair Display',serif;font-size:clamp(2.1rem,4.2vw,3.35rem);
+        margin:0 0 12px;font-weight:800;line-height:1.12;letter-spacing:-.02em;
+    }
+    .loc-head h1 em{font-style:italic;font-weight:700;color:rgba(255,255,255,.92);}
+    .loc-head > .loc-head-inner > p{margin:0;color:rgba(255,255,255,.76);max-width:640px;line-height:1.85;font-size:1.02rem;}
+    .loc-head-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;}
+    .loc-btn{
+        display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;
+        border:none;border-radius:999px;padding:13px 22px;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;transition:.28s ease;cursor:pointer;
+    }
+    .loc-btn-gold{background:var(--loc-gold-gradient);color:#0f1214;}
+    .loc-btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(197,160,89,.28);}
+    .loc-btn-ghost{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.28);color:#fff;}
+    .loc-btn-ghost:hover{background:#fff;color:#10171a;border-color:#fff;}
+    .loc-toolbar{
+        display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;margin-bottom:22px;
+        padding:16px 20px;background:#fff;border:1px solid #e2e8f0;border-radius:20px;
+        box-shadow:0 10px 32px rgba(15,23,42,.06);
+    }
+    .loc-toolbar-search{flex:1;min-width:220px;}
+    .loc-search{
+        display:flex;align-items:center;gap:12px;width:100%;
+        background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:4px 8px 4px 16px;
+        transition:border-color .2s,box-shadow .2s;
+    }
+    .loc-search:focus-within{
+        border-color:var(--loc-primary-deep);
+        box-shadow:0 0 0 3px rgba(94,198,196,.2);
+        background:#fff;
+    }
+    .loc-search i{color:#64748b;font-size:1rem;}
+    .loc-search input{
+        flex:1;min-width:0;width:100%;max-width:100%;background:transparent;border:0;outline:0;color:#0f172a;
+        font-size:1rem;font-weight:500;padding:12px 8px;line-height:1.3;-webkit-appearance:none;appearance:none;
+    }
+    .loc-search input::placeholder{color:#94a3b8;}
+    .loc-search-meta{font-size:.85rem;color:var(--loc-muted);white-space:nowrap;font-weight:600;}
+    .loc-search-meta strong{color:var(--loc-primary-deep);font-weight:800;}
+
+    .loc-pill-row{
+        display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;align-items:center;
+    }
+    .loc-pills{display:flex;flex-wrap:wrap;gap:8px;}
+    .loc-pill{
+        display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
+        background:#fff;border:1px solid #dde5e8;font-size:.75rem;font-weight:700;color:#475569;
+        box-shadow:0 4px 14px rgba(0,0,0,.04);
+    }
+    .loc-pill i{color:var(--loc-primary-deep);font-size:.72rem;}
+    .loc-cat-button{
+        display:inline-flex;align-items:center;gap:9px;border:1px solid #dde5e8;background:#fff;color:#334155;
+        border-radius:999px;padding:7px 13px 7px 7px;font-size:.78rem;font-weight:800;box-shadow:0 6px 18px rgba(15,23,42,.05);
+        cursor:pointer;transition:.2s ease;font-family:inherit;white-space:nowrap;text-decoration:none;
+    }
+    .loc-cat-button:hover{text-decoration:none;}
+    .loc-cat-button:hover,.loc-cat-button.is-active{background:#11181a;color:#fff;border-color:#11181a;}
+    .loc-cat-button img{
+        width:32px;height:32px;border-radius:999px;object-fit:cover;background:#edf2f7;border:1px solid rgba(255,255,255,.7);
+    }
+    .loc-cat-count{opacity:.72;font-size:.72rem;}
+
+    .loc-grid{
+        display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+    }
+    @media (max-width: 760px){.loc-grid{grid-template-columns:1fr;}}
+    .loc-card{
+        text-decoration:none;color:inherit;background:#fff;border-radius:20px;border:1px solid #e3ebee;
+        box-shadow:0 12px 30px rgba(15,23,42,.06);overflow:hidden;display:grid;grid-template-columns:64px minmax(0,1fr) auto;
+        align-items:center;gap:14px;padding:12px 14px;
+        transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+    }
+    .loc-card:hover{
+        transform:translateY(-5px);
+        box-shadow:0 22px 48px rgba(15,23,42,.12);
+        border-color:rgba(94,198,196,.35);
+    }
+    .loc-card[hidden]{display:none!important;}
+    .loc-card-image-wrap{display:block;position:relative;overflow:hidden;width:64px;height:64px;border-radius:999px;border:1px solid #dde5e8;background:#edf2f7;}
+    .loc-card-image{width:100%;height:100%;object-fit:cover;transition:transform .5s ease;}
+    .loc-card:hover .loc-card-image{transform:scale(1.06);}
+    .loc-card-body{min-width:0;}
+    .loc-badge{
+        display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#ecfdff;color:#0f766e;
+        font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;width:fit-content;
+    }
+    .loc-title{
+        font-size:1.08rem;font-weight:800;color:#0f172a;line-height:1.32;margin-bottom:2px;
+        text-decoration:none;display:block;transition:color .2s;
+    }
+    .loc-title:hover{color:var(--loc-primary-deep);}
+    .loc-sub{font-size:.86rem;color:var(--loc-muted);line-height:1.45;margin-bottom:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+    .loc-meta{display:none;}
+    .loc-chip{
+        display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:#f8fafc;border:1px solid #e2e8f0;
+        font-size:.74rem;color:#334155;font-weight:700;
+    }
+    .loc-empty,.loc-no-results{
+        border:1px dashed #c5ced4;border-radius:20px;padding:40px 28px;text-align:center;background:rgba(255,255,255,.75);
+        color:#64748b;backdrop-filter:blur(4px);
+    }
+    .loc-no-results h3{font-size:1.1rem;color:#334155;margin:0 0 8px;font-weight:800;}
+    .loc-card-actions{display:flex;flex-direction:column;gap:8px;margin:0;width:136px;}
+    .loc-link-btn{
+        display:inline-flex;justify-content:center;align-items:center;text-decoration:none;border-radius:999px;
+        padding:11px 14px;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;transition:.22s ease;border:none;cursor:pointer;font-family:inherit;
+    }
+    .loc-link-main{background:#11181a;color:#fff;}
+    .loc-link-main:hover{background:#000;color:#fff;}
+    .loc-link-request{background:#ecfdff;color:#0f766e;border:1px solid #b9f2ef;}
+    .loc-link-request:hover{background:#def9f8;}
+    .loc-pagination{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:26px;}
+    .loc-page-link{
+        display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 14px;
+        border-radius:999px;border:1px solid #dde5e8;background:#fff;color:#334155;text-decoration:none;
+        font-size:.82rem;font-weight:900;box-shadow:0 8px 18px rgba(15,23,42,.06);
+    }
+    .loc-page-link:hover,.loc-page-link.is-active{background:#11181a;color:#fff;border-color:#11181a;text-decoration:none;}
+    .loc-page-link.is-disabled{opacity:.45;pointer-events:none;}
+    @media (max-width: 640px){
+        .loc-page{padding-top:28px;padding-bottom:64px;}
+        .loc-head{padding:26px 22px 24px;border-radius:22px;}
+        .loc-head-actions{flex-direction:column;align-items:stretch;}
+        .loc-btn{justify-content:center;}
+        .loc-card{grid-template-columns:54px minmax(0,1fr);align-items:start;}
+        .loc-card-image-wrap{width:54px;height:54px;}
+        .loc-card-actions{grid-column:1 / -1;flex-direction:row;width:100%;}
+        .loc-link-btn{flex:1;}
+    }
+</style>
+
+<section class="loc-page" data-loc-total="{{ pagination.total_items|default(pages|length) }}">
+    <div class="loc-container">
+        <div class="loc-head">
+            <div class="loc-head-inner">
+                <div class="loc-eyebrow"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> South Florida</div>
+                <h1>VNV Event <em>Locations</em></h1>
+                <p>Discover where we craft unforgettable celebrations — curated city guides, local insight, and the same luxury standards in every market we serve.</p>
+                <div class="loc-head-actions">
+                    <a href="#" data-vnv-open-request class="loc-btn loc-btn-gold">Start New Request</a>
+                    <a href="tel:+13052045427" class="loc-btn loc-btn-ghost">Call (305) 204-5427</a>
+                </div>
+            </div>
+        </div>
+
+        {% set placeholderImage = asset_for(placeholder_image|default('assets/images/cms-image-needed.svg')) %}
+        {% if pages|length > 0 or categories|length > 0 %}
+
+        {% if categories|length > 0 %}
+        <div class="loc-pill-row" aria-label="Filter locations by category">
+            <div class="loc-pills">
+                <a class="loc-cat-button is-active" href="{{ path('locations') }}">
+                    <img src="{{ placeholderImage }}" alt="">
+                    <span>All</span>
+                    <span class="loc-cat-count">{{ pagination.total_items|default(pages|length) }}</span>
+                </a>
+                {% for category in categories|default([]) %}
+                    {% set categoryImage = category.image_url|default('') ?: placeholderImage %}
+                    <a class="loc-cat-button" href="{{ path('locations/' ~ category.slug ~ '/') }}">
+                        <img src="{{ categoryImage }}" alt="">
+                        <span>{{ category.name }}</span>
+                        <span class="loc-cat-count">{{ category.count }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if pages|length > 0 %}
+        <div class="loc-toolbar">
+            <div class="loc-toolbar-search">
+                <label class="visually-hidden" for="loc-search-input">Search locations</label>
+                <div class="loc-search" role="search">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="text" id="loc-search-input" name="loc_q" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Search by city, county, or location name…" data-loc-search-input>
+                </div>
+            </div>
+            <p class="loc-search-meta" data-loc-search-hint aria-live="polite"></p>
+        </div>
+        {% endif %}
+
+        {% if pages|length > 0 %}
+        <div class="loc-grid" data-loc-grid>
+            {% for p in pages %}
+                {% set q = (p.title|default('') ~ ' ' ~ p.city|default('') ~ ' ' ~ p.county|default('') ~ ' ' ~ p.state|default('') ~ ' ' ~ p.excerpt|default('') ~ ' ' ~ p.category|default(''))|lower|trim %}
+                {% set cardImage = p.hero_image|default('') ?: placeholderImage %}
+                {% set cardHref = path(p.public_path|default('/locations/' ~ p.slug ~ '/')|trim('/')) %}
+                <article class="loc-card" data-loc-card data-loc-category="{{ p.category_slug|default('location')|e('html_attr') }}" data-loc-search="{{ q|e('html_attr') }}">
+                    <a class="loc-card-image-wrap" href="{{ cardHref }}" tabindex="-1" aria-hidden="true">
+                        <img class="loc-card-image" src="{{ cardImage }}" alt="">
+                    </a>
+                    <div class="loc-card-body">
+                        <span class="loc-badge">{{ p.category|default('Location') }}</span>
+                        <a class="loc-title" href="{{ cardHref }}">{{ p.title }}</a>
+                        <div class="loc-sub">{{ p.excerpt ?: 'Explore details and services in this area.' }}</div>
+                        <div class="loc-meta">
+                            {% if p.city %}<span class="loc-chip">{{ p.city }}</span>{% endif %}
+                            {% if p.county %}<span class="loc-chip">{{ p.county }}</span>{% endif %}
+                            {% if p.state %}<span class="loc-chip">{{ p.state }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="loc-card-actions">
+                        <a class="loc-link-btn loc-link-main" href="{{ cardHref }}">View location</a>
+                        <button type="button" data-vnv-open-request class="loc-link-btn loc-link-request">Request</button>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="loc-no-results" data-loc-empty hidden>
+            <h3>No locations match</h3>
+            <p>Try another city, county, or keyword — or <a href="#" data-vnv-open-request>tell us where you’re planning</a> and we’ll help.</p>
+        </div>
+        {% if pagination.total_pages|default(1) > 1 %}
+            <nav class="loc-pagination" aria-label="Locations pagination">
+                {% set prevPage = pagination.current_page - 1 %}
+                {% set nextPage = pagination.current_page + 1 %}
+                <a class="loc-page-link {{ pagination.current_page == 1 ? 'is-disabled' : '' }}" href="{{ path(pagination.base_path|default('locations')|trim('/')) }}{% if prevPage > 1 %}?page={{ prevPage }}{% endif %}">Previous</a>
+                {% for page in 1..pagination.total_pages %}
+                    <a class="loc-page-link {{ page == pagination.current_page ? 'is-active' : '' }}" href="{{ path(pagination.base_path|default('locations')|trim('/')) }}{% if page > 1 %}?page={{ page }}{% endif %}">{{ page }}</a>
+                {% endfor %}
+                <a class="loc-page-link {{ pagination.current_page == pagination.total_pages ? 'is-disabled' : '' }}" href="{{ path(pagination.base_path|default('locations')|trim('/')) }}?page={{ nextPage }}">Next</a>
+            </nav>
+        {% endif %}
+        {% else %}
+            <div class="loc-empty">No published location pages are attached to these categories yet.</div>
+        {% endif %}
+        {% else %}
+            <div class="loc-empty">No published locations available yet.</div>
+        {% endif %}
+    </div>
+</section>
+
+{% if pages|length > 0 %}
+<script>
+(function(){
+    var root = document.querySelector('.loc-page');
+    if (!root) return;
+    var input = root.querySelector('[data-loc-search-input]');
+    var cards = root.querySelectorAll('[data-loc-card]');
+    var empty = root.querySelector('[data-loc-empty]');
+    var hint = root.querySelector('[data-loc-search-hint]');
+    if (!input || !cards.length) return;
+
+    var visiblePageTotal = cards.length;
+    var total = parseInt(root.getAttribute('data-loc-total') || visiblePageTotal, 10) || visiblePageTotal;
+
+    function norm(s){ return (s || '').toLowerCase().replace(/\s+/g, ' ').trim(); }
+
+    function refreshHint(n, q){
+        if (!hint) return;
+        if (!q) {
+            if (total > visiblePageTotal) {
+                hint.innerHTML = 'Showing <strong>' + visiblePageTotal + '</strong> of <strong>' + total + '</strong> locations';
+            } else {
+                hint.innerHTML = 'Showing <strong>' + visiblePageTotal + '</strong> location' + (visiblePageTotal === 1 ? '' : 's');
+            }
+        } else if (n === 0) {
+            hint.innerHTML = 'No locations match your search';
+        } else {
+            hint.innerHTML = '<strong>' + n + '</strong> location' + (n === 1 ? ' matches' : 's match') + ' your search';
+        }
+    }
+
+    function apply(){
+        var q = norm(input.value);
+        var n = 0;
+        for (var i = 0; i < cards.length; i++) {
+            var hay = norm(cards[i].getAttribute('data-loc-search') || '');
+            var matchesSearch = !q || hay.indexOf(q) !== -1;
+            var show = matchesSearch;
+            cards[i].hidden = !show;
+            if (show) n++;
+        }
+        if (empty) empty.hidden = n > 0;
+        refreshHint(n, q);
+    }
+
+    input.addEventListener('input', apply);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') e.preventDefault(); });
+    apply();
+})();
+</script>
+{% endif %}
+
+{% include "templates/components/publicEventRequestModal.html.twig" with {
+    request_form_action: "/api/public/event-request"
+} %}
+{% include "templates/layout/publicFooterVnv.html.twig" %}
+{% endblock %}

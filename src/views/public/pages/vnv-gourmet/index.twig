@@ -1,0 +1,1461 @@
+{% extends "templates/base.twig" %}
+
+{% set show_whatsapp = true %}
+{% set defer_public_third_party = true %}
+{% set skip_public_gtm_initial = true %}
+{% set skip_public_app_bundle = true %}
+{% set skip_public_google_maps = true %}
+{% set skip_public_stripe = true %}
+{% set skip_public_bootstrap_js = true %}
+{% set skip_base_fontawesome = true %}
+{% set skip_base_inter_font = true %}
+{% set skip_base_app_css = true %}
+{% set skip_base_bootstrap_css = true %}
+
+{% block title %}VNV Gourmet | Luxury Event Catering in South Florida{% endblock %}
+{% block meta_description %}Premium event catering in South Florida by VNV Gourmet: chef-led stations, corporate catering, private parties, weddings, staffing, bartenders and full-service event support.{% endblock %}
+{% block meta_keywords %}VNV Gourmet, South Florida catering, Miami catering, Broward catering, event catering, corporate catering, wedding catering, food stations, pasta station, paella station, dessert station, VNV Events{% endblock %}
+
+{% block head %}
+<link rel="preload" as="image" href="{{ asset_for('assets/images/vnv-gourmet-hero-mobile-fast.webp') }}" media="(max-width: 767px)" fetchpriority="high">
+<link rel="preload" as="image" href="{{ asset_for('assets/images/vnv-gourmet-hero-small-fast.webp') }}" media="(min-width: 768px)" fetchpriority="high">
+{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --vnv-primary: #5EC6C4;
+    --vnv-primary-dark: #4aa8a6;
+    --vnv-gold: #c5a059;
+    --vnv-gold-gradient: linear-gradient(135deg, #bf953f 0%, #fcf6ba 45%, #b38728 100%);
+    --vnv-dark-deep: #0a0c0c;
+    --vnv-dark-soft: #141818;
+    --vnv-dark-card: #1b2021;
+    --vnv-light: #ffffff;
+    --vnv-marble: #f4f7f8;
+    --vnv-text-main: #2d3436;
+    --vnv-text-dark: #11181a;
+    --vnv-text-light: #f3f5f6;
+    --vnv-text-muted: rgba(255,255,255,.74);
+    --vnv-text-muted-soft: rgba(255,255,255,.60);
+    --vnv-border: rgba(255,255,255,.08);
+    --vnv-shadow-lg: 0 40px 100px rgba(0,0,0,.24);
+    --vnv-glow: 0 0 40px rgba(94,198,196,.16);
+}
+
+html { scroll-behavior: smooth; }
+
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: var(--vnv-dark-deep);
+    color: var(--vnv-text-light);
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -12px;
+    margin-right: -12px;
+}
+
+.row > * {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.g-0 {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.g-0 > * {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.g-4 { row-gap: 1.5rem; }
+.col-12 { flex: 0 0 auto; width: 100%; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.align-items-center { align-items: center; }
+.align-items-stretch { align-items: stretch; }
+.justify-content-center { justify-content: center; }
+.text-center { text-align: center; }
+.position-relative { position: relative; }
+.mt-4 { margin-top: 1.5rem !important; }
+.mb-1 { margin-bottom: .25rem !important; }
+
+@media (min-width: 768px) {
+    .col-md-6 { flex: 0 0 auto; width: 50%; }
+}
+
+@media (min-width: 992px) {
+    .container { max-width: 960px; }
+    .col-lg-3 { flex: 0 0 auto; width: 25%; }
+    .col-lg-5 { flex: 0 0 auto; width: 41.666667%; }
+    .col-lg-6 { flex: 0 0 auto; width: 50%; }
+    .col-lg-7 { flex: 0 0 auto; width: 58.333333%; }
+}
+
+@media (min-width: 1200px) {
+    .container { max-width: 1140px; }
+    .col-xl-4 { flex: 0 0 auto; width: 33.333333%; }
+}
+
+.fa-solid,
+.fa-regular,
+.fa-brands {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-style: normal;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.fa-location-dot::before { content: "⌖"; }
+.fa-calendar-days::before { content: "▦"; }
+.fa-clock::before { content: "◷"; }
+.fa-xmark::before { content: "×"; }
+.fa-instagram::before { content: "IG"; font-size: .68em; letter-spacing: .04em; }
+.fa-youtube::before { content: "YT"; font-size: .68em; letter-spacing: .04em; }
+.fa-facebook-f::before { content: "FB"; font-size: .68em; letter-spacing: .04em; }
+.fa-tiktok::before { content: "TT"; font-size: .68em; letter-spacing: .04em; }
+.fa-yelp::before { content: "YP"; font-size: .68em; letter-spacing: .04em; }
+.fa-linkedin-in::before { content: "IN"; font-size: .68em; letter-spacing: .04em; }
+.fa-pinterest-p::before { content: "PI"; font-size: .68em; letter-spacing: .04em; }
+
+h1, h2, h3, h4, h5, .luxury-font {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.text-vnv { color: var(--vnv-primary) !important; }
+.text-gold {
+    background: var(--vnv-gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.letter-spacing-lg { letter-spacing: 4px; }
+
+.vnv-btn {
+    padding: 18px 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all .35s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: .78rem;
+    border-radius: 999px;
+}
+
+.btn-gold-vnv {
+    background: var(--vnv-gold-gradient);
+    color: #000 !important;
+}
+.btn-gold-vnv:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(197,160,89,.22);
+}
+.btn-outline-vnv {
+    border: 2px solid var(--vnv-primary);
+    color: var(--vnv-primary) !important;
+    background: transparent;
+}
+.btn-outline-vnv:hover {
+    background: var(--vnv-primary);
+    color: #fff !important;
+}
+.btn-ghost-dark {
+    border: 1px solid rgba(17,24,26,.16);
+    color: var(--vnv-text-dark) !important;
+    background: transparent;
+}
+.btn-ghost-dark:hover {
+    background: var(--vnv-text-dark);
+    color: #fff !important;
+}
+
+.section-vnv {
+    padding: 120px 0;
+    position: relative;
+}
+
+.vnv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: rgba(94,198,196,.1);
+    color: var(--vnv-primary);
+    font-size: .74rem;
+    letter-spacing: 2px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.vnv-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: .88rem;
+    color: rgba(255,255,255,.6);
+    margin-top: 18px;
+}
+.vnv-breadcrumbs a {
+    color: rgba(255,255,255,.76);
+    text-decoration: none;
+}
+.vnv-breadcrumbs span.sep {
+    opacity: .4;
+}
+
+.hero-gourmet {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(10,12,12,.88) 0%, rgba(10,12,12,.68) 42%, rgba(10,12,12,.42) 100%),
+        image-set(
+            url('{{ asset_for('assets/images/vnv-gourmet-hero-small-fast.webp') }}') type('image/webp'),
+            url('{{ asset_for('assets/images/vnv-gourmet-hero.jpg') }}') type('image/jpeg')
+        ) center/cover no-repeat;
+}
+
+.hero-gourmet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right, rgba(94,198,196,.16), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(197,160,89,.10), transparent 24%);
+    pointer-events: none;
+}
+
+.hero-gourmet-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.hero-gourmet h1 {
+    font-size: clamp(3rem, 6vw, 5.4rem);
+    line-height: 1.02;
+    margin: 20px 0 28px;
+    max-width: 900px;
+}
+
+.hero-gourmet p.hero-copy {
+    font-size: 1.08rem;
+    color: var(--vnv-text-muted);
+    max-width: 760px;
+    margin-bottom: 20px;
+}
+
+.hero-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 32px 0 28px;
+}
+
+.section-white {
+    background: var(--vnv-marble);
+    color: var(--vnv-text-dark);
+}
+
+.section-dark {
+    background: var(--vnv-dark-deep);
+    color: var(--vnv-text-light);
+}
+
+.section-heading {
+    max-width: 900px;
+    margin-bottom: 55px;
+}
+.section-heading h2 {
+    font-size: clamp(2.2rem, 4vw, 4.3rem);
+    line-height: 1.04;
+    margin: 16px 0 18px;
+}
+.section-dark .section-heading p {
+    color: var(--vnv-text-muted);
+}
+.section-white .section-heading p {
+    color: #5a6669;
+}
+
+.service-showcase-card {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 26px;
+    align-items: stretch;
+    border-radius: 30px;
+    padding: 22px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.10);
+}
+
+.section-dark .service-showcase-card,
+.section-dark .holiday-card,
+.section-dark .mini-card,
+.section-dark .contact-card,
+.section-dark .gourmet-card {
+    background: linear-gradient(145deg, rgba(28,34,35,.95) 0%, rgba(16,18,18,.96) 100%);
+    border: 1px solid rgba(255,255,255,.07);
+}
+
+.section-white .service-showcase-card,
+.section-white .holiday-card,
+.section-white .mini-card,
+.section-white .instagram-card,
+.section-white .feature-box,
+.section-white .gourmet-card {
+    background: #fff;
+    border: 1px solid rgba(17,24,26,.08);
+}
+
+.service-showcase-media {
+    min-height: 260px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #dfe7e9;
+}
+
+.service-showcase-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.service-showcase-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.service-showcase-body h3,
+.holiday-card h3,
+.mini-card h3,
+.contact-card h4,
+.instagram-card h2,
+.feature-copy h3,
+.gourmet-copy h3 {
+    margin-bottom: 16px;
+}
+
+.section-dark .service-showcase-body h3,
+.section-dark .holiday-card h3,
+.section-dark .mini-card h3,
+.section-dark .contact-card h4,
+.section-dark .gourmet-copy h3 {
+    color: #fff;
+}
+
+.section-white .service-showcase-body h3,
+.section-white .holiday-card h3,
+.section-white .mini-card h3,
+.section-white .instagram-card h2,
+.section-white .feature-copy h3,
+.section-white .gourmet-copy h3 {
+    color: var(--vnv-text-dark);
+}
+
+.service-showcase-body h3 {
+    font-size: 2rem;
+    line-height: 1.05;
+}
+
+.service-showcase-body p,
+.section-dark .holiday-card p,
+.section-dark .mini-card p,
+.section-dark .contact-card p,
+.section-dark .holiday-card li,
+.section-dark .mini-card li,
+.section-dark .contact-card li,
+.section-dark .gourmet-copy p,
+.section-dark .gourmet-copy li {
+    color: var(--vnv-text-muted);
+}
+
+.section-white .service-showcase-body p,
+.section-white .holiday-card p,
+.section-white .mini-card p,
+.section-white .instagram-card p,
+.section-white .holiday-card li,
+.section-white .mini-card li,
+.section-white .feature-copy p,
+.section-white .feature-copy li,
+.section-white .gourmet-copy p,
+.section-white .gourmet-copy li {
+    color: #485457;
+}
+
+.service-points,
+.holiday-card ul,
+.mini-card ul,
+.contact-card ul,
+.feature-copy ul,
+.gourmet-copy ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.service-points li,
+.holiday-card ul li,
+.mini-card ul li,
+.feature-copy ul li,
+.gourmet-copy ul li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 8px;
+}
+
+.service-points li::before,
+.holiday-card ul li::before,
+.mini-card ul li::before,
+.feature-copy ul li::before,
+.gourmet-copy ul li::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--vnv-gold);
+    position: absolute;
+    left: 0;
+    top: 12px;
+}
+
+.service-top-actions,
+.menu-top-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0 0 18px;
+}
+
+.call-strip {
+    margin-top: 22px;
+    padding-top: 18px;
+}
+.section-dark .call-strip {
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+.section-white .call-strip {
+    border-top: 1px solid rgba(17,24,26,.08);
+}
+.call-strip a {
+    color: #0f766e;
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.section-dark .call-strip a {
+    color: #7cf3e5;
+}
+.call-strip a:hover {
+    color: #0b5f59;
+}
+.section-dark .call-strip a:hover {
+    color: #adfff6;
+}
+
+.split-feature {
+    position: relative;
+}
+
+.feature-box {
+    border-radius: 34px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.12);
+}
+
+.feature-visual {
+    min-height: 100%;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.20)),
+        url('{{ asset_for('assets/images/service_photos/pasta_station_2_lite.webp') }}') center/cover no-repeat;
+}
+
+.feature-copy {
+    padding: 60px 50px;
+    color: var(--vnv-text-dark);
+}
+.feature-copy ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+.feature-copy ul li {
+    padding-left: 22px;
+    position: relative;
+    margin-bottom: 10px;
+}
+.feature-copy ul li::before {
+    content: "\2022";
+    color: var(--vnv-gold);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.2rem;
+}
+
+.holiday-card,
+.mini-card,
+.contact-card,
+.instagram-card,
+.gourmet-card {
+    border-radius: 28px;
+    padding: 30px;
+    height: 100%;
+}
+
+.gourmet-grid {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 28px;
+    align-items: stretch;
+}
+
+.gourmet-visuals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.gourmet-shot {
+    border-radius: 24px;
+    overflow: hidden;
+    min-height: 260px;
+    background: #dfe7e9;
+    box-shadow: 0 18px 50px rgba(0,0,0,.12);
+}
+
+.gourmet-shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gourmet-copy ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 18px 0 0;
+}
+
+.instagram-visual {
+    border-radius: 26px;
+    overflow: hidden;
+    min-height: 420px;
+    background:
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.22)),
+        image-set(
+            url('{{ asset_for('assets/images/vnv-gourmet-instagram-lite.webp') }}') type('image/webp'),
+            url('{{ asset_for('assets/images/vnv-gourmet-instagram.jpg') }}') type('image/jpeg')
+        ) center/cover no-repeat;
+    border: 1px solid rgba(17,24,26,.08);
+}
+
+.location-block {
+    padding-bottom: 90px;
+}
+.contact-card ul li {
+    margin-bottom: 10px;
+}
+.contact-card a {
+    color: var(--vnv-primary);
+    text-decoration: none;
+}
+.footer-links-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 18px;
+}
+.footer-links-inline a {
+    color: rgba(255,255,255,.75);
+    text-decoration: none;
+}
+
+@media (max-width: 1199px) {
+    .service-showcase-card {
+        grid-template-columns: 260px 1fr;
+    }
+
+    .gourmet-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 991px) {
+    .hero-gourmet {
+        min-height: auto;
+        padding: 120px 0 80px;
+        background-position: center center;
+        background-image:
+            linear-gradient(90deg, rgba(10,12,12,.88) 0%, rgba(10,12,12,.68) 42%, rgba(10,12,12,.42) 100%),
+            url('{{ asset_for('assets/images/vnv-gourmet-hero-mobile-fast.webp') }}');
+    }
+
+    .feature-copy {
+        padding: 38px 28px;
+    }
+
+    .instagram-card {
+        padding: 32px;
+    }
+
+    .service-showcase-card {
+        grid-template-columns: 1fr;
+    }
+
+    .service-showcase-media {
+        min-height: 240px;
+    }
+
+    .gourmet-visuals {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .section-vnv {
+        padding: 90px 0;
+    }
+
+    .hero-gourmet h1 {
+        font-size: 2.7rem;
+    }
+
+    .vnv-btn {
+        width: 100%;
+    }
+
+    .service-showcase-card,
+    .mini-card,
+    .holiday-card,
+    .contact-card,
+    .instagram-card,
+    .gourmet-card {
+        padding: 22px;
+    }
+
+    .service-showcase-body h3 {
+        font-size: 1.75rem;
+    }
+}
+
+.trust-bar-vnv {
+    background: var(--vnv-dark-soft);
+    border-top: 1px solid rgba(94,198,196,.15);
+    border-bottom: 1px solid rgba(94,198,196,.15);
+    padding: 22px 0;
+}
+.trust-bar-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 40px;
+    text-align: center;
+}
+.trust-bar-item strong {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--vnv-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.trust-bar-item span {
+    font-size: .78rem;
+    color: var(--vnv-text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+.metric-strip-vnv {
+    background: var(--vnv-dark-deep);
+    padding: 100px 0;
+    border-bottom: 1px solid var(--vnv-border);
+}
+
+.metric-strip-vnv .row > div {
+    display: flex;
+    justify-content: center;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: left;
+}
+
+.metric-val {
+    font-size: 4.5rem;
+    font-weight: 900;
+    color: var(--vnv-primary);
+    line-height: 1;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.metric-label {
+    letter-spacing: 5px;
+    font-weight: 700;
+    opacity: 0.5;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    margin: 0;
+    text-align: left;
+}
+
+.metric-logo-block {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.metric-logo-vnv {
+    width: min(280px, 82%);
+    max-width: 280px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    opacity: .98;
+}
+
+.metric-strip-vnv,
+.section-vnv {
+    content-visibility: auto;
+    contain-intrinsic-size: 900px;
+}
+
+.top-catering-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 22px;
+}
+.top-catering-card {
+    grid-column: span 4;
+    display: flex;
+    flex-direction: column;
+    min-height: 470px;
+    padding: 0;
+    border-radius: 30px;
+    background: linear-gradient(145deg, rgba(28,34,35,.98), rgba(14,17,18,.98));
+    border: 1px solid rgba(94,198,196,.15);
+    color: #fff;
+    overflow: hidden;
+    position: relative;
+    isolation: isolate;
+    box-shadow: 0 26px 70px rgba(0,0,0,.28);
+    transition: transform .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+.top-catering-card:first-child { grid-column: span 8; }
+.top-catering-card:hover { transform: translateY(-8px); border-color: rgba(94,198,196,.48); box-shadow: 0 34px 90px rgba(0,0,0,.38); }
+.top-catering-media { position:absolute; inset:0; z-index:-2; }
+.top-catering-media img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .7s ease; }
+.top-catering-card:hover .top-catering-media img { transform:scale(1.055); }
+.top-catering-card::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(5,8,8,.04) 10%,rgba(5,8,8,.34) 42%,rgba(5,8,8,.97) 100%); }
+.top-catering-content { margin-top:auto; padding:30px; }
+.top-catering-card .top-rank { display:inline-flex; padding:6px 12px; border-radius:999px; background:rgba(8,13,13,.72); border:1px solid rgba(94,198,196,.42); color:#8ffff1; font-weight:900; letter-spacing:2px; font-size:.68rem; text-transform:uppercase; backdrop-filter:blur(8px); }
+.top-catering-card h3 { font-size:clamp(1.8rem,3vw,2.55rem); line-height:1; margin:15px 0 10px; color:#fff; }
+.top-catering-card p { color:rgba(255,255,255,.78); margin:0 0 18px; max-width:620px; }
+.top-catering-bottom { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; border-top:1px solid rgba(255,255,255,.13); padding-top:17px; }
+.top-catering-card strong { color:#fcf6ba; }
+.top-catering-card a { color:#8ffff1; font-weight:900; text-decoration:none; }
+.top-catering-intro { display:grid; grid-template-columns:1fr auto; gap:30px; align-items:end; margin-bottom:48px; }
+.top-catering-intro .section-heading { margin-bottom:0; }
+.top-catering-count { font-family:Georgia,"Times New Roman",serif; font-size:clamp(5rem,11vw,10rem); color:rgba(94,198,196,.13); line-height:.72; font-weight:900; }
+@media (max-width: 991px) { .top-catering-card,.top-catering-card:first-child { grid-column:span 6; }.top-catering-intro{grid-template-columns:1fr}.top-catering-count{display:none} }
+@media (max-width: 640px) { .top-catering-card,.top-catering-card:first-child { grid-column:1/-1; min-height:430px; }.top-catering-content{padding:24px}.top-catering-bottom{align-items:flex-start;flex-direction:column} }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+{% include "templates/layout/publicHeaderVnv.html.twig" %}
+
+<main id="main-content" class="gourmet-page">
+<section class="hero-gourmet">
+    <div class="container hero-gourmet-inner">
+        <span class="vnv-badge">VNV Gourmet</span>
+
+        <h1>Luxury Event Catering
+        <span class="text-gold">Fast, Elegant &amp; Unbeatable Value</span></h1>
+
+        
+
+        <p class="hero-copy">
+            VNV Gourmet brings polished food stations, staffed service and event-ready catering solutions for South Florida celebrations that need to look expensive without feeling impossible to book.
+        </p>
+
+        <div class="hero-cta-row">
+            <a href="tel:+13052045427" class="vnv-btn btn-gold-vnv">Call Now (305) 204 5427</a>
+            <a href="#menu-services" class="vnv-btn btn-outline-vnv">View Event Services</a>
+            <a href="#best-sellers" class="vnv-btn btn-outline-vnv">Best Sellers</a>
+            <a href="#" data-vnv-open-request class="vnv-btn btn-outline-vnv">New Request</a>
+        </div>
+
+        <div class="vnv-breadcrumbs">
+            <a href="{{ path('/') }}">Home</a>
+            <span class="sep">/</span>
+            <a href="{{ path('/#services') }}">Our Services</a>
+            <span class="sep">/</span>
+            <span>VNV Gourmet</span>
+        </div>
+    </div>
+</section>
+
+
+
+<section class="metric-strip-vnv text-center">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-12 col-lg-3">
+                <div class="metric-item">
+                    <div class="metric-val" aria-label="More than five years of experience">5+</div>
+                    <p class="metric-label">YEARS OF EXPERIENCE</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <div class="metric-item">
+                    <div class="metric-val" aria-label="More than two hundred events per year">200+</div>
+                    <p class="metric-label">EVENTS PER YEAR</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <div class="metric-item">
+                    <div class="metric-val" aria-label="Five star Google reviews">5.0</div>
+                    <p class="metric-label">GOOGLE STARS REVIEWS</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-3">
+                <div class="metric-logo-block">
+                    <img class="metric-logo-vnv" 
+                         src="{{ asset_for('assets/images/planner-hub-logo-positive.png') }}" 
+                         alt="VNV Events" width="280" height="179" loading="lazy" decoding="async">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+ 
+
+<section class="section-vnv section-white" id="menu-services">
+    <div class="container">
+        <div class="section-heading">
+            <span class="vnv-badge">Event Catering</span>
+            <h2>Fast luxury food service your guests will actually <span class="text-vnv">remember</span></h2>
+            <p>
+                Choose elegant stations, appetizers, sweets, staff and beverage support that can scale from intimate celebrations to packed corporate events and gala-style productions.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="675" src="{{ asset_for('assets/images/service_photos/appetizers_lite.webp') }}" alt="VNV Gourmet appetizers">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/hors-doeuvres-21-77-per-guest-min-25/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Appetizers</h3>
+                            <p>Perfect when you want elegant bites, guest-friendly flow and a strong first impression without going full plated dinner.</p>
+                            <ul class="service-points">
+                                <li>Select 7 appetizers per guest package</li>
+                                <li>Great for cocktail hours, socials and elevated mingling</li>
+                                <li>Includes favorites like tequenos, sliders, ceviche and crostini</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="675" src="{{ asset_for('assets/images/service_photos/brunch_tation_lite.webp') }}" alt="VNV Gourmet brunch station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/brunch-specials/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Brunch Specials</h3>
+                            <p>Designed for showers, daytime celebrations and stylish corporate mornings where variety and presentation matter as much as flavor.</p>
+                            <ul class="service-points">
+                                <li>Choose two or three stations</li>
+                                <li>Live pancake and omelet options available</li>
+                                <li>Fresh fruit, pastries and breakfast staples included</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="675" src="{{ asset_for('assets/images/service_photos/crepes_station_1_lite.webp') }}" alt="VNV Gourmet crepes station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/crepes-station-1999-per-guest-25-guest-minimum-buffet-style/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Crepes Station</h3>
+                            <p>One of the most visual services we offer. Guests love the live interaction, and the setup instantly feels custom and memorable.</p>
+                            <ul class="service-points">
+                                <li>Sweet and savory crepes made on-site</li>
+                                <li>Guest-facing chef experience</li>
+                                <li>Elegant setup that adapts to the event theme</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="675" src="{{ asset_for('assets/images/service_photos/pasta_station_1.webp') }}" alt="VNV Gourmet pasta station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/pasta-station/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Pasta Station</h3>
+                            <p>A strong choice when you want comfort, volume and a live service feel without losing elegance.</p>
+                            <ul class="service-points">
+                                <li>Three pasta varieties and live-prepared sauces</li>
+                                <li>Fresh toppings and protein options</li>
+                                <li>Ideal for weddings, corporate events and private parties</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="900" height="1200" src="{{ asset_for('assets/images/service_photos/pizza_station_lite.webp') }}" alt="VNV Gourmet pizza station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/pizza-station/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Pizza Station</h3>
+                            <p>Interactive, family-friendly and easy to love. A smart fit for birthdays, school events, relaxed socials and corporate teams.</p>
+                            <ul class="service-points">
+                                <li>Freshly made pizzas with customizable toppings</li>
+                                <li>Great balance of speed and guest interaction</li>
+                                <li>Works especially well for casual-luxury events</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="900" height="506" src="{{ asset_for('assets/images/service_photos/paella_station_lite.webp') }}" alt="VNV Gourmet paella station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/paella-tapas-station-from-27-77-per-guest-min-25/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Paella &amp; Tapas Station</h3>
+                            <p>For hosts who want the service itself to feel like part of the show. Rich color, strong aroma and a more immersive atmosphere.</p>
+                            <ul class="service-points">
+                                <li>Authentic paella cooked live</li>
+                                <li>Spanish-inspired tapas support the experience</li>
+                                <li>Best for upscale social and cultural-style celebrations</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="675" src="{{ asset_for('assets/images/service_photos/tacos.webp') }}" alt="VNV Gourmet taco station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/taco-station/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Taco Station</h3>
+                            <p>Fast-moving, colorful and guest-friendly. Great when you want flavor, energy and a more relaxed but still curated service style.</p>
+                            <ul class="service-points">
+                                <li>Choose proteins and classic toppings</li>
+                                <li>Live chef interaction for a more custom feel</li>
+                                <li>Excellent for birthdays, offices and backyard events</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1152" height="2048" src="{{ asset_for('assets/images/service_photos/sushi_lite.webp') }}" alt="VNV Gourmet sushi boat packages">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/hors-doeuvres-21-77-per-guest-min-25/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Sushi Boat Packages</h3>
+                            <p>One of the most visual premium options in the catalog. Perfect when the food setup also needs to feel photogenic and elevated.</p>
+                            <ul class="service-points">
+                                <li>Signature sushi presentation on iconic boats</li>
+                                <li>Great for luxury birthdays, launches and intimate events</li>
+                                <li>Pairs beautifully with premium appetizer styling</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="1200" height="2133" src="{{ asset_for('assets/images/service_photos/dessert_station_2_lite.webp') }}" alt="VNV Gourmet dessert station">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/d-e-s-s-e-r-t-s-19-00-per-guest-min-25/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Dessert Station</h3>
+                            <p>A beautiful finishing layer for events that need sweetness, visual variety and an extra "wow" table moment.</p>
+                            <ul class="service-points">
+                                <li>Mini-format desserts for cleaner service</li>
+                                <li>Includes a decorated sweet table if needed</li>
+                                <li>Works as a stand-alone add-on or part of a larger menu</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="service-showcase-card">
+                    <div class="service-showcase-media">
+                        <img loading="lazy" decoding="async" width="900" height="1600" src="{{ asset_for('assets/images/service_photos/pasta_station_2_lite.webp') }}" alt="VNV Gourmet entrees and sides">
+                    </div>
+                    <div class="service-showcase-body">
+                        <div>
+                            <div class="service-top-actions">
+                                <a href="https://vnvevents.com/product/vnv-events-entree-sides-from-18-00-per-guest-min-25/" class="vnv-btn btn-gold-vnv">Price &amp; Details</a>
+                            </div>
+                            <h3>Entree &amp; Sides</h3>
+                            <p>Best when you want a fuller dining structure with traditional event catering support and broad guest appeal.</p>
+                            <ul class="service-points">
+                                <li>Entrees paired with sides and salad</li>
+                                <li>Flexible enough for social and corporate events</li>
+                                <li>Ideal for guests who expect a more complete dining format</li>
+                            </ul>
+                        </div>
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-dark" id="best-sellers" aria-labelledby="top-catering-heading">
+    <div class="container">
+        <div class="top-catering-intro">
+            <div class="section-heading">
+                <span class="vnv-badge">VNV Gourmet Best Sellers</span>
+                <h2 id="top-catering-heading">The stations South Florida keeps <span class="text-gold">asking for</span></h2>
+                <p>Our company ranking of the six catering experiences clients request most. Explore each service, see what is included and open its current menu before requesting availability.</p>
+            </div>
+            <div class="top-catering-count" aria-hidden="true">06</div>
+        </div>
+        <div class="top-catering-grid">
+            {% set top_services = [
+                {n:'No. 1 Best Seller', name:'Crepes Station', price:'From $19 p/p · min. 25', copy:'Sweet and savory crepes prepared live in a guest-facing station that feels personal, elegant and highly visual.', image:'assets/images/service_photos/crepes_station_1_lite.webp', url:path('/crepes-catering-south-florida/')},
+                {n:'No. 2 Favorite', name:'Pasta Station', price:'From $19 p/p · min. 25', copy:'Three pastas, three sauces and two proteins create a flexible live station with broad guest appeal.', image:'assets/images/service_photos/pasta_station_1.webp', url:path('/pasta-station-catering-south-florida/')},
+                {n:'No. 3 Favorite', name:'Pizza Station', price:'From $19 p/p · min. 25', copy:'Fresh pizza prepared on-site with customizable crust, sauces and toppings.', image:'assets/images/service_photos/pizza_station_lite.webp', url:path('/pizza-station-catering-south-florida/')},
+                {n:'No. 4 Favorite', name:'Paella Station', price:'From $19 p/p · min. 25', copy:'A Spanish-inspired centerpiece cooked live with seafood, chicken or vegetarian menu directions.', image:'assets/images/service_photos/paella_station_lite.webp', url:path('/paella-catering-south-florida/')},
+                {n:'No. 5 Favorite', name:'Taco Station', price:'From $19 p/p · min. 25', copy:'A fast, colorful taco and burrito bar with two proteins and customizable accompaniments.', image:'assets/images/service_photos/tacos.webp', url:path('/taco-station-catering-south-florida/')},
+                {n:'No. 6 Business Favorite', name:'Corporate Catering', price:'Stations from $17 · meal boxes from $12.50', copy:'Staffed food stations or customizable breakfast and lunch boxes made for efficient company service.', image:'assets/images/service_photos/brunch_tation_lite.webp', url:path('/corporate-catering-south-florida/')}
+            ] %}
+            {% for service in top_services %}
+                <article class="top-catering-card">
+                    <div class="top-catering-media"><img src="{{ asset_for(service.image) }}" alt="{{ service.name }} by VNV Gourmet" loading="lazy" decoding="async"></div>
+                    <div class="top-catering-content">
+                        <span class="top-rank">{{ service.n }}</span>
+                        <h3>{{ service.name }}</h3>
+                        <p>{{ service.copy }}</p>
+                        <div class="top-catering-bottom"><strong>{{ service.price }}</strong><a href="{{ service.url }}">Explore service →</a></div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="hero-cta-row" style="justify-content:center;margin-top:38px;">
+            <a href="{{ path('/catering-stations-south-florida/') }}" class="vnv-btn btn-gold-vnv">Compare all top services</a>
+            <a href="{{ path('/store-categories/') }}" class="vnv-btn btn-outline-vnv">Browse the complete catalog</a>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-dark">
+    <div class="container">
+        <div class="section-heading">
+            <span class="vnv-badge">Ready For Any Scale</span>
+            <h2>Quick luxury solutions for <span class="text-gold">events of every size</span></h2>
+            <p>
+                Build a service mix that fits the occasion: one polished station for a private gathering,
+                multiple live experiences for a celebration, or a coordinated food program for a large corporate event.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="holiday-card">
+                    <h3>Corporate Event Catering</h3>
+                    <p>Built for office celebrations, employee appreciation moments, activations and business gatherings that need smooth service and strong presentation.</p>
+
+                    <div class="menu-top-actions">
+                        <a href="https://vnvevents.com/product/corporate-team-appreciation-catering-22-5-p-p-min-50/" class="vnv-btn btn-gold-vnv">Menu &amp; Details</a>
+                    </div>
+
+                    <ul>
+                        <li>Choose stations, trays or curated event packages</li>
+                        <li>Clear pricing paths for fast decisions</li>
+                        <li>Strong fit for launches, luncheons, mixers and company celebrations</li>
+                    </ul>
+
+                    <div class="call-strip">
+                        <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="holiday-card">
+                    <h3>Private Celebrations &amp; Seasonal Events</h3>
+                    <p>When the occasion matters, seasonal packages and chef-led stations help the celebration feel thoughtful, warm and elevated.</p>
+                    <ul>
+                        <li>Holiday, birthday, shower and family celebration formats</li>
+                        <li>Brunch, cocktail-style and dinner-friendly options</li>
+                        <li>Easy path for hosts who want luxury without overcomplication</li>
+                    </ul>
+
+                    <div class="menu-top-actions" style="margin-top:18px;">
+                        <a href="https://vnvevents.com/product/seasonal-holiday-catering-minimum-15-guests-pricing-is-per-person/" class="vnv-btn btn-outline-vnv">See Catering Catalog</a>
+                    </div>
+
+                    <div class="call-strip">
+                        <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-white split-feature">
+    <div class="container">
+        <div class="feature-box">
+            <div class="row g-0 align-items-stretch">
+                <div class="col-lg-5 feature-visual"></div>
+                <div class="col-lg-7">
+                    <div class="feature-copy">
+                        <span class="vnv-badge">Staffing &amp; Beverage Support</span>
+                        <h3>Food is only part of the experience.</h3>
+
+                        <p>
+                            If the event needs smoother flow, better guest attention and a cleaner hospitality finish, pair your food service with the right support team.
+                        </p>
+
+                        <div class="menu-top-actions">
+                            <a href="https://vnvevents.com/product/professional-servers/" class="vnv-btn btn-gold-vnv">Professional Servers</a>
+                            <a href="https://vnvevents.com/product/drinks-bartender-40-per-hour-bar-setup-for-just-80-per-event/" class="vnv-btn btn-outline-vnv">Bartenders</a>
+                        </div>
+
+                        <ul>
+                            <li>Uniformed professional servers for guest-facing hospitality</li>
+                            <li>Bartenders for weddings, birthdays and corporate bar service</li>
+                            <li>Easy upgrade path when you want the whole event to feel more complete</li>
+                        </ul>
+
+                        <div class="call-strip">
+                            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-dark">
+    <div class="container">
+        <div class="section-heading">
+            <span class="vnv-badge">Food + Event Support</span>
+            <h2>Connect VNV Gourmet with the rest of your <span class="text-vnv">event experience</span></h2>
+            <p>
+                VNV Gourmet is part of the VNV Events ecosystem. When your catering also needs
+                planning, decor, DJ, photo, video, rentals or staff, our team can connect the pieces
+                so the event feels unified from setup to last call.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>Planner &amp; Coordinator</h3>
+                    <p>When the menu is only one part of a bigger event and you need timeline, flow and execution support.</p>
+                    <a href="https://vnvevents.com/product-category/event-planners-and-coordinator/" class="vnv-btn btn-outline-vnv">Planner Details</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>Decoration</h3>
+                    <p>Backdrops, balloons, floral touches and visual styling that elevate the perception of the whole setup.</p>
+                    <a href="https://vnvevents.com/product-category/balloons-and-flower/" class="vnv-btn btn-outline-vnv">Decoration Details</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>Rentals &amp; Setup</h3>
+                    <p>Tables, chairs, linens and the physical foundation that helps the food setup feel organized and intentional.</p>
+                    <a href="https://vnvevents.com/product-category/rental-services/" class="vnv-btn btn-outline-vnv">Rental Details</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>DJ &amp; Entertainment</h3>
+                    <p>Great food lands even better when the energy, timing and atmosphere are handled by the right music team.</p>
+                    <a href="https://vnvevents.com/product-category/dj-services-live-music/" class="vnv-btn btn-outline-vnv">DJ Details</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>Photo Booth, Photo &amp; Video</h3>
+                    <p>Capture the plated moments, guest reactions and branded content opportunities around your event.</p>
+                    <a href="https://vnvevents.com/product-category/photo-video-booths/" class="vnv-btn btn-outline-vnv">Photo Details</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4">
+                <div class="mini-card">
+                    <h3>Event Staffing</h3>
+                    <p>Add servers and hospitality support when service style matters as much as the menu itself.</p>
+                    <a href="https://vnvevents.com/product/professional-servers/" class="vnv-btn btn-outline-vnv">Staffing Details</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="call-strip mt-4">
+            <a href="tel:+13052045427">Call Now (305) 204 5427</a>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-white">
+    <div class="container">
+        <div class="section-heading">
+            <span class="vnv-badge">VNV Gourmet Advantage</span>
+            <h2>Luxury presentation, fast booking and <span class="text-vnv">unbeatable event value</span></h2>
+            <p>
+                The promise is simple: make the food side of your event feel premium, move quickly
+                and keep the budget smarter than a traditional high-end catering buildout.
+            </p>
+        </div>
+
+        <div class="gourmet-grid">
+            <div class="gourmet-card">
+                <div class="gourmet-copy">
+                    <h3>Chef-led event service for gatherings, celebrations and large productions.</h3>
+                    <p>
+                        Use VNV Gourmet when you need food that arrives with intention: attractive stations,
+                        polished service options, flexible packages and a team that understands how events move.
+                    </p>
+
+                    <ul>
+                        <li>Fast solutions for hosts who need confidence now</li>
+                        <li>Elegant stations for small rooms or large guest counts</li>
+                        <li>Staff, beverage and setup support available</li>
+                        <li>Designed for luxury impact at a more accessible price</li>
+                    </ul>
+
+                    <div class="menu-top-actions" style="margin-top:24px;">
+                        <a href="#menu-services" class="vnv-btn btn-gold-vnv">View Services</a>
+                        <a href="#" data-vnv-open-request class="vnv-btn btn-outline-vnv">Request Quote</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gourmet-visuals">
+                <div class="gourmet-shot">
+                    <img loading="lazy" decoding="async" width="720" height="720" src="{{ asset_for('assets/images/service_photos/vnv_gourmet_1_lite.webp') }}" alt="VNV Gourmet event catering">
+                </div>
+                <div class="gourmet-shot">
+                    <img loading="lazy" decoding="async" width="720" height="720" src="{{ asset_for('assets/images/service_photos/vnv_gourmet_2_lite.webp') }}" alt="VNV Gourmet event service">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-vnv section-white">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <div class="instagram-card">
+                    <span class="vnv-badge">Visit our Instagram Gallery</span>
+                    <h2 style="font-size:2.3rem;">See the setups, the stations, the styling and the kind of event atmosphere we build in real life.</h2>
+                    <p>
+                        This section stays important because a lot of people decide with their eyes first. Let them see the scale, finish and presentation.
+                    </p>
+                    <a href="https://www.instagram.com/vnv_events/" target="_blank" class="vnv-btn btn-gold-vnv">View Instagram</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="instagram-visual"></div>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+{% include "templates/components/publicEventRequestModal.html.twig" with {
+    request_form_action: "/api/public/event-request"
+} %}
+
+{% include "templates/layout/publicFooterVnv.html.twig" %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    let mapsLoading = false;
+    function loadMapsOnce() {
+        if (mapsLoading || window.google?.maps) return;
+        mapsLoading = true;
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initPublicEventRequestMap';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('[data-vnv-open-request]')) {
+            loadMapsOnce();
+        }
+    }, { passive: true });
+
+    document.addEventListener('focusin', function (event) {
+        if (event.target.matches('#request_event_location, [data-places-autocomplete]')) {
+            loadMapsOnce();
+        }
+    });
+})();
+</script>
+{% endblock %}

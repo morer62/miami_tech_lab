@@ -1,0 +1,277 @@
+{% extends 'templates/base.admin.twig' %}
+{% import 'templates/macros.twig' as macros %}
+{% set csrf_token = get_csrf() %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    {{ macros.breadcrumb2() }}
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">
+                <i data-feather="search"></i> SEO / AI Control Center
+            </h1>
+            <p class="text-muted mb-0">Manual regeneration for public SEO and AI context files.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ path('panel/seo-center/indexing-queue') }}" class="btn btn-outline-primary">
+                <i data-feather="send"></i> Indexing Queue
+            </a>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="action" value="all">
+                <button type="submit" class="btn btn-primary">
+                    <i data-feather="refresh-cw"></i> Regenerate All SEO Files
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Total public URLs</div>
+                    <div class="fs-3 fw-bold">{{ audit.total_detected|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Pages URLs</div>
+                    <div class="fs-3 fw-bold">{{ audit.pages_detected|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Blog URLs</div>
+                    <div class="fs-3 fw-bold">{{ audit.blog_detected|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Store URLs</div>
+                    <div class="fs-3 fw-bold">{{ audit.store_detected|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Locations URLs</div>
+                    <div class="fs-3 fw-bold">{{ audit.locations_detected|default(0) }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Last generation</div>
+                    <div class="fw-semibold">
+                        {{ audit.last_generation ? audit.last_generation|date('M d, Y g:i A') : 'Not generated yet' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small mb-2">Google Search Console Sitemap</div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-copy="{{ sitemapUrl }}">
+                            <i data-feather="copy"></i> Copy sitemap.xml
+                        </button>
+                        <a class="btn btn-outline-primary btn-sm" href="{{ sitemapUrl }}" target="_blank" rel="noopener">
+                            <i data-feather="external-link"></i> Open
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0">Generated Files</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Public URL</th>
+                        <th>Last generated</th>
+                        <th class="text-center">Items</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ file.label }}</div>
+                            <div class="small">
+                                {% if file.exists %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border">Pending</span>
+                                {% endif %}
+                                {% if file.status %}
+                                    <span class="badge bg-{{ file.status == 'success' ? 'success' : (file.status == 'partial' ? 'warning' : 'danger') }}">
+                                        {{ file.status }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control form-control-sm" value="{{ file.public_url }}" readonly>
+                        </td>
+                        <td>
+                            {{ file.last_generated ? file.last_generated|date('M d, Y g:i A') : 'Not generated yet' }}
+                            {% if file.message %}
+                                <div class="small text-muted">{{ file.message }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ file.items_count is not null ? file.items_count : '-' }}</td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a class="btn btn-outline-primary" href="{{ file.public_url }}" target="_blank" rel="noopener" title="Open">
+                                    <i data-feather="external-link"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-secondary" data-copy="{{ file.public_url }}" title="Copy URL">
+                                    <i data-feather="copy"></i>
+                                </button>
+                                <form method="POST" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                    <input type="hidden" name="action" value="{{ file.file_type }}">
+                                    <button type="submit" class="btn btn-outline-success" title="Regenerate">
+                                        <i data-feather="refresh-cw"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0">Editable SEO / AI Files</h5>
+            <div class="small text-muted">Use this for richer robots.txt and AI context files. sitemap.xml remains generated automatically from public routes.</div>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="seoEditableFiles">
+                {% for file in files %}
+                    {% if file.editable %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading-{{ file.file_type }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ file.file_type }}" aria-expanded="false" aria-controls="collapse-{{ file.file_type }}">
+                                    {{ file.label }}
+                                </button>
+                            </h2>
+                            <div id="collapse-{{ file.file_type }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ file.file_type }}" data-bs-parent="#seoEditableFiles">
+                                <div class="accordion-body">
+                                    <form method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                        <input type="hidden" name="action" value="save_file">
+                                        <input type="hidden" name="file_type" value="{{ file.file_type }}">
+                                        <textarea name="content" class="form-control font-monospace" rows="14" spellcheck="false">{{ file.content }}</textarea>
+                                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                                            <div class="small text-muted">
+                                                Editing saves the file immediately. Regenerating later will replace it with generated content.
+                                            </div>
+                                            <button type="submit" class="btn btn-success">
+                                                <i data-feather="save"></i> Save {{ file.label }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Submit These URLs</h5>
+                </div>
+                <div class="card-body">
+                    {% for label, url in submitUrls %}
+                        <label class="form-label small text-muted mb-1">{{ label }}</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" value="{{ url }}" readonly>
+                            <button type="button" class="btn btn-outline-secondary" data-copy="{{ url }}">
+                                <i data-feather="copy"></i> Copy
+                            </button>
+                        </div>
+                    {% endfor %}
+                    <p class="text-muted mb-0">
+                        Use the sitemap URL in Google Search Console under Sitemaps. Use robots.txt to confirm crawler access rules. Use llms.txt and llms-full.txt as public AI context files for compatible crawlers and tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Manual Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% set actions = {
+                        'all': 'Regenerate All SEO Files',
+                        'sitemap': 'Regenerate Sitemap Index + Children',
+                        'sitemap_pages': 'Regenerate Pages Sitemap',
+                        'sitemap_blog': 'Regenerate Blog Sitemap',
+                        'sitemap_store': 'Regenerate Store Sitemap',
+                        'sitemap_locations': 'Regenerate Locations Sitemap',
+                        'robots': 'Regenerate Robots.txt Only',
+                        'llms': 'Regenerate LLMs.txt Only',
+                        'llms_full': 'Regenerate LLMs Full Only'
+                    } %}
+                    <div class="d-grid gap-2">
+                        {% for action, label in actions %}
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="action" value="{{ action }}">
+                                <button type="submit" class="btn {{ action == 'all' ? 'btn-primary' : 'btn-outline-primary' }} w-100">
+                                    <i data-feather="refresh-cw"></i> {{ label }}
+                                </button>
+                            </form>
+                        {% endfor %}
+                    </div>
+                    <div class="alert alert-light border mt-3 mb-0">
+                        Files update only when one of these buttons is clicked. No cron or automatic regeneration is active here.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (button) {
+    button.addEventListener('click', function () {
+        var value = button.getAttribute('data-copy');
+        navigator.clipboard.writeText(value).then(function () {
+            button.classList.add('btn-success');
+            setTimeout(function () {
+                button.classList.remove('btn-success');
+            }, 900);
+        });
+    });
+});
+</script>
+{% endblock %}

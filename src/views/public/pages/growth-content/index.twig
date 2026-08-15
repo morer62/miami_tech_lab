@@ -1,0 +1,286 @@
+{% extends "templates/base.twig" %}
+
+{% set isList = mode|default('detail') == 'list' %}
+{% set c = content|default({}) %}
+{% set seoData = c.seo|default({}) %}
+{% set titleText = isList
+    ? (list_type == 'blog' ? 'VNV Events Blog' : 'VNV Events Locations')
+    : (seoData.title|default(c.seo_title|default(c.title|default('VNV Events'))))
+%}
+{% set descriptionText = isList
+    ? (list_type == 'blog' ? 'Published VNV Events articles and event planning guides.' : 'Published VNV Events service area and location pages.')
+    : (seoData.description|default(c.meta_description|default(c.excerpt|default('VNV Events public content'))))
+%}
+{% set canonicalUrl = isList
+    ? (list_type == 'blog' ? 'https://vnvevents.com/blog/' : 'https://vnvevents.com/locations/')
+    : (seoData.canonical|default(c.canonical_url|default('https://vnvevents.com' ~ c.route|default('/'))))
+%}
+{% set ogImage = isList
+    ? asset_for('assets/images/planner-hub-logo-negative.png')
+    : (seoData.og_image|default(c.media[0].secure_url|default(c.featured_image_url|default(asset_for('assets/images/planner-hub-logo-negative.png')))))
+%}
+
+{% block title %}{{ titleText }}{% endblock %}
+{% block meta_description %}{{ descriptionText }}{% endblock %}
+{% block canonical %}{{ canonicalUrl }}{% endblock %}
+{% block og_title %}{{ titleText }}{% endblock %}
+{% block og_description %}{{ descriptionText }}{% endblock %}
+{% block og_url %}{{ canonicalUrl }}{% endblock %}
+{% block og_image %}{{ ogImage }}{% endblock %}
+
+{% block body %}
+{% include "templates/layout/publicHeaderVnv.html.twig" %}
+<style>
+  .gh-shell{background:#f7f4ee;color:#151515;padding:64px 0 82px;min-height:70vh;}
+  .gh-container{max-width:1120px;margin:0 auto;padding:0 18px;}
+  .gh-hero{background:#111316;color:#fff;border-radius:24px;padding:34px 30px;margin-bottom:28px;box-shadow:0 24px 54px rgba(0,0,0,.18);}
+  .gh-kicker{display:inline-flex;border:1px solid rgba(94,198,196,.35);color:#7ad8d6;border-radius:999px;padding:7px 12px;font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;}
+  .gh-title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.1rem,4vw,3.6rem);line-height:1.05;margin:0 0 14px;color:#fff;}
+  .gh-excerpt{max-width:850px;color:#e7e1d7;font-size:1.05rem;line-height:1.75;margin:0;}
+  .gh-featured{width:100%;max-height:520px;object-fit:cover;border-radius:22px;margin:8px 0 28px;box-shadow:0 20px 44px rgba(0,0,0,.14);}
+  .gh-body{background:#fff;border:1px solid #e8ddcc;border-radius:20px;padding:28px;box-shadow:0 16px 34px rgba(24,18,10,.1);font-size:1.02rem;line-height:1.85;}
+  .gh-body h2,.gh-body h3{font-family:Georgia,"Times New Roman",serif;color:#151515;margin-top:1.8rem;}
+  .gh-list-tools{display:grid;gap:14px;margin:0 0 24px;}
+  .gh-search{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e0d5c6;border-radius:999px;padding:6px 8px 6px 18px;box-shadow:0 12px 28px rgba(24,18,10,.07);}
+  .gh-search:focus-within{border-color:#5ec6c4;box-shadow:0 0 0 3px rgba(94,198,196,.16),0 12px 28px rgba(24,18,10,.07);}
+  .gh-search i{color:#6d655b;}
+  .gh-search input{width:100%;border:0;outline:0;background:transparent;font-size:1rem;color:#151515;padding:12px 8px;}
+  .gh-search-count{font-size:.86rem;color:#6d655b;white-space:nowrap;font-weight:800;padding-right:8px;}
+  .gh-cat-strip{display:flex;gap:10px;overflow:auto;padding:2px 2px 8px;scrollbar-width:thin;}
+  .gh-cat-button{display:inline-flex;align-items:center;gap:9px;border:1px solid #e0d5c6;background:#fff;color:#2b2925;border-radius:999px;padding:7px 12px 7px 7px;font-size:.82rem;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 8px 18px rgba(24,18,10,.06);transition:.18s ease;}
+  .gh-cat-button:hover,.gh-cat-button.is-active{background:#111316;color:#fff;border-color:#111316;}
+  .gh-cat-button img{width:30px;height:30px;border-radius:999px;object-fit:cover;background:#f1eee8;border:1px solid rgba(255,255,255,.56);}
+  .gh-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;}
+  .gh-card{background:#fff;color:#151515;border:1px solid #e8ddcc;border-radius:18px;overflow:hidden;box-shadow:0 14px 28px rgba(24,18,10,.08);transition:.2s ease;display:flex;flex-direction:column;min-height:100%;}
+  .gh-card:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(24,18,10,.12);color:#151515;}
+  .gh-card[hidden]{display:none!important;}
+  .gh-card-image{display:block;position:relative;overflow:hidden;background:#f1eee8;}
+  .gh-card-image img{display:block;width:100%;height:190px;object-fit:cover;transition:.42s ease;}
+  .gh-card:hover .gh-card-image img{transform:scale(1.04);}
+  .gh-card-body{padding:17px 18px 19px;display:flex;flex-direction:column;gap:9px;flex:1;}
+  .gh-card-cat{color:#0f766e;text-decoration:none;font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em;}
+  .gh-card-cat:hover{color:#0b5f59;}
+  .gh-card h2{font-size:1.18rem;line-height:1.25;margin:0;color:#151515;}
+  .gh-card h2 a{color:inherit;text-decoration:none;}
+  .gh-card h2 a:hover{color:#0f766e;}
+  .gh-card p{color:#685f54;line-height:1.6;margin:0;}
+  .gh-read-more{margin-top:auto;color:#151515;font-weight:900;text-decoration:none;font-size:.86rem;}
+  .gh-empty-filter{border:1px dashed #cfc3b4;background:rgba(255,255,255,.72);border-radius:18px;padding:26px;text-align:center;color:#685f54;}
+  .gh-blocks{margin-top:18px;display:grid;gap:16px;}
+  .gh-block{border:1px solid #eadfce;border-radius:16px;padding:20px;background:#fffaf3;}
+  .gh-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+  .gh-gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px;}
+  .gh-body .cms-block-media-text{display:block;}
+  .gh-body .cms-media-text-grid{display:grid;gap:1.5rem;}
+  .gh-body .cms-media-text-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1.5rem;align-items:center;}
+  .gh-body .cms-image-copy h3{margin-top:0;}
+  .gh-body .cms-image-copy p{color:inherit;font-size:1rem;line-height:1.75;}
+  .gh-body .cms-image-copy ul{margin:1rem 0 0;padding-left:1.15rem;}
+  .gh-body .cms-image-copy li{margin-bottom:.45rem;line-height:1.6;}
+  .gh-body .cms-media-text-row figure{margin:0;}
+  .gh-body .cms-image-generated img,.gh-body .cms-image-placeholder img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:18px;}
+  .gh-body .cms-image-generated figcaption,.gh-body .cms-image-placeholder figcaption{margin-top:.45rem;font-size:.82rem;color:#6b6358;}
+  .gh-links{margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;}
+  .gh-links a{border:1px solid #d7cbb9;border-radius:999px;padding:9px 13px;text-decoration:none;color:#1b1b1b;font-weight:700;background:#fff;}
+  @media (max-width:768px){.gh-shell{padding:44px 0 58px}.gh-hero{padding:26px 20px;border-radius:20px}.gh-search{border-radius:18px;align-items:flex-start}.gh-search-count{display:none}.gh-body{padding:22px 18px}.gh-body .cms-media-text-row{grid-template-columns:1fr}}
+</style>
+{% if c.template.css_text|default('') %}
+  <style>{{ c.template.css_text|raw }}</style>
+{% elseif c.template_css_text|default('') %}
+  <style>{{ c.template_css_text|raw }}</style>
+{% endif %}
+
+<main class="gh-shell">
+  <div class="gh-container">
+    {% if isList %}
+      {% set placeholderImage = asset_for(placeholder_image|default('assets/images/cms-image-needed.svg')) %}
+      <header class="gh-hero">
+        <span class="gh-kicker">VNV Events</span>
+        <h1 class="gh-title">{{ titleText }}</h1>
+        <p class="gh-excerpt">{{ descriptionText }}</p>
+      </header>
+
+      {% if items|default([]) is not empty %}
+        <div class="gh-list-tools" data-gh-list>
+          <label class="gh-search" for="gh-list-search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="gh-list-search" type="search" autocomplete="off" placeholder="Search {{ list_type == 'blog' ? 'articles' : 'locations' }}..." data-gh-search>
+            <span class="gh-search-count" data-gh-count></span>
+          </label>
+
+          {% if categories|default([]) is not empty %}
+            <div class="gh-cat-strip" aria-label="Filter by category">
+              <button type="button" class="gh-cat-button is-active" data-gh-category="all">
+                <img src="{{ placeholderImage }}" alt="">
+                <span>All</span>
+              </button>
+              {% for category in categories %}
+                {% set categoryImage = category.image_url|default('') ?: placeholderImage %}
+                <button type="button" class="gh-cat-button" data-gh-category="{{ category.slug|default('uncategorized')|e('html_attr') }}">
+                  <img src="{{ categoryImage }}" alt="">
+                  <span>{{ category.name }}</span>
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <section class="gh-grid" aria-label="{{ titleText }}" data-gh-grid>
+        {% for item in items|default([]) %}
+          {% set itemHref = path(item.route|default('/')|trim('/')) %}
+          {% set itemImage = item._image_url|default('') ?: placeholderImage %}
+          {% set itemCategoryName = item._category_name|default(list_type == 'blog' ? 'Blog' : 'Location') %}
+          {% set itemCategorySlug = item._category_slug|default('uncategorized') %}
+          {% set itemExcerpt = item._excerpt|default(item.excerpt|default('')) %}
+          <article class="gh-card" data-gh-card data-gh-category-value="{{ itemCategorySlug|e('html_attr') }}" data-gh-search-value="{{ item._search_text|default('')|e('html_attr') }}">
+            <a class="gh-card-image" href="{{ itemHref }}" aria-label="{{ item.title }}">
+              <img src="{{ itemImage }}" alt="{{ item.title }}">
+            </a>
+            <div class="gh-card-body">
+              <a class="gh-card-cat" href="{{ path('category/' ~ list_type ~ '/' ~ itemCategorySlug ~ '/') }}">{{ itemCategoryName }}</a>
+              <h2><a href="{{ itemHref }}">{{ item.title }}</a></h2>
+              {% if itemExcerpt %}
+                <p>{{ itemExcerpt|striptags|slice(0, 155) }}{% if itemExcerpt|length > 155 %}...{% endif %}</p>
+              {% endif %}
+              <a class="gh-read-more" href="{{ itemHref }}">Read more</a>
+            </div>
+          </article>
+        {% else %}
+          <article class="gh-card">
+            <div class="gh-card-body">
+              <h2>No published content yet.</h2>
+              <p>Approved Growth Hub content for VNV Events will appear here once it is published in Ophyra.</p>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+      <div class="gh-empty-filter" data-gh-empty hidden>No matching content found.</div>
+    {% else %}
+      <article>
+        <header class="gh-hero">
+          <span class="gh-kicker">{{ c.content_type|default('page')|replace({'_':' '})|title }}</span>
+          <h1 class="gh-title">{{ c.title }}</h1>
+          {% if c.excerpt|default('') %}
+            <p class="gh-excerpt">{{ c.excerpt }}</p>
+          {% endif %}
+        </header>
+
+        {% if c.media[0].secure_url|default('') %}
+          <img class="gh-featured" src="{{ c.media[0].secure_url }}" alt="{{ c.media[0].alt_text|default(c.title) }}">
+        {% elseif seoData.og_image|default('') %}
+          <img class="gh-featured" src="{{ seoData.og_image }}" alt="{{ c.title }}">
+        {% endif %}
+
+        {% set templateKey = c.template.key|default(c.template.template_key|default(c.metadata.template_key|default(c.template_key|default('default')))) %}
+        {% if c.body|default('') %}
+          <div class="gh-body cms-preview-document cms-preview-template-{{ templateKey }}">{{ c.body|raw }}</div>
+        {% elseif c.body_html|default('') %}
+          <div class="gh-body cms-preview-document cms-preview-template-{{ templateKey }}">{{ c.body_html|raw }}</div>
+        {% endif %}
+
+        {% if c.blocks|default([]) is not empty %}
+          <section class="gh-blocks">
+            {% for block in c.blocks %}
+              {% set data = block.data_json is defined and block.data_json is iterable ? block.data_json : block %}
+              <div class="gh-block">
+                {% if block.title|default(data.title|default('')) %}
+                  <h2>{{ block.title|default(data.title) }}</h2>
+                {% endif %}
+                {% if data.content|default('') %}
+                  <div>{{ data.content|raw }}</div>
+                {% elseif data.body|default('') %}
+                  <div>{{ data.body|raw }}</div>
+                {% endif %}
+                {% if data.items|default([]) %}
+                  <ul>
+                    {% for item in data.items %}
+                      <li>{{ item.label|default(item.question|default(item.title|default(item))) }}{% if item.value|default(item.answer|default('')) %}: {{ item.value|default(item.answer) }}{% endif %}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                {% if data.images|default([]) %}
+                  <div class="gh-gallery">
+                    {% for image in data.images %}
+                      <img src="{{ image.url|default(image.secure_url|default(image)) }}" alt="{{ image.alt|default(c.title) }}">
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </section>
+        {% endif %}
+
+        {% if c.schema_json|default({}) %}
+          <script type="application/ld+json">{{ c.schema_json|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }}</script>
+        {% endif %}
+
+        {% if internal_links is defined and internal_links is not empty %}
+          <nav class="gh-links" aria-label="Related VNV Events links">
+            {% for link in internal_links %}
+              <a href="{{ link.url }}">{{ link.label }}</a>
+            {% endfor %}
+          </nav>
+        {% endif %}
+      </article>
+    {% endif %}
+  </div>
+</main>
+{% if isList %}
+<script>
+(function(){
+  var root = document.querySelector('[data-gh-grid]');
+  if (!root) return;
+  var input = document.querySelector('[data-gh-search]');
+  var count = document.querySelector('[data-gh-count]');
+  var empty = document.querySelector('[data-gh-empty]');
+  var cards = Array.prototype.slice.call(root.querySelectorAll('[data-gh-card]'));
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-gh-category]'));
+  var activeCategory = 'all';
+
+  function normalize(value) {
+    return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  function update() {
+    var q = normalize(input ? input.value : '');
+    var visible = 0;
+
+    cards.forEach(function(card){
+      var searchValue = normalize(card.getAttribute('data-gh-search-value'));
+      var cardCategory = card.getAttribute('data-gh-category-value') || 'uncategorized';
+      var matchesSearch = !q || searchValue.indexOf(q) !== -1;
+      var matchesCategory = activeCategory === 'all' || cardCategory === activeCategory;
+      var show = matchesSearch && matchesCategory;
+      card.hidden = !show;
+      if (show) visible++;
+    });
+
+    if (count) {
+      count.textContent = visible + ' result' + (visible === 1 ? '' : 's');
+    }
+
+    if (empty) {
+      empty.hidden = visible !== 0;
+    }
+  }
+
+  buttons.forEach(function(button){
+    button.addEventListener('click', function(){
+      activeCategory = button.getAttribute('data-gh-category') || 'all';
+      buttons.forEach(function(item){ item.classList.toggle('is-active', item === button); });
+      update();
+    });
+  });
+
+  if (input) {
+    input.addEventListener('input', update);
+  }
+
+  update();
+})();
+</script>
+{% endif %}
+{% include "templates/components/publicEventRequestModal.html.twig" %}
+{% include "templates/layout/publicFooterVnv.html.twig" %}
+{% endblock %}

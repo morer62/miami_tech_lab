@@ -1,0 +1,359 @@
+{% extends "templates/base.admin.twig" %}
+
+{% block body %}
+<style>
+    .cms-wrap{
+        padding:24px;
+        max-width:900px;
+    }
+
+    .cms-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom:24px;
+        flex-wrap:wrap;
+    }
+
+    .cms-title{
+        font-size:2rem;
+        font-weight:800;
+        color:#111827;
+        margin:0 0 6px 0;
+    }
+
+    .cms-subtitle{
+        color:#6b7280;
+        font-size:.96rem;
+        margin:0;
+    }
+
+    .cms-card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:20px;
+        padding:24px;
+        box-shadow:0 10px 30px rgba(0,0,0,.05);
+    }
+
+    .cms-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+    }
+
+    .cms-field{
+        margin-bottom:18px;
+    }
+
+    .cms-field.full{
+        grid-column:1 / -1;
+    }
+
+    .cms-label{
+        display:block;
+        font-size:.92rem;
+        font-weight:700;
+        color:#111827;
+        margin-bottom:8px;
+    }
+
+    .cms-input,
+    .cms-textarea{
+        width:100%;
+        border:1px solid #d1d5db;
+        border-radius:14px;
+        padding:12px 14px;
+        font-size:.95rem;
+        color:#111827;
+        background:#fff;
+        outline:none;
+        transition:.2s ease;
+        box-sizing:border-box;
+    }
+
+    .cms-input:focus,
+    .cms-textarea:focus{
+        border-color:#111827;
+        box-shadow:0 0 0 3px rgba(17,24,39,.08);
+    }
+
+    .cms-textarea{
+        min-height:130px;
+        resize:vertical;
+    }
+
+    .cms-help{
+        margin-top:6px;
+        font-size:.84rem;
+        color:#6b7280;
+    }
+
+    .cms-check{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:12px 14px;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        background:#f9fafb;
+    }
+
+    .cms-actions{
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-top:10px;
+    }
+
+    .cms-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:10px 16px;
+        border-radius:12px;
+        text-decoration:none;
+        font-weight:700;
+        font-size:.92rem;
+        transition:.2s ease;
+        border:none;
+        cursor:pointer;
+    }
+
+    .cms-btn-primary{
+        background:#111827;
+        color:#fff;
+    }
+
+    .cms-btn-primary:hover{
+        background:#000;
+        color:#fff;
+    }
+
+    .cms-btn-light{
+        background:#f3f4f6;
+        color:#111827;
+    }
+
+    .cms-btn-light:hover{
+        background:#e5e7eb;
+        color:#111827;
+    }
+
+    .cms-path{
+        font-family:monospace;
+        font-size:.88rem;
+        color:#1f2937;
+        background:#f9fafb;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        display:inline-block;
+        padding:5px 8px;
+        word-break:break-all;
+        text-decoration:none;
+    }
+
+    .cms-path:hover{
+        background:#eef2ff;
+    }
+
+    .cms-alert{
+        margin-bottom:18px;
+        background:#fef2f2;
+        border:1px solid #fecaca;
+        color:#991b1b;
+        border-radius:16px;
+        padding:14px 16px;
+    }
+
+    .cms-alert ul{
+        margin:0;
+        padding-left:18px;
+    }
+
+    .cms-image-preview{
+        margin-top:10px;
+    }
+
+    .cms-image-preview img{
+        display:block;
+        width:100%;
+        max-width:260px;
+        aspect-ratio:16 / 9;
+        object-fit:cover;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+    }
+
+    @media (max-width:768px){
+        .cms-wrap{
+            padding:16px;
+        }
+
+        .cms-grid{
+            grid-template-columns:1fr;
+        }
+
+        .cms-title{
+            font-size:1.55rem;
+        }
+    }
+</style>
+
+<div class="cms-wrap">
+    <div class="cms-header">
+        <div>
+            <h1 class="cms-title">Create Category</h1>
+            <p class="cms-subtitle">
+                Create a public route group such as blog, locations, legal or landing.
+            </p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{{ path('panel/cms/pages/categories') }}" class="cms-btn cms-btn-light">← Back to Categories</a>
+            {% if old.slug %}
+                {% set preview_path = old.applies_to_pages ? 'pages/' : (old.applies_to_blog ? 'blog/' : 'locations/') %}
+                <a href="{{ path(preview_path ~ old.slug ~ '/') }}" target="_blank" rel="noopener noreferrer" class="cms-btn cms-btn-light">Open Public Page</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="cms-card">
+        {% if errors and errors|length > 0 %}
+            <div class="cms-alert">
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="cms-grid">
+                <div class="cms-field">
+                    <label class="cms-label">Name *</label>
+                    <input
+                        type="text"
+                        name="name"
+                        class="cms-input"
+                        value="{{ old.name }}"
+                        placeholder="Example: Blog"
+                        required
+                    >
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Slug</label>
+                    <input
+                        type="text"
+                        name="slug"
+                        class="cms-input"
+                        value="{{ old.slug }}"
+                        placeholder="Example: blog"
+                    >
+                    <div class="cms-help">
+                        If left empty, it will be generated automatically from the name.
+                    </div>
+                    {% if old.slug %}
+                        <div class="cms-help">
+                            Public URLs:
+                            {% if old.applies_to_pages %}
+                                <a href="{{ path('pages/' ~ old.slug ~ '/') }}" target="_blank" rel="noopener noreferrer" class="cms-path">/pages/{{ old.slug }}/</a>
+                            {% endif %}
+                            {% if old.applies_to_blog %}
+                                <a href="{{ path('blog/' ~ old.slug ~ '/') }}" target="_blank" rel="noopener noreferrer" class="cms-path">/blog/{{ old.slug }}/</a>
+                            {% endif %}
+                            {% if old.applies_to_locations %}
+                                <a href="{{ path('locations/' ~ old.slug ~ '/') }}" target="_blank" rel="noopener noreferrer" class="cms-path">/locations/{{ old.slug }}/</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Description</label>
+                    <textarea
+                        name="description"
+                        class="cms-textarea"
+                        placeholder="Optional internal description for this category."
+                    >{{ old.description }}</textarea>
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Applies To *</label>
+                    <label class="cms-check">
+                        <input type="checkbox" name="applies_to_pages" value="1" {% if old.applies_to_pages %}checked{% endif %}>
+                        <span>Pages</span>
+                    </label>
+                    <label class="cms-check">
+                        <input type="checkbox" name="applies_to_blog" value="1" {% if old.applies_to_blog %}checked{% endif %}>
+                        <span>Blog</span>
+                    </label>
+                    <label class="cms-check">
+                        <input type="checkbox" name="applies_to_locations" value="1" {% if old.applies_to_locations %}checked{% endif %}>
+                        <span>Locations</span>
+                    </label>
+                    <div class="cms-help">
+                        Controls where this category can be selected and which public category URLs exist.
+                    </div>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Featured Image URL</label>
+                    <input
+                        type="text"
+                        name="featured_image_url"
+                        class="cms-input"
+                        value="{{ old.featured_image_url }}"
+                        placeholder="https://..."
+                    >
+                    <div class="cms-help">
+                        Used on public category pages and as a fallback card image.
+                    </div>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Featured Image Alt Text</label>
+                    <input
+                        type="text"
+                        name="featured_image_alt"
+                        class="cms-input"
+                        value="{{ old.featured_image_alt }}"
+                        placeholder="Describe the image for SEO and accessibility"
+                    >
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Featured Image Upload</label>
+                    <input type="file" name="featured_image" class="cms-input" accept="image/*">
+                    {% if old.featured_image_url %}
+                        <div class="cms-image-preview">
+                            <img src="{{ old.featured_image_url }}" alt="{{ old.featured_image_alt ?: 'Category featured image' }}">
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Status</label>
+                    <label class="cms-check">
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            value="1"
+                            {% if old.is_active %}checked{% endif %}
+                        >
+                        <span>Active category</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="cms-actions">
+                <button type="submit" class="cms-btn cms-btn-primary">Save Category</button>
+                <a href="{{ path('panel/cms/pages/categories') }}" class="cms-btn cms-btn-light">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

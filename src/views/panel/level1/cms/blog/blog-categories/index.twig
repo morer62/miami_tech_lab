@@ -1,0 +1,260 @@
+{% extends "templates/base.admin.twig" %}
+
+{% block body %}
+<style>
+    .cms-wrap{
+        padding:24px;
+    }
+
+    .cms-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom:24px;
+        flex-wrap:wrap;
+    }
+
+    .cms-title{
+        font-size:2rem;
+        font-weight:800;
+        color:#111827;
+        margin:0 0 6px 0;
+    }
+
+    .cms-subtitle{
+        color:#6b7280;
+        font-size:.96rem;
+        margin:0;
+    }
+
+    .cms-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:10px 16px;
+        border-radius:12px;
+        text-decoration:none;
+        font-weight:700;
+        font-size:.92rem;
+        transition:.2s ease;
+        border:none;
+        cursor:pointer;
+    }
+
+    .cms-btn-primary{
+        background:#111827;
+        color:#fff;
+    }
+
+    .cms-btn-primary:hover{
+        background:#000;
+        color:#fff;
+    }
+
+    .cms-btn-light{
+        background:#f3f4f6;
+        color:#111827;
+    }
+
+    .cms-btn-light:hover{
+        background:#e5e7eb;
+        color:#111827;
+    }
+
+    .cms-card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:20px;
+        padding:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,.05);
+    }
+
+    .cms-table-wrap{
+        width:100%;
+        overflow:auto;
+    }
+
+    .cms-table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:1050px;
+    }
+
+    .cms-table th{
+        text-align:left;
+        font-size:.85rem;
+        color:#6b7280;
+        font-weight:700;
+        padding:14px 12px;
+        border-bottom:1px solid #e5e7eb;
+        white-space:nowrap;
+    }
+
+    .cms-table td{
+        padding:16px 12px;
+        border-bottom:1px solid #f1f5f9;
+        vertical-align:top;
+        color:#111827;
+        font-size:.95rem;
+    }
+
+    .cms-table tr:last-child td{
+        border-bottom:none;
+    }
+
+    .cms-slug{
+        font-family:monospace;
+        font-size:.92rem;
+        color:#374151;
+        background:#f9fafb;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        display:inline-block;
+        padding:4px 8px;
+    }
+
+    .cms-path{
+        font-family:monospace;
+        font-size:.88rem;
+        color:#1f2937;
+        background:#f9fafb;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        display:inline-block;
+        padding:5px 8px;
+        word-break:break-all;
+    }
+
+    .cms-badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:6px 10px;
+        border-radius:999px;
+        font-size:.8rem;
+        font-weight:700;
+        white-space:nowrap;
+    }
+
+    .cms-badge.active{
+        background:#ecfdf5;
+        color:#047857;
+    }
+
+    .cms-badge.inactive{
+        background:#f3f4f6;
+        color:#4b5563;
+    }
+
+    .cms-muted{
+        color:#6b7280;
+    }
+
+    .cms-actions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+    }
+
+    .cms-empty{
+        padding:28px;
+        text-align:center;
+        color:#6b7280;
+    }
+
+    .cms-empty strong{
+        display:block;
+        color:#111827;
+        font-size:1.05rem;
+        margin-bottom:8px;
+    }
+
+    @media (max-width:768px){
+        .cms-wrap{
+            padding:16px;
+        }
+
+        .cms-title{
+            font-size:1.55rem;
+        }
+    }
+</style>
+
+<div class="cms-wrap">
+    <div class="cms-header">
+        <div>
+            <h1 class="cms-title">Blog Categories</h1>
+            <p class="cms-subtitle">
+                Manage the categories used by blog posts and public category pages.
+            </p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{{ path('panel/cms') }}" class="cms-btn cms-btn-light">← Back to CMS</a>
+            <a href="{{ path('panel/cms/blog/blog-categories/create') }}" class="cms-btn cms-btn-primary">+ New Category</a>
+        </div>
+    </div>
+
+    <div class="cms-card">
+        {% if categories|length > 0 %}
+            <div class="cms-table-wrap">
+                <table class="cms-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Public Path</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th style="width:220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in categories %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.name }}</strong>
+                                    {% if item.description %}
+                                        <div class="cms-muted" style="margin-top:6px;">
+                                            {{ item.description|slice(0, 90) }}{% if item.description|length > 90 %}...{% endif %}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="cms-slug">{{ item.slug }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ path('category/blog/' ~ item.slug ~ '/') }}" target="_blank" rel="noopener noreferrer" class="cms-path">
+                                        /category/blog/{{ item.slug }}/
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="cms-badge {{ item.status|lower }}">{{ item.status }}</span>
+                                </td>
+                                <td>
+                                    {{ item.created_at ?: '—' }}
+                                </td>
+                                <td>
+                                    <div class="cms-actions">
+                                        <a href="{{ path('panel/cms/blog/blog-categories/edit') }}?id={{ item.id }}" class="cms-btn cms-btn-light">Edit</a>
+                                        <a href="{{ path('category/blog/' ~ item.slug ~ '/') }}" target="_blank" class="cms-btn cms-btn-light">Open</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="cms-empty">
+                <strong>No blog categories yet</strong>
+                Create your first category to organize blog posts.
+                <div style="margin-top:16px;">
+                    <a href="{{ path('panel/cms/blog/blog-categories/create') }}" class="cms-btn cms-btn-primary">+ Create First Category</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,396 @@
+{% extends 'templates/base.admin.twig' %}
+{% import 'templates/macros.twig' as macros %}
+
+{% block style %}
+<style>
+.vnv-calendar-shell {
+    display: grid;
+    gap: 1rem;
+    max-width: 1360px;
+    margin: 0 auto;
+}
+.vnv-event-calendar-hero {
+    max-width: 1360px;
+    margin: 0 auto 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    padding: clamp(24px, 3vw, 38px);
+    color: #fff;
+    background:
+        linear-gradient(115deg, rgba(6, 11, 13, .94), rgba(6, 11, 13, .70)),
+        url("{{ path('/assets/images/vnv-core-brunch-mansion-hero.png') }}") center 48% / cover;
+    box-shadow: 0 30px 80px rgba(8, 22, 24, .18);
+}
+.vnv-event-calendar-hero h1 {
+    max-width: 760px;
+    margin: 16px 0 0;
+    color: #fff !important;
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 950;
+    line-height: 1;
+    letter-spacing: 0;
+}
+.vnv-event-calendar-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(69, 227, 207, .28);
+    border-radius: 999px;
+    background: rgba(69, 227, 207, .12);
+    color: #45e3cf;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    padding: 10px 14px;
+    text-transform: uppercase;
+}
+.vnv-calendar-toolbar,
+.vnv-calendar-day,
+.vnv-no-time {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    box-shadow: 0 22px 58px rgba(14, 31, 34, .09);
+}
+.vnv-calendar-toolbar {
+    max-width: 1240px;
+    margin: -22px auto 1rem;
+    position: relative;
+    z-index: 2;
+    padding: 1rem;
+    border-color: rgba(16, 30, 33, .08);
+}
+.vnv-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(160px, 1fr));
+    gap: .8rem;
+    overflow-x: auto;
+    padding-bottom: .4rem;
+}
+.vnv-calendar-day {
+    min-height: 260px;
+    padding: 1rem;
+}
+.vnv-calendar-day__label {
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: .75rem;
+}
+.vnv-order-card {
+    display: block;
+    text-decoration: none;
+    color: #111827;
+    border-left: 0;
+    background: #f7fafa;
+    border: 1px solid rgba(14, 31, 34, .08) !important;
+    border-radius: 18px;
+    padding: .85rem;
+    margin-bottom: .65rem;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+.vnv-order-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(69, 227, 207, .34) !important;
+    background: #0f1719;
+    color: #fff;
+}
+.vnv-order-time {
+    font-size: .78rem;
+    font-weight: 800;
+    color: #247170;
+}
+.vnv-order-title {
+    font-weight: 800;
+    line-height: 1.3;
+}
+.vnv-order-meta {
+    color: #64748b;
+    font-size: .78rem;
+}
+.vnv-order-card:hover .vnv-order-meta {
+    color: rgba(255,255,255,.72);
+}
+.vnv-status {
+    display: inline-flex;
+    max-width: 100%;
+    border-radius: 999px;
+    padding: .18rem .5rem;
+    font-size: .72rem;
+    font-weight: 800;
+    background: #111827;
+    color: #fff;
+}
+.vnv-order-card:hover .vnv-status {
+    background: rgba(69, 227, 207, .18);
+    color: #45e3cf;
+}
+.vnv-no-time {
+    padding: 1rem;
+}
+@media (max-width: 991px) {
+    .vnv-calendar-grid {
+        grid-template-columns: repeat(7, minmax(220px, 1fr));
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4 vnv-page-shell">
+    {{ macros.breadcrumb2() }}
+
+    <section class="vnv-event-calendar-hero">
+        <span class="vnv-event-calendar-kicker"><i class="fa-solid fa-calendar-days"></i> Upcoming Events</span>
+        <h1>Your VNV event schedule.</h1>
+    </section>
+
+    <section class="vnv-calendar-toolbar mb-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Week</label>
+                <input type="date" name="week" class="form-control" value="{{ calendar.week_start }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search client</label>
+                <input type="text" name="search" class="form-control" value="{{ search|default('') }}" placeholder="Name or email">
+            </div>
+            <div class="col-md-5 d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary">Apply</button>
+                <a class="btn btn-outline-secondary" href="{{ path(calendarUrl) }}?week={{ calendar.previous_week }}">Previous</a>
+                <a class="btn btn-outline-secondary" href="{{ path(calendarUrl) }}">Today</a>
+                <a class="btn btn-outline-secondary" href="{{ path(calendarUrl) }}?week={{ calendar.next_week }}">Next</a>
+                <a class="btn btn-outline-secondary" href="{{ path(listUrl) }}">List View</a>
+            </div>
+        </form>
+    </section>
+
+    <div class="vnv-calendar-shell">
+        <div class="vnv-calendar-grid">
+            {% for day in calendar.days %}
+                <section class="vnv-calendar-day">
+                    <div class="vnv-calendar-day__label">{{ day.label }}</div>
+                    {% for order in day.orders %}
+                        <button type="button" class="vnv-order-card text-start border-0 w-100" data-vnv-order-details='{{ order.details|json_encode|e('html_attr') }}'>
+                            <div class="vnv-order-time">{{ order.time }}</div>
+                            <div class="vnv-order-title">{{ order.client }}</div>
+                            <div class="vnv-order-meta">{{ order.title }}</div>
+                            {% if order.address %}
+                                <div class="vnv-order-meta">{{ order.address }}</div>
+                            {% endif %}
+                            <span class="vnv-status mt-2">{{ order.status }}</span>
+                        </button>
+                    {% else %}
+                        <p class="text-muted small mb-0">No orders.</p>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+        </div>
+
+        <section class="vnv-no-time">
+            <h2 class="h6 fw-bold mb-3">No time assigned</h2>
+            <div class="row g-2">
+                {% for order in calendar.no_time %}
+                    <div class="col-md-6 col-xl-4">
+                        <button type="button" class="vnv-order-card mb-0 text-start border-0 w-100" data-vnv-order-details='{{ order.details|json_encode|e('html_attr') }}'>
+                            <div class="vnv-order-title">{{ order.client }}</div>
+                            <div class="vnv-order-meta">{{ order.date|date('M d, Y') }} - {{ order.title }}</div>
+                            <span class="vnv-status mt-2">{{ order.status }}</span>
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <p class="text-muted mb-0">All scheduled orders in this week have a time.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="modal fade" id="vnvOrderCalendarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="vnvOrderCalendarModalBody"></div>
+            <div class="modal-footer">
+                <a href="#" class="btn vnv-btn-primary" id="vnvOrderCalendarModalLink">Open Full View</a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalElement = document.getElementById('vnvOrderCalendarModal');
+    const body = document.getElementById('vnvOrderCalendarModalBody');
+    const link = document.getElementById('vnvOrderCalendarModalLink');
+    if (!modalElement || !body || !link || !window.bootstrap) return;
+
+    const modal = new bootstrap.Modal(modalElement);
+    const esc = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[char]));
+    const money = (value) => {
+        const number = Number(value || 0);
+        return number.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    };
+    const valueOrNa = (value) => esc(value || 'N/A');
+    const serviceRows = (services) => {
+        if (!Array.isArray(services) || services.length === 0) {
+            return '<tr><td colspan="4" class="text-muted">No services attached.</td></tr>';
+        }
+        return services.map((service) => `
+            <tr>
+                <td>
+                    <strong>${esc(service.name || 'Service')}</strong>
+                    ${service.description ? `<div class="small text-muted">${esc(service.description)}</div>` : ''}
+                </td>
+                <td class="text-end">${esc(service.quantity || 0)}</td>
+                <td class="text-end">${money(service.unitPrice)}</td>
+                <td class="text-end fw-semibold">${money(service.subtotal)}</td>
+            </tr>
+        `).join('');
+    };
+    const paymentRows = (payments) => {
+        if (!Array.isArray(payments) || payments.length === 0) {
+            return '<tr><td colspan="6" class="text-muted">No payment records yet.</td></tr>';
+        }
+        return payments.map((payment) => `
+            <tr>
+                <td>${valueOrNa(payment.paidAt)}</td>
+                <td>${valueOrNa(payment.concept || payment.method)}</td>
+                <td>${valueOrNa(payment.provider || payment.method)}</td>
+                <td>${valueOrNa(payment.card)}</td>
+                <td>${esc(payment.status || 'PAID')}</td>
+                <td class="text-end fw-semibold">${money(payment.netAmount)}</td>
+            </tr>
+        `).join('');
+    };
+    const totalsHtml = (totals) => {
+        const data = totals || {};
+        return `
+            <div class="row g-2">
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Subtotal</div><strong>${money(data.subtotal)}</strong></div></div>
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Discount</div><strong>${money(data.discount)}</strong></div></div>
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Tax</div><strong>${money(data.tax)}</strong></div></div>
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Total</div><strong>${money(data.total)}</strong></div></div>
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Paid</div><strong>${money(data.paid)}</strong></div></div>
+                <div class="col-6 col-md-4"><div class="p-3 border rounded-3"><div class="small text-muted">Balance</div><strong>${money(data.balance)}</strong></div></div>
+            </div>
+        `;
+    };
+    const subordersHtml = (suborders) => {
+        if (!Array.isArray(suborders) || suborders.length === 0) {
+            return '<p class="text-muted mb-0">No invoice detail found for this order.</p>';
+        }
+        return suborders.map((suborder, index) => `
+            <section class="border rounded-3 p-3 mb-3">
+                <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+                    <strong>Invoice ${index + 1} ${suborder.id ? `#${esc(suborder.id)}` : ''}</strong>
+                    <span class="badge text-bg-dark">${esc(suborder.status || 'INVOICE_READY')}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-3">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Unit</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>${serviceRows(suborder.services)}</tbody>
+                    </table>
+                </div>
+                <div class="row g-2 small">
+                    <div class="col-6 col-md-2"><strong>Subtotal</strong><br>${money(suborder.subtotal)}</div>
+                    <div class="col-6 col-md-2"><strong>Discount</strong><br>${money(suborder.discount)}</div>
+                    <div class="col-6 col-md-2"><strong>Tax</strong><br>${money(suborder.tax)}</div>
+                    <div class="col-6 col-md-2"><strong>Total</strong><br>${money(suborder.total)}</div>
+                    <div class="col-6 col-md-2"><strong>Paid</strong><br>${money(suborder.paid)}</div>
+                    <div class="col-6 col-md-2"><strong>Balance</strong><br>${money(suborder.balance)}</div>
+                </div>
+            </section>
+        `).join('');
+    };
+    const chatHtml = (contacts) => {
+        if (!Array.isArray(contacts) || contacts.length === 0) {
+            return '';
+        }
+        return `
+            <section class="mt-4">
+                <h6 class="fw-bold">Team chat</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    ${contacts.map((contact) => `<a class="btn btn-outline-success btn-sm" href="${esc(contact.url)}">Chat with ${esc(contact.name || 'team')}</a>`).join('')}
+                </div>
+            </section>
+        `;
+    };
+
+    document.querySelectorAll('[data-vnv-order-details]').forEach((button) => {
+        button.addEventListener('click', function () {
+            const data = JSON.parse(this.dataset.vnvOrderDetails || '{}');
+            if (data.url) {
+                link.href = data.url;
+                link.classList.remove('d-none');
+            } else {
+                link.href = '#';
+                link.classList.add('d-none');
+            }
+            body.innerHTML = `
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><strong>Order</strong><br>${valueOrNa(data.id)}</div>
+                    <div class="col-md-6"><strong>Status</strong><br>${esc(data.status || 'ORDER')}</div>
+                    <div class="col-md-6"><strong>Client / Company</strong><br>${valueOrNa(data.client)}</div>
+                    <div class="col-md-6"><strong>Email</strong><br>${valueOrNa(data.email)}</div>
+                    <div class="col-md-6"><strong>Event date</strong><br>${valueOrNa(data.eventDate)}</div>
+                    <div class="col-md-6"><strong>Time</strong><br>${esc(data.time || 'No time assigned')}</div>
+                    <div class="col-12"><strong>Address</strong><br>${valueOrNa(data.address)}</div>
+                    <div class="col-md-6"><strong>Created</strong><br>${valueOrNa(data.createdAt)}</div>
+                    <div class="col-md-6"><strong>Workflow</strong><br>${valueOrNa(data.workflow)}</div>
+                </div>
+                <section class="mb-4">
+                    <h6 class="fw-bold">Payment summary</h6>
+                    ${totalsHtml(data.totals)}
+                </section>
+                <section class="mb-4">
+                    <h6 class="fw-bold">Invoice details</h6>
+                    ${subordersHtml(data.suborders)}
+                </section>
+                <section>
+                    <h6 class="fw-bold">Payments</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Concept</th>
+                                    <th>Provider</th>
+                                    <th>Card</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>${paymentRows(data.payments)}</tbody>
+                        </table>
+                    </div>
+                </section>
+                ${chatHtml(data.chatContacts)}
+            `;
+            modal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

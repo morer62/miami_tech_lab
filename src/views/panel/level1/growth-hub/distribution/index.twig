@@ -1,0 +1,62 @@
+{% extends "templates/base.admin.twig" %}
+{% block body %}
+<style>
+.ds{max-width:1280px;padding:24px}.ds-hero{background:linear-gradient(135deg,#101827,#4338ca);color:#fff;padding:28px;border-radius:24px;margin:14px 0}.ds-hero h1{color:#fff}.ds-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.ds-tab,.ds-btn{border:0;border-radius:12px;padding:10px 15px;font-weight:850;text-decoration:none}.ds-tab{background:#eef2ff;color:#3730a3}.ds-tab.active,.ds-btn{background:#111827;color:#fff}.ds-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px}.ds-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;margin-bottom:16px}.ds-input{width:100%;border:1px solid #cbd5e1;border-radius:11px;padding:11px;margin:6px 0}.ds-source{display:grid;grid-template-columns:auto 54px 1fr;gap:10px;align-items:start;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:8px 0}.ds-source:has(input:checked){border-color:#6366f1;background:#eef2ff}.ds-source p{margin:0;white-space:pre-line}.ds-network{display:inline-flex;gap:6px;border:1px solid #cbd5e1;border-radius:999px;padding:8px 11px;margin:4px}.ds-library{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}.ds-item{border:1px solid #e2e8f0;border-radius:15px;padding:14px;overflow:hidden}.ds-item img,.ds-item video{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:#0f172a}.ds-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.ds-danger{background:#fee2e2;color:#991b1b}.ds-note{background:#eef2ff;color:#3730a3;border-radius:12px;padding:12px}.ds-connected{color:#047857;font-weight:900}@media(max-width:850px){.ds-grid{grid-template-columns:1fr}.ds{padding:13px}.ds-source{grid-template-columns:auto 48px 1fr}}
+</style>
+<div class="ds"><a href="{{ path('panel/growth-hub') }}">← Growth Hub</a>
+<section class="ds-hero"><h1>Social Media Studio</h1><p>Select the exact source material. OpenAI designs and adapts it, but never decides what part of your video or article is published.</p></section>
+<nav class="ds-tabs">
+ <a class="ds-tab {{ mode=='social'?'active':'' }}" href="?mode=social">Posts & publishing</a>
+ <a class="ds-tab {{ mode=='carousel'?'active':'' }}" href="?mode=carousel">Carousel builder</a>
+ <a class="ds-tab {{ mode=='creative'?'active':'' }}" href="?mode=creative">Single creative</a>
+ <a class="ds-tab {{ mode=='library'?'active':'' }}" href="?mode=library">Creative library</a>
+</nav>
+{% if mode in ['carousel','creative'] %}
+<div class="ds-grid"><main>
+ <section class="ds-card"><h2>{{ mode=='creative'?'Create one social graphic':'Build a carousel page by page' }}</h2>
+  <p>Choose a finished article, then mark only the passages you want. The page number controls the final order.</p>
+  <form method="get"><input type="hidden" name="mode" value="{{ mode }}"><select class="ds-input" name="content" onchange="this.form.submit()" required><option value="">Choose an article or page…</option>{% for item in contents %}<option value="{{ item.id }}" {{ selectedContentId==item.id?'selected':'' }}>#{{ item.id }} — {{ item.title }}</option>{% endfor %}</select></form>
+  {% if selectedContent %}
+  <form method="post" data-creative-form><input type="hidden" name="action" value="run"><input type="hidden" name="mode" value="{{ mode }}"><input type="hidden" name="content_id" value="{{ selectedContent.id }}">
+   <h3>{{ selectedContent.title }}</h3>
+   {% for paragraph in contentParagraphs %}
+   <label class="ds-source"><input type="checkbox" name="slide_text[{{ loop.index0 }}]" value="{{ paragraph }}"><input class="ds-input" type="number" min="1" max="100" name="slide_page[{{ loop.index0 }}]" value="{{ mode=='creative'?1:loop.index }}"><p>{{ paragraph }}</p></label>
+   {% else %}<p>No usable paragraphs were found in this content.</p>{% endfor %}
+   <label>Format<select class="ds-input" name="creative_format">{% if mode=='carousel' %}<option value="carousel-square">Square carousel · 1:1</option><option value="carousel-vertical">Vertical carousel · 9:16</option>{% else %}<option value="single-square">Single square · 1:1</option><option value="single-vertical">Single vertical · 9:16</option>{% endif %}</select></label>
+   <label>Creative direction<textarea class="ds-input" name="concept" rows="3" placeholder="Brand mood, colors, typography, visual hierarchy…"></textarea></label>
+   <label>Reference image/model URLs<textarea class="ds-input" name="reference_urls" rows="2" placeholder="One public URL per line"></textarea></label>
+   <label>Optional link for caption<input class="ds-input" name="caption_link" type="url" value="{{ selectedContent.canonical_url }}"></label>
+   <label class="ds-network"><input type="checkbox" name="include_link" value="1"> Include link in caption</label>
+   <label class="ds-network"><input type="checkbox" name="generate_images" value="1" checked> Generate final artwork with OpenAI</label>
+   <div><strong>Destinations</strong><br>{% for network in ['instagram','facebook'] %}<label class="ds-network"><input type="checkbox" name="networks[]" value="{{ network }}" checked> {{ network|capitalize }}</label>{% endfor %}</div>
+   <button class="ds-btn mt-3">Generate editable draft</button>
+  </form>{% endif %}
+ </section>
+</main><aside><section class="ds-card"><h3>Human-controlled workflow</h3><ol><li>Select source passages.</li><li>Assign page order.</li><li>Set visual direction.</li><li>Review generated copy and art.</li><li>Approve before publishing.</li></ol><p class="ds-note">For reels, open the main Video Editor and press <strong>Start reel</strong> beside the transcript tools.</p></section></aside></div>
+{% elseif mode=='library' %}
+<section class="ds-card"><h2>Creative library</h2><p>Review, publish, archive or delete every reel, carousel and single creative from one place.</p>
+ <div class="ds-library">
+ {% for item in creativeLibrary %}
+  <article class="ds-item"><small>{{ item.action_type|replace({'PUBLISH_':'','REVIEW_':''})|replace({'_':' '}) }} · {{ item.status }}{% if item.artwork_status %} · ART {{ item.artwork_status }}{% endif %}</small><h3>{{ item.title }}</h3>
+   {% if item.preview_url %}<img src="{{ item.preview_url }}" alt="Creative preview">{% endif %}
+   {% if item.artwork_error %}<p class="text-danger">{{ item.artwork_error }}</p>{% endif %}<p>{{ item.preview_caption }}</p><div class="ds-actions"><a class="ds-btn" href="{{ path('panel/agents/approval') }}?id={{ item.id }}">Review / publish</a>
+   {% if item.status=='PENDING' %}<form method="post"><input type="hidden" name="mode" value="library"><input type="hidden" name="action" value="archive_creative"><input type="hidden" name="approval_id" value="{{ item.id }}"><button class="ds-tab">Archive</button></form><form method="post" onsubmit="return confirm('Delete this creative draft?')"><input type="hidden" name="mode" value="library"><input type="hidden" name="action" value="delete_creative"><input type="hidden" name="approval_id" value="{{ item.id }}"><button class="ds-tab ds-danger">Delete</button></form>{% endif %}</div>
+  </article>
+ {% endfor %}
+ {% for item in reelLibrary %}
+  <article class="ds-item"><small>REEL · {{ item.status }}</small><h3>{{ item.title }}</h3>{% if item.output_url %}<video controls preload="metadata" src="{{ item.output_url }}"></video>{% endif %}<div class="ds-actions"><a class="ds-btn" href="{{ path('panel/growth-hub/video-studio') }}?project={{ item.id }}">Open editor</a></div></article>
+ {% endfor %}
+ {% if creativeLibrary is empty and reelLibrary is empty %}<p>No generated creatives yet.</p>{% endif %}
+ </div>
+</section>
+{% else %}
+<div class="ds-grid"><main><section class="ds-card"><h2>Posts & publishing</h2><p>Generate channel-specific copy from an approved article or completed video. Reels are selected directly inside the Video Editor.</p>
+ <form method="post" data-social><input type="hidden" name="action" value="run"><input type="hidden" name="mode" value="social"><label>Source<select class="ds-input" name="source_kind"><option value="content">Article / CMS page</option><option value="video">Completed video</option></select></label><label>Article<select class="ds-input" name="content_id"><option value="">Choose…</option>{% for item in contents %}<option value="{{ item.id }}">{{ item.title }}</option>{% endfor %}</select></label><label>Video<select class="ds-input" name="media_job_id"><option value="">Choose…</option>{% for item in media %}<option value="{{ item.id }}">{{ item.title }}</option>{% endfor %}</select></label><div>{% for n in ['facebook','instagram','linkedin','youtube'] %}<label class="ds-network"><input type="checkbox" name="networks[]" value="{{ n }}"> {{ n|capitalize }}</label>{% endfor %}</div><button class="ds-btn mt-2">Generate for approval</button></form>
+ </section></main><aside><section class="ds-card"><h2>Connections</h2>{% for platform in ['facebook','instagram','linkedin'] %}{% set c=connections[platform]|default(null) %}<p><strong>{{ platform|capitalize }}</strong> {% if c %}<span class="ds-connected">· {{ c.status }}</span>{% else %}· Not configured{% endif %}</p>{% endfor %}</section><section class="ds-card"><h3>Reels</h3><p>Select the exact spoken blocks inside the long-video transcript.</p><a class="ds-btn" href="{{ path('panel/growth-hub/video-studio') }}">Open Video Editor</a></section></aside></div>
+{% endif %}
+</div>
+<script>
+document.querySelector('[data-creative-form]')?.addEventListener('submit',e=>{if(!e.currentTarget.querySelector('[name^="slide_text"]:checked')){e.preventDefault();alert('Select at least one source passage.');}});
+document.querySelector('[data-social]')?.addEventListener('submit',e=>{if(!e.currentTarget.querySelector('[name="networks[]"]:checked')){e.preventDefault();alert('Select at least one network.');}});
+</script>
+{% endblock %}

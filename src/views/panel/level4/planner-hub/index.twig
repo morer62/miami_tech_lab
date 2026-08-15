@@ -1,0 +1,30 @@
+{% extends 'templates/base.admin.twig' %}
+{% import 'templates/macros.twig' as macros %}
+
+{% block body %}
+<main class="mt-4 container vnv-panel">
+  <div class="vnv-page-header">
+    <div>
+      <p class="vnv-kicker">Team Operations</p>
+      <h1>VNV Events Team Workspace</h1>
+      <p>Review assignments, clock activity, messages and event work for your team role.</p>
+    </div>
+  </div>
+
+  <section class="vnv-grid vnv-grid-2">
+    <div class="vnv-card text-center">
+      <img src="{{ asset_for('assets/images/icons_website/icon_1.png') }}" alt="Team Area" class="mb-4" style="height: 110px;">
+      <h2 class="h4 fw-bold mb-2">My Team Area</h2>
+      <p class="text-muted fs-6 mb-3">Track time, assignments and upcoming events.</p>
+      <a href="{{ path('panel/home') }}" class="vnv-btn vnv-btn-primary">Access</a>
+    </div>
+
+    <div class="vnv-card text-center">
+      <img src="{{ asset_for('assets/images/icons_website/icon_2.png') }}" alt="Orders Calendar" class="mb-4" style="height: 110px;">
+      <h2 class="h4 fw-bold mb-2">Orders Calendar</h2>
+      <p class="text-muted fs-6 mb-3">Open the schedule and review upcoming assigned event work.</p>
+      <a href="{{ path('panel/planner-hub/team/orders/calendar') }}" class="vnv-btn vnv-btn-secondary">Open Calendar</a>
+    </div>
+  </section>
+</main>
+{% endblock %}

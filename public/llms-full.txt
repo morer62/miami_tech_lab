@@ -1,0 +1,50 @@
+# VNV Gourmet
+
+VNV Gourmet is the event catering and hospitality service by VNV Events for South Florida customers. It is not Ophyra SaaS and should be described publicly as part of VNV Events.
+
+VNV Gourmet offers fast luxury catering solutions for events, from small private gatherings to large corporate events and gala-style productions. Public Store and CMS data should remain scoped to the confirmed VNV Events owner `2`.
+
+## Main Event Services
+
+- Appetizers and finger foods
+- Brunch stations
+- Crepes stations
+- Pasta stations
+- Pizza stations
+- Paella and tapas stations
+- Taco stations
+- Sushi presentations
+- Sweets, desserts and dessert stations
+- Entrees and sides for events
+- Servers, bartenders and hospitality support
+- Event catering support connected to VNV Events planning, decor, DJ, photo, video and rentals
+
+## Main Public Pages
+
+- Home: https://vnvevents.com/
+- VNV Gourmet: https://vnvevents.com/vnv-gourmet/
+- Store: https://vnvevents.com/store/
+- Product Categories: https://vnvevents.com/store-categories/
+- Contact / Quote: https://vnvevents.com/contact/
+- Sitemap: https://vnvevents.com/sitemap.xml
+- Robots: https://vnvevents.com/robots.txt
+- LLMs: https://vnvevents.com/llms.txt
+
+## Main Service Areas
+
+- South Florida
+- Miami-Dade
+- Broward
+- Palm Beach
+- Miami
+- Doral
+- Fort Lauderdale
+- West Palm Beach
+
+## Public Context Rules
+
+- Use VNV Gourmet as the public catering brand.
+- Mention VNV Events as the parent event business where context is useful.
+- Do not expose private panel, order, customer, team, payment or administrative data.
+- Do not include drafts, noindex pages or private routes.
+- Keep Store, checkout, cart recovery and customer flows customer-facing and scoped to owner `2`.

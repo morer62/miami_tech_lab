@@ -1,0 +1,671 @@
+{% extends "templates/base.admin.twig" %}
+
+{% block body %}
+<style>
+    .cms-wrap{
+        padding:24px;
+        max-width:1200px;
+    }
+
+    .cms-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+        margin-bottom:24px;
+        flex-wrap:wrap;
+    }
+
+    .cms-title{
+        font-size:2rem;
+        font-weight:800;
+        color:#111827;
+        margin:0 0 6px 0;
+    }
+
+    .cms-subtitle{
+        color:#6b7280;
+        font-size:.96rem;
+        margin:0;
+    }
+
+    .cms-card{
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:20px;
+        padding:24px;
+        box-shadow:0 10px 30px rgba(0,0,0,.05);
+        margin-bottom:22px;
+    }
+
+    .cms-section-title{
+        font-size:1.15rem;
+        font-weight:800;
+        color:#111827;
+        margin:0 0 18px 0;
+    }
+
+    .cms-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px;
+    }
+
+    .cms-field{
+        margin-bottom:18px;
+    }
+
+    .cms-field.full{
+        grid-column:1 / -1;
+    }
+
+    .cms-label{
+        display:block;
+        font-size:.92rem;
+        font-weight:700;
+        color:#111827;
+        margin-bottom:8px;
+    }
+
+    .cms-input,
+    .cms-select,
+    .cms-textarea{
+        width:100%;
+        border:1px solid #d1d5db;
+        border-radius:14px;
+        padding:12px 14px;
+        font-size:.95rem;
+        color:#111827;
+        background:#fff;
+        outline:none;
+        transition:.2s ease;
+        box-sizing:border-box;
+        font-family:inherit;
+    }
+
+    .cms-input:focus,
+    .cms-select:focus,
+    .cms-textarea:focus{
+        border-color:#111827;
+        box-shadow:0 0 0 3px rgba(17,24,39,.08);
+    }
+
+    .cms-textarea{
+        min-height:130px;
+        resize:vertical;
+    }
+
+    .cms-textarea.code{
+        min-height:420px;
+        font-family:Consolas, Monaco, monospace;
+        font-size:.9rem;
+        line-height:1.6;
+        white-space:pre;
+    }
+
+    .cms-help{
+        margin-top:6px;
+        font-size:.84rem;
+        color:#6b7280;
+    }
+
+    .cms-cut-button{
+        align-items:center;
+        background:#eef2ff;
+        border:1px solid #c7d2fe;
+        border-radius:9px;
+        color:#4338ca;
+        cursor:pointer;
+        display:inline-flex;
+        float:right;
+        font-size:.78rem;
+        font-weight:800;
+        gap:6px;
+        margin:-34px 0 7px 8px;
+        padding:6px 10px;
+    }
+
+    .cms-cut-button:hover{ background:#e0e7ff; }
+    .cms-cut-button.is-done{ background:#ecfdf5; border-color:#a7f3d0; color:#047857; }
+
+    .cms-check-group{
+        display:flex;
+        flex-wrap:wrap;
+        gap:16px;
+        padding:12px 14px;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        background:#f9fafb;
+    }
+
+    .cms-check{
+        display:flex;
+        align-items:center;
+        gap:8px;
+    }
+
+    .cms-actions{
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-top:10px;
+    }
+
+    .cms-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:10px 16px;
+        border-radius:12px;
+        text-decoration:none;
+        font-weight:700;
+        font-size:.92rem;
+        transition:.2s ease;
+        border:none;
+        cursor:pointer;
+    }
+
+    .cms-btn-primary{
+        background:#111827;
+        color:#fff;
+    }
+
+    .cms-btn-primary:hover{
+        background:#000;
+        color:#fff;
+    }
+
+    .cms-btn-light{
+        background:#f3f4f6;
+        color:#111827;
+    }
+
+    .cms-btn-light:hover{
+        background:#e5e7eb;
+        color:#111827;
+    }
+
+    .cms-alert{
+        margin-bottom:18px;
+        background:#fef2f2;
+        border:1px solid #fecaca;
+        color:#991b1b;
+        border-radius:16px;
+        padding:14px 16px;
+    }
+
+    .cms-alert ul{
+        margin:0;
+        padding-left:18px;
+    }
+
+    .cms-image-preview{
+        margin-top:10px;
+    }
+
+    .cms-image-preview img{
+        max-width:220px;
+        border-radius:14px;
+        border:1px solid #e5e7eb;
+        display:block;
+    }
+
+    .cms-mini{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+        margin-bottom:20px;
+    }
+
+    .cms-mini-box{
+        padding:12px 14px;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        background:#f9fafb;
+        font-size:.92rem;
+    }
+
+    .cms-mini-box strong{
+        display:block;
+        margin-bottom:6px;
+        color:#111827;
+    }
+
+    .cms-editor-tabs{
+        display:inline-flex;
+        background:#f3f4f6;
+        border-radius:12px;
+        gap:4px;
+        padding:4px;
+    }
+
+    .cms-editor-tabs button{
+        background:transparent;
+        border:0;
+        border-radius:10px;
+        color:#4b5563;
+        font-weight:800;
+        padding:8px 12px;
+    }
+
+    .cms-editor-tabs button.active{
+        background:#111827;
+        color:#fff;
+    }
+
+    .cms-rich-editor,
+    .cms-preview-frame{
+        border:1px solid #d1d5db;
+        border-radius:14px;
+        min-height:420px;
+        padding:18px;
+        width:100%;
+    }
+
+    .cms-rich-editor[hidden],
+    .cms-preview-frame[hidden],
+    .cms-textarea.code[hidden]{
+        display:none;
+    }
+
+    @media (max-width:768px){
+        .cms-wrap{
+            padding:16px;
+        }
+
+        .cms-grid,
+        .cms-mini{
+            grid-template-columns:1fr;
+        }
+
+        .cms-title{
+            font-size:1.55rem;
+        }
+
+        .cms-textarea.code{
+            min-height:320px;
+        }
+    }
+</style>
+
+<div class="cms-wrap">
+    <div class="cms-header">
+        <div>
+            <h1 class="cms-title">Edit Content</h1>
+            <p class="cms-subtitle">
+                Update Growth Hub content stored in cms_contents and its public route in cms_routes.
+            </p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="{{ path('panel/cms/pages') }}" class="cms-btn cms-btn-light">Back to Content</a>
+            {% if old.route %}
+                <a href="{{ path(old.route|trim('/')) }}" target="_blank" class="cms-btn cms-btn-light">Open Public Content</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if errors and errors|length > 0 %}
+        <div class="cms-alert">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="cms-mini">
+        <div class="cms-mini-box">
+            <strong>Published At</strong>
+            {{ old.published_at ?: '—' }}
+        </div>
+        <div class="cms-mini-box">
+            <strong>Last Generated At</strong>
+            {{ old.last_generated_at ?: '—' }}
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="{{ old.id }}">
+
+        <div class="cms-card">
+            <h2 class="cms-section-title">General</h2>
+
+            <div class="cms-grid">
+                <div class="cms-field">
+                    <label class="cms-label">Template</label>
+                    <select name="id_template" class="cms-select">
+                        <option value="">No template</option>
+                        {% for item in templates %}
+                            <option value="{{ item.id }}" {% if old.id_template == item.id %}selected{% endif %}>
+                                {{ item.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Content Type</label>
+                    <select name="content_type" class="cms-select" data-content-type-select>
+                        {% for type in ['page', 'location', 'blog'] %}
+                            <option value="{{ type }}" {% if old.content_type == type %}selected{% endif %}>
+                                {{ type|title }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="cms-help">Page uses /slug/, Location uses /locations/slug/, Blog uses /blog/slug/.</div>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Category</label>
+                    <select name="id_cms_category" class="cms-select" data-cms-category-select>
+                        <option value="">No category</option>
+                        {% for category in categories %}
+                            <option
+                                value="{{ category.id }}"
+                                data-applies-pages="{{ category.applies_to_pages ? '1' : '0' }}"
+                                data-applies-blog="{{ category.applies_to_blog ? '1' : '0' }}"
+                                data-applies-locations="{{ category.applies_to_locations ? '1' : '0' }}"
+                                {% if old.id_cms_category == category.id %}selected{% endif %}
+                            >
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="cms-help">Only categories enabled for the selected content type are available.</div>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Status</label>
+                    <select name="status" class="cms-select">
+                        <option value="DRAFT" {% if old.status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                        <option value="PREVIEW" {% if old.status == 'PREVIEW' %}selected{% endif %}>Preview</option>
+                        <option value="GENERATED" {% if old.status == 'GENERATED' %}selected{% endif %}>Generated</option>
+                        <option value="PUBLISHED" {% if old.status == 'PUBLISHED' %}selected{% endif %}>Published</option>
+                        <option value="ARCHIVED" {% if old.status == 'ARCHIVED' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Title *</label>
+                    <input type="text" name="title" class="cms-input" value="{{ old.title }}" required>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Slug</label>
+                    <input type="text" name="slug" class="cms-input" value="{{ old.slug }}">
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Public Route</label>
+                    <input type="text" name="route" class="cms-input" value="{{ old.route }}">
+                    <div class="cms-help">Leave empty to generate from content type and slug.</div>
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Excerpt</label>
+                    <textarea name="excerpt" class="cms-textarea">{{ old.excerpt }}</textarea>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Content Mode</label>
+                    <select name="content_mode" class="cms-select">
+                        <option value="structured" {% if old.content_mode == 'structured' %}selected{% endif %}>Structured</option>
+                        <option value="html" {% if old.content_mode == 'html' %}selected{% endif %}>HTML / Twig code</option>
+                        <option value="hybrid" {% if old.content_mode == 'hybrid' %}selected{% endif %}>Hybrid</option>
+                    </select>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Robots</label>
+                    <input type="text" name="robots" class="cms-input" value="{{ old.robots }}">
+                </div>
+
+                <div class="cms-field full">
+                    <div class="cms-check-group">
+                        <label class="cms-check">
+                            <input type="checkbox" name="is_homepage" value="1" {% if old.is_homepage %}checked{% endif %}>
+                            <span>Set as homepage</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cms-card">
+            <h2 class="cms-section-title">Content</h2>
+
+            <div class="cms-field">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+                    <label class="cms-label" style="margin:0;">Body HTML / Twig code</label>
+                    <div class="cms-editor-tabs" data-cms-editor-tabs>
+                        <button class="active" type="button" data-editor-mode="code">Code</button>
+                        <button type="button" data-editor-mode="visual">Visual</button>
+                        <button type="button" data-editor-mode="preview">Preview</button>
+                    </div>
+                </div>
+                <textarea name="body_html" class="cms-textarea code" data-editor-source placeholder="Paste full HTML or Twig-ready markup here.">{{ old.body_html }}</textarea>
+                <div class="cms-help">Use Code for full developer markup. Visual mode is for simple rich text edits; Twig tags should be edited in Code.</div>
+                <div class="cms-rich-editor" contenteditable="true" data-editor-rich hidden></div>
+                <iframe class="cms-preview-frame" data-editor-preview hidden title="Content preview"></iframe>
+            </div>
+
+            <div class="cms-field">
+                <label class="cms-label">Content JSON</label>
+                <textarea name="content_json" class="cms-textarea code">{{ old.content_json }}</textarea>
+            </div>
+        </div>
+
+        <div class="cms-card">
+            <h2 class="cms-section-title">SEO / Metadata</h2>
+
+            <div class="cms-grid">
+                <div class="cms-field">
+                    <label class="cms-label">Meta Title</label>
+                    <input type="text" name="meta_title" class="cms-input" value="{{ old.meta_title }}">
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Canonical URL</label>
+                    <input type="text" name="canonical_url" class="cms-input" value="{{ old.canonical_url }}">
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Meta Description</label>
+                    <textarea name="meta_description" class="cms-textarea">{{ old.meta_description }}</textarea>
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Meta Keywords</label>
+                    <textarea name="meta_keywords" class="cms-textarea">{{ old.meta_keywords }}</textarea>
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Featured Image</label>
+                    <input type="file" name="featured_image" class="cms-input" accept="image/*">
+
+                    {% if old.featured_image_url %}
+                        <div class="cms-image-preview">
+                            <img src="{{ old.featured_image_url }}" alt="Featured image">
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">Featured Image URL</label>
+                    <input type="text" name="featured_image_url" class="cms-input" value="{{ old.featured_image_url }}">
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">OG Title</label>
+                    <input type="text" name="og_title" class="cms-input" value="{{ old.og_title }}">
+                </div>
+
+                <div class="cms-field">
+                    <label class="cms-label">OG Description</label>
+                    <input type="text" name="og_description" class="cms-input" value="{{ old.og_description }}">
+                </div>
+
+                <div class="cms-field full">
+                    <label class="cms-label">Schema JSON</label>
+                    <textarea name="schema_json" class="cms-textarea code">{{ old.schema_json }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="cms-actions">
+            <button type="submit" class="cms-btn cms-btn-primary">Update Content</button>
+            <a href="{{ path('panel/cms/pages') }}" class="cms-btn cms-btn-light">Cancel</a>
+        </div>
+    </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var typeSelect = document.querySelector('[data-content-type-select]');
+    var categorySelect = document.querySelector('[data-cms-category-select]');
+    var categoryOptions = categorySelect ? Array.prototype.map.call(categorySelect.options, function (option) {
+        return option.cloneNode(true);
+    }) : [];
+
+    function optionApplies(option, type) {
+        if (!option.value) {
+            return true;
+        }
+
+        var attr = type === 'location' ? 'appliesLocations' : (type === 'blog' ? 'appliesBlog' : 'appliesPages');
+        return option.dataset[attr] === '1';
+    }
+
+    function filterCategories() {
+        if (!typeSelect || !categorySelect) {
+            return;
+        }
+        var type = typeSelect.value || 'page';
+        var previousValue = categorySelect.value;
+        var nextOptions = categoryOptions.filter(function (option) {
+            return optionApplies(option, type);
+        });
+
+        categorySelect.innerHTML = '';
+        nextOptions.forEach(function (option) {
+            categorySelect.appendChild(option.cloneNode(true));
+        });
+
+        if (nextOptions.some(function (option) { return option.value === previousValue; })) {
+            categorySelect.value = previousValue;
+        }
+    }
+
+    if (typeSelect) typeSelect.addEventListener('change', filterCategories);
+    filterCategories();
+
+    var cuttableFields = [
+        'title', 'slug', 'route', 'excerpt', 'body_html', 'content_json',
+        'meta_title', 'canonical_url', 'meta_description', 'meta_keywords',
+        'featured_image_url', 'og_title', 'og_description', 'schema_json'
+    ];
+
+    function copyText(value) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(value);
+        }
+        return new Promise(function (resolve, reject) {
+            var helper = document.createElement('textarea');
+            helper.value = value;
+            helper.style.position = 'fixed';
+            helper.style.opacity = '0';
+            document.body.appendChild(helper);
+            helper.select();
+            try {
+                document.execCommand('copy') ? resolve() : reject(new Error('Copy was blocked by the browser.'));
+            } catch (error) {
+                reject(error);
+            } finally {
+                helper.remove();
+            }
+        });
+    }
+
+    cuttableFields.forEach(function (name) {
+        var field = document.querySelector('[name="' + name + '"]');
+        if (!field || field.type === 'file') return;
+        var container = field.closest('.cms-field');
+        if (!container) return;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'cms-cut-button';
+        button.setAttribute('aria-label', 'Cut ' + name.replace(/_/g, ' ') + ' to clipboard');
+        button.innerHTML = '<span aria-hidden="true">✂</span> Cut';
+        var label = container.querySelector('.cms-label');
+        if (label) label.insertAdjacentElement('afterend', button);
+        else container.insertBefore(button, field);
+        button.addEventListener('click', function () {
+            field.focus();
+            if (typeof field.select === 'function') field.select();
+            var value = field.value || '';
+            if (!value) return;
+            copyText(value).then(function () {
+                field.value = '';
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+                button.classList.add('is-done');
+                button.innerHTML = '<span aria-hidden="true">✓</span> Cut';
+                setTimeout(function () {
+                    button.classList.remove('is-done');
+                    button.innerHTML = '<span aria-hidden="true">✂</span> Cut';
+                }, 1800);
+            }).catch(function (error) {
+                alert(error.message || 'The browser could not access the clipboard.');
+            });
+        });
+    });
+
+    document.querySelectorAll('[data-cms-editor-tabs]').forEach(function (tabs) {
+        var field = tabs.closest('.cms-field');
+        var source = field ? field.querySelector('[data-editor-source]') : null;
+        var rich = field ? field.querySelector('[data-editor-rich]') : null;
+        var preview = field ? field.querySelector('[data-editor-preview]') : null;
+        if (!source || !rich || !preview) return;
+
+        function setMode(mode) {
+            tabs.querySelectorAll('[data-editor-mode]').forEach(function (button) {
+                button.classList.toggle('active', button.dataset.editorMode === mode);
+            });
+            if (mode === 'visual') {
+                rich.innerHTML = source.value;
+            }
+            if (mode === 'preview') {
+                var doc = preview.contentDocument || preview.contentWindow.document;
+                doc.open();
+                doc.write('<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;padding:24px;color:#111827} img{max-width:100%;height:auto}</style></head><body>' + source.value + '</body></html>');
+                doc.close();
+            }
+            source.hidden = mode !== 'code';
+            rich.hidden = mode !== 'visual';
+            preview.hidden = mode !== 'preview';
+        }
+
+        rich.addEventListener('input', function () {
+            source.value = rich.innerHTML;
+        });
+        tabs.querySelectorAll('[data-editor-mode]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                if (!rich.hidden) {
+                    source.value = rich.innerHTML;
+                }
+                setMode(button.dataset.editorMode);
+            });
+        });
+        var form = source.closest('form');
+        if (form) {
+            form.addEventListener('submit', function () {
+                if (!rich.hidden) {
+                    source.value = rich.innerHTML;
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

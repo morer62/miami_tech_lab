@@ -1,0 +1,634 @@
+{% if skip_base_fontawesome|default(false) %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endif %}
+
+<style>
+/* =========================
+   NEW PUBLIC HEADER - VNVX
+========================= */
+
+.vnvx-header{
+    position: sticky;
+    top: 0;
+    z-index: 1400;
+    width: 100%;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(17,24,26,0.08);
+}
+
+.vnvx-header__wrap{
+    max-width: 1320px;
+    width: min(1320px, calc(100% - 40px));
+    margin: 0 auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.vnvx-header__row{
+    min-height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.vnvx-header__nav{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.34);
+    border: 1px solid rgba(17,24,26,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.52);
+}
+
+.vnvx-header__nav a{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 17px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #11181a;
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: color .22s ease, background .22s ease, transform .22s ease, box-shadow .22s ease;
+}
+
+.vnvx-header__nav a::before{
+    content: "";
+    position: absolute;
+    inset: 6px 10px auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(94,198,196,0.72), transparent);
+    opacity: 0;
+    transition: opacity .22s ease;
+}
+
+.vnvx-header__nav a::after{
+    content: "";
+    position: absolute;
+    left: 17px;
+    right: 17px;
+    bottom: 7px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #5EC6C4, #c5a059);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform .22s ease;
+}
+
+.vnvx-header__nav a:hover{
+    background: rgba(255,255,255,0.68);
+    color: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(17,24,26,0.07);
+}
+
+.vnvx-header__nav a:hover::before{
+    opacity: 1;
+}
+
+.vnvx-header__nav a:hover::after{
+    transform: scaleX(1);
+}
+
+.vnvx-header__right{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.vnvx-header__socials{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vnvx-header__socials a{
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #11181a;
+    background: rgba(17,24,26,0.05);
+    border: 1px solid rgba(17,24,26,0.08);
+    transition: all .22s ease;
+}
+
+.vnvx-header__socials a:hover{
+    transform: translateY(-2px);
+    background: #fff;
+    color: #000;
+}
+
+.vnvx-header__cta{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    background: linear-gradient(135deg, #e3c06c 0%, #cfa24b 100%);
+    color: #11181a;
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: 0 14px 28px rgba(207,162,75,0.22);
+    transition: all .22s ease;
+}
+
+.vnvx-header__cta:hover{
+    transform: translateY(-2px);
+    color: #000;
+}
+
+.vnvx-header__toggle{
+    display: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(17,24,26,0.10);
+    background: #fff;
+    border-radius: 14px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+}
+
+.vnvx-header__toggle span{
+    width: 20px;
+    height: 2px;
+    border-radius: 999px;
+    background: #11181a;
+    transition: all .22s ease;
+}
+
+.vnvx-header__toggle.is-active span:nth-child(1){
+    transform: translateY(7px) rotate(45deg);
+}
+
+.vnvx-header__toggle.is-active span:nth-child(2){
+    opacity: 0;
+}
+
+.vnvx-header__toggle.is-active span:nth-child(3){
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.vnvx-mobile{
+    display: none;
+    width: 100%;
+    background: rgba(255,255,255,0.96);
+    border-top: 1px solid rgba(17,24,26,0.08);
+}
+
+.vnvx-mobile.is-open{
+    display: block;
+}
+
+.vnvx-mobile__content{
+    padding: 18px 0 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vnvx-mobile__brand-card{
+    display: none;
+}
+
+.vnvx-mobile__section-label{
+    display: none;
+}
+
+.vnvx-mobile__account-link{
+    display: none;
+}
+
+.vnvx-mobile__content > a{
+    text-decoration: none;
+    color: #11181a;
+    font-weight: 800;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(17,24,26,0.08);
+}
+
+.vnvx-mobile__meta{
+    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vnvx-mobile__meta a{
+    text-decoration: none;
+    color: #475254;
+    font-weight: 600;
+}
+
+.vnvx-mobile__socials{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 14px;
+}
+
+.vnvx-mobile__socials a{
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #11181a;
+    color: #fff;
+}
+
+.vnvx-mobile-appbar{
+    display: none;
+}
+
+.vnvx-mobile-header-offset{
+    display: none;
+}
+
+.vnvx-mobile-appbar__menu,
+.vnvx-mobile-appbar__call,
+.vnvx-mobile-appbar__request{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    text-decoration: none;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.vnvx-mobile-appbar__menu{
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(94,234,212,0.18);
+    flex-direction: column;
+    gap: 5px;
+}
+
+.vnvx-mobile-appbar__menu span{
+    width: 19px;
+    height: 2px;
+    border-radius: 999px;
+    background: #5eead4;
+    transition: all .22s ease;
+}
+
+.vnvx-mobile-appbar__menu.is-active span:nth-child(1){
+    transform: translateY(7px) rotate(45deg);
+}
+
+.vnvx-mobile-appbar__menu.is-active span:nth-child(2){
+    opacity: 0;
+}
+
+.vnvx-mobile-appbar__menu.is-active span:nth-child(3){
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.vnvx-mobile-appbar__call{
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 16px;
+    color: #d7fff7;
+    background: rgba(255,255,255,0.075);
+    border: 1px solid rgba(255,255,255,0.08);
+    gap: 7px;
+    font-size: .78rem;
+}
+
+.vnvx-mobile-appbar__request{
+    min-height: 46px;
+    padding: 0 15px;
+    border-radius: 16px;
+    color: #061211;
+    background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 100%);
+    box-shadow: 0 14px 30px rgba(45,212,191,0.22);
+    font-size: .78rem;
+}
+
+/* Tablet / laptop */
+@media (max-width: 1100px){
+    .vnvx-header__nav a{
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .vnvx-header__socials{
+        display: none;
+    }
+}
+
+/* Mobile */
+@media (max-width: 860px){
+    .vnvx-header{
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(18,21,25,0.88);
+        backdrop-filter: blur(22px);
+        border-bottom: 1px solid rgba(94,234,212,0.16);
+        box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+    }
+
+    .vnvx-header__wrap{
+        max-width: none;
+        width: 100%;
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+    }
+
+    .vnvx-header__row{
+        min-height: calc(68px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        justify-content: center;
+    }
+
+    .vnvx-header__nav{
+        display: none;
+    }
+
+    .vnvx-header__right{
+        display: none;
+    }
+
+    .vnvx-header__cta{
+        display: none;
+    }
+
+    .vnvx-mobile-appbar{
+        display: grid;
+        grid-template-columns: 46px minmax(0, 1fr) minmax(0, 1.05fr);
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+    }
+
+    .vnvx-mobile{
+        background: rgba(18,21,25,0.96);
+        border-top: 1px solid rgba(94,234,212,0.13);
+        box-shadow: 0 22px 44px rgba(0,0,0,0.34);
+    }
+
+    .vnvx-mobile__content{
+        padding: 14px max(4px, env(safe-area-inset-left)) 22px;
+    }
+
+    .vnvx-mobile__brand-card{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        margin-bottom: 8px;
+        border-radius: 22px;
+        background:
+            radial-gradient(circle at top left, rgba(94,234,212,0.20), transparent 42%),
+            linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.035));
+        border: 1px solid rgba(94,234,212,0.16);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 16px 34px rgba(0,0,0,0.22);
+    }
+
+    .vnvx-mobile__brand-logo{
+        width: 48px;
+        height: 48px;
+        border-radius: 17px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 1px solid rgba(94,234,212,0.18);
+        overflow: hidden;
+        flex: 0 0 auto;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+    }
+
+    .vnvx-mobile__brand-logo img{
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+    }
+
+    .vnvx-mobile__brand-copy strong{
+        display: block;
+        color: #fff;
+        font-size: .96rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .vnvx-mobile__brand-copy small{
+        display: block;
+        margin-top: 4px;
+        color: rgba(94,234,212,0.86);
+        font-size: .72rem;
+        font-weight: 800;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+    }
+
+    .vnvx-mobile__content > a{
+        color: rgba(255,255,255,0.86);
+        border-bottom-color: rgba(255,255,255,0.08);
+    }
+
+    .vnvx-mobile__meta a{
+        color: #5eead4;
+    }
+
+    .vnvx-mobile__meta{
+        margin-top: 6px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(94,234,212,0.14);
+    }
+
+    .vnvx-mobile__section-label{
+        display: block;
+        color: rgba(255,255,255,0.44);
+        font-size: .7rem;
+        font-weight: 900;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+    }
+
+    .vnvx-mobile__account-link{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 15px;
+        border-radius: 18px;
+        color: #d7fff7 !important;
+        background: rgba(255,255,255,0.065);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .vnvx-mobile__account-link span{
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .vnvx-mobile__account-link i{
+        color: #5eead4;
+    }
+
+    .vnvx-mobile__socials a{
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #fff;
+    }
+
+    .vnvx-mobile-header-offset{
+        display: block;
+        height: calc(68px + env(safe-area-inset-top));
+    }
+}
+</style>
+ 
+ <header class="vnvx-header" id="vnvxHeader">
+    <div class="vnvx-header__wrap">
+        <div class="vnvx-header__row">
+            <div class="vnvx-mobile-appbar" aria-label="Mobile quick actions">
+                <button class="vnvx-mobile-appbar__menu" type="button" aria-label="Open menu" data-vnvx-toggle>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a class="vnvx-mobile-appbar__call" href="tel:+13052045427">
+                    <i class="fa-solid fa-phone"></i>
+                    <span>Click to call</span>
+                </a>
+                <a class="vnvx-mobile-appbar__request" href="#" data-vnv-open-request>
+                    New Request
+                </a>
+            </div>
+
+            <nav class="vnvx-header__nav" aria-label="Main navigation">
+                <a href="{{ path('/') }}">Home</a>
+                <a href="{{ path('/#services') }}">Services</a>
+                <a href="https://www.instagram.com/vnv_events/" target="_blank" rel="noopener">Portfolio</a>
+                <a href="{{ path('/blog') }}">Tips and Advice</a>
+                <a href="{{ path('/vnv-sessions') }}">VNV Sessions</a>
+            </nav>
+
+            <div class="vnvx-header__right">
+                <div class="vnvx-header__socials">
+                    
+
+                    <a href="https://www.instagram.com/vnv_events/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@vnv_events/playlists" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                            <a href="https://www.facebook.com/VnvEvents/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="https://www.tiktok.com/@vnv_events" target="_blank" rel="noopener" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                            <a href="https://www.yelp.com/biz/vnv-events-sunrise" target="_blank" rel="noopener" aria-label="Yelp"><i class="fa-brands fa-yelp"></i></a>
+                            <a href="https://www.linkedin.com/company/vnv-events/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                            <a href="https://www.pinterest.com/VNV_Events/" target="_blank" rel="noopener" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+                </div>
+
+                <a href="#"  data-vnv-open-request class="vnvx-header__cta">New Request</a>
+
+                <button class="vnvx-header__toggle" type="button" aria-label="Open menu" data-vnvx-toggle>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="vnvx-mobile" data-vnvx-panel>
+        <div class="vnvx-header__wrap">
+            <div class="vnvx-mobile__content">
+                <div class="vnvx-mobile__brand-card">
+                    <div class="vnvx-mobile__brand-logo">
+                        <img src="{{ asset_for('assets/images/planner-hub-logo-negative.png') }}" alt="VNV Events">
+                    </div>
+                    <div class="vnvx-mobile__brand-copy">
+                        <strong>VNV Events</strong>
+                        <small>Stress-free luxury events</small>
+                    </div>
+                </div>
+
+                <a href="{{ path('/') }}">Home</a>
+                <a href="{{ path('/#services') }}">Services</a>
+                <a href="https://www.instagram.com/vnv_events/" target="_blank" rel="noopener">Portfolio</a>
+                <a href="{{ path('/blog') }}">Tips and Advice</a>
+                <a href="{{ path('/vnv-sessions') }}">VNV Sessions</a>
+
+                <div class="vnvx-mobile__meta">
+<a href="{{ path('/login') }}" class="vnvx-mobile__account-link">
+                        <span><i class="fa-solid fa-user-lock"></i> Login / Client Access</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div> 
+
+                <div class="vnvx-mobile__socials">
+                    <a href="https://www.instagram.com/vnv_events/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@vnv_events/playlists" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                            <a href="https://www.facebook.com/VnvEvents/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="https://www.tiktok.com/@vnv_events" target="_blank" rel="noopener" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                            <a href="https://www.yelp.com/biz/vnv-events-sunrise" target="_blank" rel="noopener" aria-label="Yelp"><i class="fa-brands fa-yelp"></i></a>
+                            <a href="https://www.linkedin.com/company/vnv-events/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                           
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="vnvx-mobile-header-offset" aria-hidden="true"></div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.querySelector('[data-vnvx-toggle]');
+    const panel = document.querySelector('[data-vnvx-panel]');
+
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener('click', function () {
+        toggle.classList.toggle('is-active');
+        panel.classList.toggle('is-open');
+    });
+
+    panel.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            toggle.classList.remove('is-active');
+            panel.classList.remove('is-open');
+        });
+    });
+});
+</script>
+
+
+

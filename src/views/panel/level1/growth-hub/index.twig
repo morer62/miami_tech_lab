@@ -1,0 +1,17 @@
+{% extends "templates/base.admin.twig" %}
+{% block body %}
+<style>
+.gh-wrap{padding:26px;max-width:1450px}.gh-hero{background:radial-gradient(circle at 85% 15%,rgba(73,242,194,.25),transparent 30%),linear-gradient(135deg,#0f172a,#312e81);border-radius:28px;color:#fff;padding:36px;margin-bottom:22px}.gh-hero small{color:#49f2c2;font-weight:900;letter-spacing:.15em}.gh-hero h1{font-size:2.5rem;font-weight:950;margin:7px 0}.gh-hero p{max-width:780px;color:#cbd5e1}.gh-stats,.gh-grid{display:grid;gap:16px}.gh-stats{grid-template-columns:repeat(3,1fr);margin-bottom:20px}.gh-stat,.gh-card{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:20px}.gh-stat strong{display:block;font-size:1.8rem}.gh-stat span{color:#64748b}.gh-grid{grid-template-columns:repeat(3,1fr)}.gh-card{min-height:250px;display:flex;flex-direction:column;box-shadow:0 12px 34px rgba(15,23,42,.06)}.gh-card i{color:#4f46e5}.gh-card h2{font-size:1.25rem;font-weight:950;margin-top:16px}.gh-card p{color:#64748b;flex:1;line-height:1.65}.gh-btn{background:#111827;color:#fff;border-radius:11px;padding:10px 14px;text-decoration:none;font-weight:850;width:max-content}.gh-note{margin-top:22px;color:#64748b}.gh-note a{font-weight:850}@media(max-width:900px){.gh-grid{grid-template-columns:1fr}.gh-stats{grid-template-columns:1fr 1fr}}@media(max-width:620px){.gh-stats{grid-template-columns:1fr}.gh-wrap{padding:14px}.gh-hero h1{font-size:2rem}}
+.gh-hero h1{color:#fff}
+</style>
+<div class="gh-wrap">
+ <section class="gh-hero"><small>VNV EVENTS CREATIVE STUDIO</small><h1>Growth Hub</h1><p>Three workspaces, one clear production flow: create content, edit long-form video, then turn finished work into social media deliverables.</p></section>
+ <div class="gh-stats"><div class="gh-stat"><strong>{{ content.total|default(0) }}</strong><span>Content items</span></div><div class="gh-stat"><strong>{{ content.generated|default(0) }}</strong><span>Awaiting publication</span></div><div class="gh-stat"><strong>{{ media.ready|default(0) }}</strong><span>Ready video projects</span></div></div>
+ <div class="gh-grid">
+  <article class="gh-card"><i data-feather="edit-3"></i><h2>Content & SEO</h2><p>Create articles, service pages and location pages from scratch or from an existing VNV reference. Manage the editorial calendar and publication workflow here.</p><a class="gh-btn" href="{{ path('panel/cms/pages/create') }}?mode=ai">Open Content Studio</a></article>
+  <article class="gh-card"><i data-feather="film"></i><h2>Video Studio</h2><p>Import large originals, open one project at a time, edit its transcript and timeline, direct the AI, add production assets and render the final master.</p><a class="gh-btn" href="{{ path('panel/growth-hub/video-studio') }}">Open Video Studio</a></article>
+  <article class="gh-card"><i data-feather="share-2"></i><h2>Social Media Studio</h2><p>Use finished content and completed video projects to create short reels, platform posts and Instagram carousels, then send them for approval and distribution.</p><a class="gh-btn" href="{{ path('panel/growth-hub/distribution') }}">Open Social Media Studio</a></article>
+ </div>
+ <p class="gh-note">Schedules, agents, conversations and approvals now live in the separate <a href="{{ path('panel/agents') }}">AI Operations</a> area.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+vendor
+node_modules/
+.env
+!public/files/.gitkeep
+public/files/*
+public/.well-known/*
+public/.well-known/
+.idea
+.logs/*.log
+
+!src/views/public/profiles/vendor
+public/phpmyadmin
+
+# Archivos de configuración y pruebas
+affiliate_commission_payments.sql
+affiliate_system_clean.sql
+aws-ses-config.txt
+diagnostico_ses.php
+env_aws_ses_clean.txt
+README_PHPMailer.md
+README_SES.md
+README.md
+test_aws_ses.php
+test_email_ses.php
+test_email_simple.php
+test_email.php
+.secrets/*
+!.secrets/.gitkeep
+localhost+*.pem
+.logs/app-venue.code-workspace
+.autopay-cron.bat
+.autopay-cron.sh
+.secrets/*
+
+# Runtime video projects uploaded through SFTP/FTP must never enter Git.
+storage/video-ingest/incoming/
+
+# Video Studio runtime output is reproducible/user data, never source code.
+public/uploads/video-studio/
+storage/video-proxies/
+storage/video-cache/
+
+# Local QA output and every temporary video-processing artifact.
+test-results/
+.logs/*
+!.logs/.gitkeep
+
+# Runtime and generated media never belong in source control.
+public/uploads/
+storage/video-ingest/
+storage/video-proxies/
+storage/video-cache/
+storage/logs/
+storage/cache/
+storage/tmp/
+storage/*
+!storage/.htaccess
+test-results/
+public/assets/miami-tech-lab/mark-source.png
+
+# OAuth/session caches and provider secrets are runtime-only.
+src/views/panel/*/planner-hub/management/orders/cache/
+*.key
+*.pem
