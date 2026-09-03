@@ -551,6 +551,12 @@ class Kernel
                     $this->includeGrowthHubContentAndExit($route, 'blog');
                 }
 
+                if ($this->publishedCmsRouteExists($route)) {
+                    $blogPostView = LocationUtils::getRootLocation()
+                        . "/src/views/public/pages/blog-post/index.php";
+                    $this->includeResolvedFileAndExit($blogPostView);
+                }
+
                 http_response_code(404);
                 $this->includeResolvedFileAndExit($this->getNotFoundView());
             }
@@ -559,6 +565,12 @@ class Kernel
                 $route = '/locations/' . trim($urlViews[1], '/');
                 if ($this->growthHubHasContent($route, 'location')) {
                     $this->includeGrowthHubContentAndExit($route, 'location');
+                }
+
+                if ($this->publishedCmsRouteExists($route)) {
+                    $cmsContentView = LocationUtils::getRootLocation()
+                        . "/src/views/public/pages/cms-content/index.php";
+                    $this->includeResolvedFileAndExit($cmsContentView);
                 }
 
                 http_response_code(404);
