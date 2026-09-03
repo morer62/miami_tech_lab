@@ -11,12 +11,6 @@ $route = (string)($GLOBALS['growth_hub_route'] ?? '');
 $listType = $GLOBALS['growth_hub_list_type'] ?? null;
 $expectedType = $GLOBALS['growth_hub_expected_type'] ?? null;
 
-if (!$client->isConfigured()) {
-    http_response_code(404);
-    echo "Page not found";
-    exit;
-}
-
 if ($listType) {
     $categories = growth_hub_list_categories((string)$listType);
     $categoryLookup = growth_hub_category_lookup($categories);
@@ -33,6 +27,12 @@ if ($listType) {
         'internal_links' => PublicSeoService::defaultInternalLinks(),
         'show_whatsapp' => true,
     ]);
+    exit;
+}
+
+if (!$client->isConfigured()) {
+    http_response_code(404);
+    echo "Page not found";
     exit;
 }
 
