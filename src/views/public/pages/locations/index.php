@@ -81,9 +81,12 @@ function get_growth_hub_location_pages(): array
                 {$categoryImageSelect} AS category_image_url
             FROM cms_contents c
             INNER JOIN cms_routes r ON r.id_content = c.id AND r.is_main = 1
+                AND r.id_owner = c.id_owner AND r.site_key = c.site_key
             LEFT JOIN cms_categories cc ON cc.id = c.id_cms_category
+                AND cc.id_owner = c.id_owner AND cc.site_key = c.site_key
             WHERE {$typeExpression} IN ('location', 'locations', 'location_page', 'location-page')
               AND c.status = 'PUBLISHED'
+              AND COALESCE(c.approval_status, 'APPROVED') IN ('APPROVED', 'PUBLISHED')
               AND COALESCE(r.status, 'ACTIVE') = 'ACTIVE'
               AND COALESCE(c.language, 'en') = 'en'
               AND c.id_owner = :owner_id
@@ -152,14 +155,11 @@ function get_location_categories(array $pages): array
         $siteKey = strtolower(trim(SiteContext::siteKey()));
         $hasCategoryImage = table_has_column($db, 'cms_categories', 'featured_image_url');
         $categoryImageSelect = $hasCategoryImage ? 'featured_image_url' : "NULL AS featured_image_url";
-        $where = ["COALESCE(is_active, 1) = 1"];
+        $ownerId = SiteContext::businessOwnerId();
+        $where = ["COALESCE(is_active, 1) = 1", "id_owner = :owner_id", "LOWER(site_key) = :site_key"];
 
         if (table_has_column($db, 'cms_categories', 'applies_to_locations')) {
             $where[] = "COALESCE(applies_to_locations, 1) = 1";
-        }
-
-        if ($siteKey !== '' && table_has_column($db, 'cms_categories', 'site_key')) {
-            $where[] = "(site_key IS NULL OR site_key = '' OR LOWER(site_key) IN (:site_key, 'shared', 'global', 'all_sites'))";
         }
 
         $db->query("
@@ -168,9 +168,8 @@ function get_location_categories(array $pages): array
             WHERE " . implode(' AND ', $where) . "
             ORDER BY name ASC
         ");
-        if ($siteKey !== '' && table_has_column($db, 'cms_categories', 'site_key')) {
-            $db->bind(':site_key', $siteKey);
-        }
+        $db->bind(':site_key', $siteKey);
+        $db->bind(':owner_id', $ownerId, \PDO::PARAM_INT);
 
         foreach ($db->fetchAll() ?: [] as $category) {
             $slug = (string)($category->slug ?? '');

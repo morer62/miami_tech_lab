@@ -267,7 +267,7 @@
         </div>
         <div class="loc-no-results" data-loc-empty hidden>
             <h3>No locations match</h3>
-            <p>Try another city, county, or keyword — or <a href="#" data-vnv-open-request>tell us where you’re planning</a> and we’ll help.</p>
+            <p>Try another city, county, or keyword — or <a href="{{ path('support') }}">tell us what you’re building</a> and we’ll help.</p>
         </div>
         {% if pagination.total_pages|default(1) > 1 %}
             <nav class="loc-pagination" aria-label="Locations pagination">

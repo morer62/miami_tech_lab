@@ -229,7 +229,7 @@ echo TemplateResponse::render(__DIR__ . '/index.twig', [
     'categories' => $categories,
     'featured_posts' => $featuredPosts,
     'recent_posts' => $recentPosts,
-    'meta_title' => 'Tips and Advices | VNV Events',
-    'meta_description' => 'Ideas, planning tips, and expert guidance for stress-free luxury events in South Florida.',
+    'meta_title' => 'Technology Insights | Tech Lab Miami',
+    'meta_description' => 'Practical insights about artificial intelligence, automation, software and technology entrepreneurship from Tech Lab Miami.',
 ]);
 exit;

@@ -1,21 +1,21 @@
 ﻿{% extends 'templates/base.twig' %}
 {% set show_whatsapp = true %}
 
-{% block title %}Tips and Advices | VNV Events{% endblock %}
-{% block meta_description %}Ideas, planning tips, and expert guidance for stress-free luxury events in South Florida.{% endblock %}
+{% block title %}Technology Insights | Tech Lab Miami{% endblock %}
+{% block meta_description %}Practical insights about artificial intelligence, automation, software and technology entrepreneurship from Tech Lab Miami.{% endblock %}
 
 {% block body %}
-{% set placeholderImage = asset_for('assets/images/store-category-planning.jpg') %}
+{% set placeholderImage = asset_for('assets/miami-tech-lab/mark.png') %}
 {% set heroImage = featured_posts|length and featured_posts[0].featured_image_url ? featured_posts[0].featured_image_url : placeholderImage %}
 
 <style>
     :root {
-        --vnv-mint: #4df7d2;
-        --vnv-mint-soft: rgba(77, 247, 210, 0.18);
-        --vnv-gold: #e7bb55;
-        --vnv-ink: #071010;
-        --vnv-charcoal: #171b1c;
-        --vnv-plomo: #24292b;
+        --vnv-mint: #54e5ff;
+        --vnv-mint-soft: rgba(84, 229, 255, 0.18);
+        --vnv-gold: #8aa8ff;
+        --vnv-ink: #07111f;
+        --vnv-charcoal: #111d35;
+        --vnv-plomo: #182746;
         --vnv-line: rgba(255, 255, 255, 0.13);
         --vnv-text: #f7fbf8;
         --vnv-muted: rgba(247, 251, 248, 0.72);
@@ -23,9 +23,9 @@
 
     .vnv-blog-page {
         background:
-            radial-gradient(circle at 12% 8%, rgba(77, 247, 210, 0.16), transparent 28rem),
-            radial-gradient(circle at 86% 12%, rgba(231, 187, 85, 0.14), transparent 24rem),
-            linear-gradient(135deg, #071010 0%, #1d2324 42%, #111616 100%);
+            radial-gradient(circle at 12% 8%, rgba(84, 229, 255, 0.18), transparent 28rem),
+            radial-gradient(circle at 86% 12%, rgba(94, 111, 255, 0.18), transparent 24rem),
+            linear-gradient(135deg, #07111f 0%, #111d35 45%, #091323 100%);
         color: var(--vnv-text);
         min-height: 100vh;
         overflow: hidden;
@@ -539,28 +539,28 @@
 </style>
 
 <div class="vnv-blog-page">
-    {% include 'templates/layout/publicHeaderVnv.html.twig' %}
+    {% include 'templates/layout/publicHeaderTech.html.twig' %}
 
     <main>
         <section class="vnv-blog-hero">
             <div class="vnv-blog-shell">
                 <div class="vnv-blog-hero-card">
                     <div class="vnv-blog-hero-copy">
-                        <span class="vnv-blog-kicker">VNV Events Journal</span>
-                        <h1>Tips for <span>luxury events.</span></h1>
-                        <p>Fresh planning ideas, vendor guidance, guest-flow notes, and production insight for clients who want the event to feel effortless from the first call to the last song.</p>
+                        <span class="vnv-blog-kicker">Tech Lab Miami Insights</span>
+                        <h1>Technology with <span>practical direction.</span></h1>
+                        <p>Clear thinking about artificial intelligence, automation, software and the decisions shaping modern businesses and founders.</p>
                         <div class="vnv-blog-stat-row">
                             <div class="vnv-blog-stat">
                                 <strong>{{ categories|length ?: '01' }}</strong>
-                                <span>Planning categories</span>
+                                <span>Technology categories</span>
                             </div>
                             <div class="vnv-blog-stat">
                                 <strong>{{ (featured_posts|length + recent_posts|length) ?: 'New' }}</strong>
-                                <span>Event articles</span>
+                                <span>Published insights</span>
                             </div>
                             <div class="vnv-blog-stat">
-                                <strong>VNV</strong>
-                                <span>Real production notes</span>
+                                <strong>Miami</strong>
+                                <span>Applied technology</span>
                             </div>
                         </div>
                         <div class="vnv-blog-actions">
@@ -569,18 +569,18 @@
                         </div>
                     </div>
                     <div class="vnv-blog-hero-media">
-                        <img src="{{ heroImage starts with 'http' or heroImage starts with '/' ? heroImage : asset_for(heroImage) }}" alt="VNV Events planning inspiration">
+                        <img src="{{ heroImage starts with 'http' or heroImage starts with '/' ? heroImage : asset_for(heroImage) }}" alt="Tech Lab Miami technology insights">
                         <div class="vnv-blog-floating-note">
-                            <strong>Stress-free luxury</strong>
-                            <span>Practical advice from real event production, not generic party tips.</span>
+                            <strong>Useful, not theoretical</strong>
+                            <span>Technology explained around real decisions and measurable work.</span>
                         </div>
                     </div>
                 </div>
                 <div class="vnv-blog-service-strip">
-                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Design ideas</span></div>
-                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-champagne-glasses"></i><span>Guest experience</span></div>
-                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-music"></i><span>DJ sessions</span></div>
-                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-clipboard-check"></i><span>Planning tips</span></div>
+                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-brain"></i><span>Artificial intelligence</span></div>
+                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-gears"></i><span>Automation</span></div>
+                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-code"></i><span>Software</span></div>
+                    <div class="vnv-blog-service-pill"><i class="fa-solid fa-lightbulb"></i><span>Entrepreneurship</span></div>
                 </div>
             </div>
         </section>
@@ -635,7 +635,7 @@
                                     <img src="{{ postImage starts with 'http' or postImage starts with '/' ? postImage : asset_for(postImage) }}" alt="{{ post.title }}">
                                 </div>
                                 <div class="vnv-blog-post-body">
-                                    <small>{{ post.category_name ?: 'VNV Guide' }}</small>
+                                    <small>{{ post.category_name ?: 'Tech Insight' }}</small>
                                     <h3>{{ post.title }}</h3>
                                     <p>{{ (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags|length > 140 ? (post.excerpt ?: post.meta_description ?: post.description)|striptags|slice(0, 140) ~ '...' : (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags }}</p>
                                     <span class="vnv-blog-read-more">Read article</span>
@@ -654,7 +654,7 @@
                 <div class="vnv-blog-shell">
                     <div class="vnv-blog-section-head">
                         <div>
-                            <h2>More planning notes</h2>
+                            <h2>More technology notes</h2>
                         </div>
                     </div>
                     <div class="vnv-blog-post-grid">
@@ -666,7 +666,7 @@
                                     <img src="{{ postImage starts with 'http' or postImage starts with '/' ? postImage : asset_for(postImage) }}" alt="{{ post.title }}">
                                 </div>
                                 <div class="vnv-blog-post-body">
-                                    <small>{{ post.category_name ?: 'VNV Guide' }}</small>
+                                    <small>{{ post.category_name ?: 'Tech Insight' }}</small>
                                     <h3>{{ post.title }}</h3>
                                     <p>{{ (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags|length > 120 ? (post.excerpt ?: post.meta_description ?: post.description)|striptags|slice(0, 120) ~ '...' : (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags }}</p>
                                     <span class="vnv-blog-read-more">Read article</span>
@@ -679,8 +679,7 @@
         {% endif %}
     </main>
 
-    {% include 'templates/components/publicEventRequestModal.html.twig' %}
-    {% include 'templates/layout/publicFooterVnv.html.twig' %}
+    {% include 'templates/layout/publicFooterTech.html.twig' %}
 </div>
 {% endblock %}
 

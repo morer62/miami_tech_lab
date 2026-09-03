@@ -9,15 +9,15 @@
 {% set itemCtaLabel = category_type == 'location' ? 'View location' : 'Read more' %}
 
 {% block title %}
-    {{ category.meta_title ?: (categoryTitle ~ ' - ' ~ categoryTypeLabel ~ ' | VNV Events') }}
+    {{ category.meta_title ?: (categoryTitle ~ ' - ' ~ categoryTypeLabel ~ ' | Tech Lab Miami') }}
 {% endblock %}
 
 {% block meta_description %}
-    {{ category.meta_description ?: category.description ?: (categoryTypeLabel ~ ' results for ' ~ categoryTitle ~ ' at VNV Events') }}
+    {{ category.meta_description ?: category.description ?: (categoryTypeLabel ~ ' results for ' ~ categoryTitle ~ ' at Tech Lab Miami') }}
 {% endblock %}
 
 {% block body %}
-{% include "templates/layout/publicHeaderVnv.html.twig" %}
+{% include "templates/layout/publicHeaderTech.html.twig" %}
 <style>
     :root{
       --vnv-bg:#f6f1e8;
@@ -297,6 +297,5 @@
 })();
 </script>
 {% endif %}
-{% include "templates/components/publicEventRequestModal.html.twig" %}
-{% include "templates/layout/publicFooterVnv.html.twig" %}
+{% include "templates/layout/publicFooterTech.html.twig" %}
 {% endblock %}
