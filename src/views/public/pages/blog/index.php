@@ -70,7 +70,7 @@ try {
         }
 
         if ($siteKey !== '' && vnv_blog_column_exists($db, 'cms_categories', 'site_key')) {
-            $categoryWhere[] = "(site_key IS NULL OR site_key = '' OR LOWER(site_key) IN (:category_site_key, 'shared', 'global', 'all_sites'))";
+            $categoryWhere[] = "LOWER(site_key) = :category_site_key";
             $categoryParams[':category_site_key'] = $siteKey;
         }
 
@@ -94,8 +94,13 @@ try {
         }
 
         if ($siteKey !== '' && vnv_blog_column_exists($db, 'cms_contents', 'site_key')) {
-            $contentWhere[] = "(c.site_key IS NULL OR c.site_key = '' OR LOWER(c.site_key) IN (:content_site_key, 'shared', 'global', 'all_sites'))";
+            $contentWhere[] = "LOWER(c.site_key) = :content_site_key";
             $contentParams[':content_site_key'] = $siteKey;
+        }
+
+        if (vnv_blog_column_exists($db, 'cms_contents', 'id_owner')) {
+            $contentWhere[] = "c.id_owner = :content_owner_id";
+            $contentParams[':content_owner_id'] = SiteContext::businessOwnerId();
         }
 
         $typeParts = [];
@@ -117,7 +122,7 @@ try {
                 $routeFilters[] = "LOWER(COALESCE(r.status, 'active')) IN ('active', 'published', '1')";
             }
             if ($siteKey !== '' && vnv_blog_column_exists($db, 'cms_routes', 'site_key')) {
-                $routeFilters[] = "(r.site_key IS NULL OR r.site_key = '' OR LOWER(r.site_key) IN (:route_site_key, 'shared', 'global', 'all_sites'))";
+                $routeFilters[] = "LOWER(r.site_key) = :route_site_key";
                 $contentParams[':route_site_key'] = $siteKey;
             }
             $routeFilterSql = $routeFilters ? " AND " . implode(' AND ', $routeFilters) : "";

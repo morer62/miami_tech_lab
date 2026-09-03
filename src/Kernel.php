@@ -166,7 +166,7 @@ class Kernel
 
         // Miami Tech Lab public ecosystem. Nested routes share one content engine
         // while keeping clean, indexable URLs such as /shows/local-tech-lab.
-        $miamiSections = ['shows','events','software','community','learn','resources','news','benefits','partners','speakers','people','about','now','directory','membership','media'];
+        $miamiSections = ['shows','events','software','services','community','learn','resources','news','benefits','partners','speakers','people','about','now','directory','membership','media'];
         if (in_array($urlViews[0] ?? '', $miamiSections, true)) {
             $GLOBALS['miami_tech_route'] = $slug;
             $hub = $publicRoot . '/pages/miami-tech-hub/index.php';
@@ -218,6 +218,46 @@ class Kernel
 
         include $filePath;
         exit;
+    }
+
+    /**
+     * Prevent inherited VNV Events commerce and marketplace pages from becoming
+     * public on the Tech Lab Miami domain. Internal panel/API routes are handled
+     * before this guard and remain available to the shared application.
+     */
+    private function isBlockedPublicRoute(array $urlViews): bool
+    {
+        $root = $urlViews[0] ?? '';
+        $blockedRoots = [
+            'store', 'store-categories', 'product', 'product-category', 'cart',
+            'checkout', 'meal-plans', 'tickets', 'forums', 'forum', 'affiliates',
+            'venues', 'vendors', 'vendors-search', 'profiles', 'search',
+            'vnv-live', 'vnv-gourmet', 'vnv-sessions', 'vnv-events-productions',
+            'event-planners', 'event-production', 'event-staffing', 'corporate-events',
+            'wedding-planning', 'party-tents-and-event-rental-services-in-south-florida',
+            'photo-booth-rental-video-photography-services-in-south-florida',
+            'bar-calculator-for-parties-and-venues', 'dj-sound-system-requirements-calculator',
+            'tent-and-seating-calculator-vnv-events', 'free-wellness-tools'
+        ];
+
+        if (in_array($root, $blockedRoots, true)) {
+            return true;
+        }
+
+        $allowedRoots = [
+            '', 'login', 'logout', 'signup', 'forgot-password', 'reset-password',
+            'update-password', 'google-auth', 'shows', 'events', 'software', 'services',
+            'community', 'learn', 'blog', 'locations', 'about', 'news',
+            'resources', 'people', 'directory', 'partners', 'benefits', 'now',
+            'contact', 'support', 'privacy-policy', 'terms-and-conditions',
+            'sitemap.xml', 'robots.txt', 'llms.txt'
+        ];
+
+        if (in_array($root, $allowedRoots, true)) {
+            return false;
+        }
+
+        return count($urlViews) !== 1 || !$this->growthHubHasContent('/' . trim($root, '/'));
     }
 
     private function includeGrowthHubContentAndExit(string $route, ?string $expectedType = null, ?string $listType = null): void
@@ -472,6 +512,11 @@ class Kernel
                 $this->includeViewAndExit($this->getApiViews($urlViews));
             }
 
+            if ($this->isBlockedPublicRoute($urlViews)) {
+                http_response_code(404);
+                $this->includeResolvedFileAndExit($this->getNotFoundView());
+            }
+
             // Rutas de afiliado
             if (count($urlViews) >= 2 && $urlViews[0] === 'r') {
                 $this->handleAffiliateRoute($urlViews[1]);
@@ -497,9 +542,7 @@ class Kernel
             // Public CMS generated in Ophyra Growth Hub. VNV Events consumes only
             // `site_key=vnvevents`; other brand content stays in Ophyra.
             if (count($urlViews) === 1 && $urlViews[0] === 'blog') {
-                $blogIndexView = LocationUtils::getRootLocation()
-                    . "/src/views/public/pages/blog/index.php";
-                $this->includeResolvedFileAndExit($blogIndexView);
+                $this->includeGrowthHubContentAndExit('/blog', null, 'blog');
             }
 
             if (count($urlViews) === 2 && $urlViews[0] === 'blog' && !empty($urlViews[1])) {
@@ -507,6 +550,9 @@ class Kernel
                 if ($this->growthHubHasContent($route, 'blog')) {
                     $this->includeGrowthHubContentAndExit($route, 'blog');
                 }
+
+                http_response_code(404);
+                $this->includeResolvedFileAndExit($this->getNotFoundView());
             }
 
             if (count($urlViews) === 2 && $urlViews[0] === 'locations' && !empty($urlViews[1])) {
@@ -515,17 +561,8 @@ class Kernel
                     $this->includeGrowthHubContentAndExit($route, 'location');
                 }
 
-                try {
-                    $repo = new LocationPagesRepository();
-                    if ($repo->getPublishedBySlug($urlViews[1])) {
-                        $locationPageView = LocationUtils::getRootLocation()
-                            . "/src/views/public/pages/location-page/index.php";
-
-                        $this->includeResolvedFileAndExit($locationPageView);
-                    }
-                } catch (\Throwable $e) {
-                    error_log('Location page lookup failed: ' . $e->getMessage());
-                }
+                http_response_code(404);
+                $this->includeResolvedFileAndExit($this->getNotFoundView());
             }
 
             if (

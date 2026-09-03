@@ -169,11 +169,13 @@ function growth_hub_local_content_list(string $listType, string $siteKey, int $l
               AND c.status = 'PUBLISHED'
               AND COALESCE(r.status, 'ACTIVE') = 'ACTIVE'
               AND COALESCE(c.language, 'en') = 'en'
-              AND c.site_key IN (:site_key, 'shared', 'global', 'all_sites')
+              AND c.id_owner = :owner_id
+              AND c.site_key = :site_key
             ORDER BY c.published_at DESC, c.updated_at DESC, c.id DESC
             LIMIT " . max(1, $limit)
         );
         $db->bind(':site_key', strtolower(trim($siteKey)));
+        $db->bind(':owner_id', \App\Utils\SiteContext::businessOwnerId(), \PDO::PARAM_INT);
 
         return array_map(static fn ($row) => (array)$row, $db->fetchAll() ?: []);
     } catch (\Throwable $e) {

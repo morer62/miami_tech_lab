@@ -1,23 +1,10 @@
 <?php
 
-use App\Repositories\LocationPagesRepository;
 use App\Repositories\Connection;
 use App\Utils\SiteContext;
 use App\Utils\TemplateResponse;
 
-$repo = new LocationPagesRepository();
-$pagesByRoute = [];
-
-foreach ($repo->getAllPublished() as $page) {
-    $normalized = normalize_location_legacy_page($page);
-    $pagesByRoute[$normalized['public_path']] = $normalized;
-}
-
-foreach (get_growth_hub_location_pages() as $page) {
-    $pagesByRoute[$page['public_path']] = $page;
-}
-
-$allPages = array_values($pagesByRoute);
+$allPages = get_growth_hub_location_pages();
 $categories = get_location_categories($allPages);
 $perPage = 20;
 $currentPage = max(1, (int)($_GET['page'] ?? 1));
@@ -77,6 +64,7 @@ function get_growth_hub_location_pages(): array
             ? "LOWER(COALESCE(NULLIF(c.content_type, ''), NULLIF(r.route_type, ''), NULLIF(c.type, ''), 'page'))"
             : "LOWER(COALESCE(NULLIF(c.content_type, ''), NULLIF(c.type, ''), 'page'))";
         $siteKey = SiteContext::siteKey();
+        $ownerId = SiteContext::businessOwnerId();
 
         $db->query("
             SELECT
@@ -98,10 +86,12 @@ function get_growth_hub_location_pages(): array
               AND c.status = 'PUBLISHED'
               AND COALESCE(r.status, 'ACTIVE') = 'ACTIVE'
               AND COALESCE(c.language, 'en') = 'en'
-              AND c.site_key IN (:site_key, 'shared', 'global', 'all_sites')
+              AND c.id_owner = :owner_id
+              AND c.site_key = :site_key
             ORDER BY c.published_at DESC, c.updated_at DESC, c.id DESC
         ");
         $db->bind(':site_key', $siteKey);
+        $db->bind(':owner_id', $ownerId, \PDO::PARAM_INT);
 
         $items = [];
         foreach ($db->fetchAll() ?: [] as $row) {

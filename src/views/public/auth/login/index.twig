@@ -2,8 +2,8 @@
 
 {% set show_whatsapp = true %}
 
-{% block title %}Sign In | Miami Tech Lab{% endblock %}
-{% block meta_description %}Sign in to access Miami Tech Lab events, software, resources and community benefits.{% endblock %}
+{% block title %}Sign In | Tech Lab Miami{% endblock %}
+{% block meta_description %}Sign in to access Tech Lab Miami events, software, resources and community benefits.{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -315,21 +315,21 @@ body{
         <div class="row align-items-center justify-content-center g-4">
             <div class="col-lg-6 col-xl-6">
                 <div class="vnv-login-brand">
-                    <a href="{{ path('planner-hub') }}">
-                        <img src="{{ asset_for('assets/miami-tech-lab/mark.png') }}" alt="Miami Tech Lab">
+                    <a href="{{ path('') }}">
+                        <img src="{{ asset_for('assets/miami-tech-lab/mark.png') }}" alt="Tech Lab Miami">
                     </a>
                 </div>
 
                 <div class="vnv-login-copy">
                     <span class="vnv-login-kicker">
                         <i class="fa-solid fa-lock"></i>
-                        Client & Team Access
+                        Member Access
                     </span>
 
                     <h1>Sign in to continue</h1>
 
                     <p>
-                        Access your Miami Tech Lab account to join events, launch software, discover resources and connect with the community.
+                        Access your Tech Lab Miami account to join events, launch software, discover resources and connect with the community.
                     </p>
                 </div>
 
@@ -346,7 +346,7 @@ body{
                     <div class="vnv-login-card-inner">
                         <h2 class="vnv-login-card-title">Welcome back</h2>
                         <div class="vnv-login-card-sub">
-                            Sign in to access your dashboard, event information and account tools.
+                            Sign in to access your dashboard, community resources and account tools.
                         </div>
 
                         <form method="post">
@@ -416,7 +416,6 @@ body{
     </div>
 </main>
 
-{% include "public/auth/_mobile_app_prompt.twig" %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

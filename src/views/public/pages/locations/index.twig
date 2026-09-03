@@ -1,10 +1,10 @@
 {% extends "templates/base.twig" %}
 
-{% block title %}Locations | VNV Events{% endblock %}
-{% block meta_description %}Explore VNV Events service locations and city pages across South Florida.{% endblock %}
+{% block title %}Technology & AI Locations | Tech Lab Miami{% endblock %}
+{% block meta_description %}Explore Tech Lab Miami city guides, technology resources and business innovation coverage across South Florida.{% endblock %}
 
 {% block body %}
-{% include "templates/layout/publicHeaderVnv.html.twig" %}
+{% include "templates/layout/publicHeaderTech.html.twig" %}
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap');
     :root{
@@ -194,10 +194,10 @@
         <div class="loc-head">
             <div class="loc-head-inner">
                 <div class="loc-eyebrow"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> South Florida</div>
-                <h1>VNV Event <em>Locations</em></h1>
-                <p>Discover where we craft unforgettable celebrations — curated city guides, local insight, and the same luxury standards in every market we serve.</p>
+                <h1>South Florida Tech <em>Locations</em></h1>
+                <p>Explore city-specific technology, AI and business innovation guides created for South Florida founders and operators.</p>
                 <div class="loc-head-actions">
-                    <a href="#" data-vnv-open-request class="loc-btn loc-btn-gold">Start New Request</a>
+                    <a href="{{ path('contact') }}" class="loc-btn loc-btn-gold">Start a Project</a>
                     <a href="tel:+13052045427" class="loc-btn loc-btn-ghost">Call (305) 204-5427</a>
                 </div>
             </div>
@@ -344,5 +344,5 @@
 {% include "templates/components/publicEventRequestModal.html.twig" with {
     request_form_action: "/api/public/event-request"
 } %}
-{% include "templates/layout/publicFooterVnv.html.twig" %}
+{% include "templates/layout/publicFooterTech.html.twig" %}
 {% endblock %}

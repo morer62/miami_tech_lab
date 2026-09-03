@@ -183,7 +183,11 @@ class SeoFilesGeneratorService
             );
         }
 
-        $indexResult = $this->generateSitemapIndex($children, $urls, $userId);
+        $indexChildren = array_filter(
+            $children,
+            static fn (array $child): bool => !empty($child['urls'])
+        );
+        $indexResult = $this->generateSitemapIndex($indexChildren, $urls, $userId);
 
         $status = $this->aggregateStatus([...$results, 'sitemap' => $indexResult]);
         if ($status !== 'success') {
@@ -362,15 +366,15 @@ class SeoFilesGeneratorService
         $today = $this->today();
 
         $static = [
-            ['/', 'VNV Events Home', 'daily', 1.0],
-            ['/event-planners/', 'Event Planners', 'weekly', 0.9],
-            ['/corporate-events/', 'Corporate Events', 'weekly', 0.8],
-            ['/event-production/', 'Event Production', 'weekly', 0.8],
-            ['/event-staffing/', 'Event Staffing', 'weekly', 0.7],
-            ['/locations/', 'VNV Events Locations', 'weekly', 0.8],
-            ['/blog/', 'VNV Events Blog', 'weekly', 0.7],
-            ['/faq/', 'VNV Events FAQ', 'weekly', 0.8],
-            ['/vnv-sessions/', 'VNV Sessions', 'weekly', 0.7],
+            ['/', 'Tech Lab Miami Home', 'daily', 1.0],
+            ['/shows/', 'Tech Lab Miami Shows', 'weekly', 0.9],
+            ['/events/', 'Tech Lab Miami Events', 'weekly', 0.8],
+            ['/software/', 'Software and AI Tools', 'weekly', 0.8],
+            ['/community/', 'Tech Community', 'weekly', 0.7],
+            ['/learn/', 'Learning Resources', 'weekly', 0.7],
+            ['/locations/', 'Tech Lab Miami Locations', 'weekly', 0.8],
+            ['/blog/', 'Tech Lab Miami Insights', 'weekly', 0.8],
+            ['/about/', 'About Tech Lab Miami', 'monthly', 0.6],
         ];
 
         foreach ($static as [$path, $title, $freq, $priority]) {
@@ -379,13 +383,9 @@ class SeoFilesGeneratorService
 
         $entries = array_merge(
             $entries,
-            $this->collectPhysicalPublicPages(),
-            $this->collectStoreContent(),
             $this->collectGrowthHubContent(),
-            $this->collectLocations(),
             $this->collectCmsRoutes(),
-            $this->collectCmsCategories(),
-            $this->collectForums()
+            $this->collectCmsCategories()
         );
 
         $deduped = [];

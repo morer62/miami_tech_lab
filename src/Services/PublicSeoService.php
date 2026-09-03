@@ -2,14 +2,17 @@
 
 namespace App\Services;
 
+use App\Utils\SiteContext;
+
 class PublicSeoService
 {
-    private const SITE_URL = 'https://vnvevents.com';
-    private const SITE_NAME = 'VNV Events';
-    private const LOGO_URL = 'https://vnvevents.com/assets/images/planner-hub-logo-negative.png';
-    private const LOCAL_BUSINESS_ID = 'https://vnvevents.com/#localbusiness';
-    private const WEBSITE_ID = 'https://vnvevents.com/#website';
     private const GOOGLE_BUSINESS_PROFILE_URL = 'https://share.google/dQqX7hhKBHLVaZaqQ';
+
+    private static function siteUrl(): string { return rtrim(SiteContext::publicBaseUrl(), '/'); }
+    private static function siteName(): string { return SiteContext::siteName(); }
+    private static function logoUrl(): string { return self::siteUrl() . '/assets/miami-tech-lab/mark.png'; }
+    private static function localBusinessId(): string { return self::siteUrl() . '/#organization'; }
+    private static function websiteId(): string { return self::siteUrl() . '/#website'; }
 
     public static function locationSeo(object $page): array
     {
@@ -17,12 +20,12 @@ class PublicSeoService
         $title = self::firstFilled([
             $page->meta_title ?? null,
             $page->hero_title ?? null,
-            ($page->title ?? '') ? $page->title . ' | VNV Events' : null,
+            ($page->title ?? '') ? $page->title . ' | Tech Lab Miami' : null,
         ]);
         $description = self::firstFilled([
             $page->meta_description ?? null,
             $page->excerpt ?? null,
-            ($page->city ?? '') ? 'Professional event planning, rentals, decor, DJ, photo and video services for events in ' . $page->city . '.' : null,
+            ($page->city ?? '') ? 'Practical AI consulting, business automation, software guidance and technology education for organizations in ' . $page->city . '.' : null,
         ]);
 
         return [
@@ -31,8 +34,8 @@ class PublicSeoService
             'canonical' => $canonical,
             'robots' => self::robots(($page->status ?? '') === 'PUBLISHED' && (int)($page->is_indexable ?? 1) === 1),
             'og_type' => 'website',
-            'og_image' => self::absoluteUrl(self::firstFilled([$page->og_image ?? null, $page->hero_image ?? null, self::LOGO_URL])),
-            'og_image_alt' => self::clean($page->title ?? self::SITE_NAME),
+            'og_image' => self::absoluteUrl(self::firstFilled([$page->og_image ?? null, $page->hero_image ?? null, self::logoUrl()])),
+            'og_image_alt' => self::clean($page->title ?? self::siteName()),
         ];
     }
 
@@ -48,15 +51,14 @@ class PublicSeoService
         $graph = [
             self::organizationNode(),
             self::websiteNode(),
-            self::locationBusinessNode($canonical, $page, $areaName),
             [
                 '@type' => 'WebPage',
                 '@id' => $canonical . '#webpage',
                 'url' => $canonical,
                 'name' => $title,
                 'description' => $description,
-                'isPartOf' => ['@id' => self::WEBSITE_ID],
-                'about' => ['@id' => $canonical . '#localbusiness'],
+                'isPartOf' => ['@id' => self::websiteId()],
+                'about' => ['@id' => $canonical . '#service'],
                 'breadcrumb' => ['@id' => $canonical . '#breadcrumb'],
                 'inLanguage' => 'en-US',
             ],
@@ -65,9 +67,9 @@ class PublicSeoService
                 '@id' => $canonical . '#service',
                 'name' => self::firstFilled([
                     $page->primary_keyword ?? null,
-                    $city ? 'Event Planning Services in ' . $city : 'Event Planning Services',
+                    $city ? 'Technology and AI Services in ' . $city : 'Technology and AI Services',
                 ]),
-                'provider' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'provider' => ['@id' => self::localBusinessId()],
                 'areaServed' => $city ? [[
                     '@type' => 'City',
                     'name' => $areaName ?: $city,
@@ -75,12 +77,12 @@ class PublicSeoService
                     '@type' => 'AdministrativeArea',
                     'name' => 'South Florida',
                 ]],
-                'serviceType' => 'Event planning, event rentals, decor, DJ, photo and video',
+                'serviceType' => 'AI consulting, business automation, software strategy and technology education',
                 'url' => $canonical,
             ],
             self::breadcrumbNode($canonical, [
-                ['name' => 'Home', 'url' => self::SITE_URL . '/'],
-                ['name' => 'Locations', 'url' => self::SITE_URL . '/locations/'],
+                ['name' => 'Home', 'url' => self::siteUrl() . '/'],
+                ['name' => 'Locations', 'url' => self::siteUrl() . '/locations/'],
                 ['name' => $city ?: ($page->title ?? 'Location'), 'url' => $canonical],
             ]),
         ];
@@ -95,16 +97,16 @@ class PublicSeoService
 
     public static function homepageSchema(array $seo = []): array
     {
-        $canonical = self::SITE_URL . '/';
+        $canonical = self::siteUrl() . '/';
         return self::schema([
             self::organizationNode(),
             self::websiteNode(),
             self::webPageNode(
                 $canonical,
-                self::firstFilled([$seo['title'] ?? null, 'VNV Events | South Florida Event Planning, Catering and Production']),
+                self::firstFilled([$seo['title'] ?? null, 'Tech Lab Miami | AI, Software and Business Innovation']),
                 self::firstFilled([
                     $seo['description'] ?? null,
-                    'VNV Events is a full-service luxury event planning, catering, production, entertainment and event rental studio serving Miami, Broward, Palm Beach and South Florida.',
+                    'Tech Lab Miami connects South Florida entrepreneurs and small businesses with practical AI, software, automation, education and a trusted technology community.',
                 ])
             ),
         ]);
@@ -112,14 +114,14 @@ class PublicSeoService
 
     public static function productSchema(object $product, array $faqs = []): array
     {
-        $canonical = self::SITE_URL . '/product/' . trim((string)($product->slug ?? ''), '/') . '/';
-        $name = self::clean($product->name ?? 'VNV Events Product');
+        $canonical = self::siteUrl() . '/product/' . trim((string)($product->slug ?? ''), '/') . '/';
+        $name = self::clean($product->name ?? 'Tech Lab Miami Product');
         $description = self::firstFilled([
             $product->short_description ?? null,
             $product->description ?? null,
             $name,
         ]);
-        $image = self::absoluteUrl(self::firstFilled([$product->main_image ?? null, self::LOGO_URL]));
+        $image = self::absoluteUrl(self::firstFilled([$product->main_image ?? null, self::logoUrl()]));
 
         $productNode = [
             '@type' => 'Product',
@@ -128,8 +130,8 @@ class PublicSeoService
             'url' => $canonical,
             'description' => $description,
             'image' => [$image],
-            'brand' => ['@id' => self::LOCAL_BUSINESS_ID],
-            'seller' => ['@id' => self::LOCAL_BUSINESS_ID],
+            'brand' => ['@id' => self::localBusinessId()],
+            'seller' => ['@id' => self::localBusinessId()],
             'category' => self::productCategoryName($product),
             'offers' => self::productOffersNode($product, $canonical),
         ];
@@ -146,17 +148,17 @@ class PublicSeoService
                 '@type' => 'WebPage',
                 '@id' => $canonical . '#webpage',
                 'url' => $canonical,
-                'name' => $name . ' | VNV Events Store',
+                'name' => $name . ' | Tech Lab Miami Store',
                 'description' => $description,
-                'isPartOf' => ['@id' => self::WEBSITE_ID],
+                'isPartOf' => ['@id' => self::websiteId()],
                 'about' => ['@id' => $canonical . '#product'],
                 'breadcrumb' => ['@id' => $canonical . '#breadcrumb'],
                 'inLanguage' => 'en-US',
             ],
             $productNode,
             self::breadcrumbNode($canonical, [
-                ['name' => 'Home', 'url' => self::SITE_URL . '/'],
-                ['name' => 'Store', 'url' => self::SITE_URL . '/store-categories/'],
+                ['name' => 'Home', 'url' => self::siteUrl() . '/'],
+                ['name' => 'Store', 'url' => self::siteUrl() . '/store-categories/'],
                 ['name' => self::productCategoryName($product), 'url' => self::productCategoryUrl($product)],
                 ['name' => $name, 'url' => $canonical],
             ]),
@@ -173,7 +175,7 @@ class PublicSeoService
     public static function contentSeo(object $content, object $route, string $fallbackType = 'page'): array
     {
         $canonical = self::canonical($content->canonical_url ?? null, $route->route ?? ('/' . trim((string)($content->slug ?? ''), '/') . '/'));
-        $titleSuffix = $fallbackType === 'post' ? ' | VNV Events Blog' : ' | VNV Events';
+        $titleSuffix = $fallbackType === 'post' ? ' | Tech Lab Miami Blog' : ' | Tech Lab Miami';
 
         return [
             'title' => self::firstFilled([
@@ -183,13 +185,13 @@ class PublicSeoService
             'description' => self::firstFilled([
                 $content->meta_description ?? null,
                 $content->excerpt ?? null,
-                $fallbackType === 'post' ? 'VNV Events blog article.' : 'VNV Events public page.',
+                $fallbackType === 'post' ? 'Tech Lab Miami blog article.' : 'Tech Lab Miami public page.',
             ]),
             'canonical' => $canonical,
             'robots' => self::robots(($content->status ?? '') === 'PUBLISHED', $content->robots ?? null),
             'og_type' => $fallbackType === 'post' ? 'article' : 'website',
-            'og_image' => self::absoluteUrl(self::firstFilled([$content->featured_image_url ?? null, self::LOGO_URL])),
-            'og_image_alt' => self::clean($content->title ?? self::SITE_NAME),
+            'og_image' => self::absoluteUrl(self::firstFilled([$content->featured_image_url ?? null, self::logoUrl()])),
+            'og_image_alt' => self::clean($content->title ?? self::siteName()),
         ];
     }
 
@@ -205,8 +207,8 @@ class PublicSeoService
                 'url' => $canonical,
                 'name' => self::firstFilled([$post->meta_title ?? null, $post->title ?? null]),
                 'description' => self::firstFilled([$post->meta_description ?? null, $post->excerpt ?? null]),
-                'isPartOf' => ['@id' => self::WEBSITE_ID],
-                'about' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'isPartOf' => ['@id' => self::websiteId()],
+                'about' => ['@id' => self::localBusinessId()],
                 'breadcrumb' => ['@id' => $canonical . '#breadcrumb'],
                 'inLanguage' => 'en-US',
             ],
@@ -220,15 +222,15 @@ class PublicSeoService
                 'mainEntityOfPage' => ['@id' => $canonical . '#webpage'],
                 'author' => [
                     '@type' => 'Organization',
-                    '@id' => self::LOCAL_BUSINESS_ID,
-                    'name' => self::SITE_NAME,
+                    '@id' => self::localBusinessId(),
+                    'name' => self::siteName(),
                 ],
-                'publisher' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'publisher' => ['@id' => self::localBusinessId()],
             ],
             self::breadcrumbNode($canonical, [
-                ['name' => 'Home', 'url' => self::SITE_URL . '/'],
-                ['name' => 'Blog', 'url' => self::SITE_URL . '/blog/'],
-                ['name' => $category->name ?? 'Article', 'url' => $category ? self::SITE_URL . '/blog/' . trim((string)$category->slug, '/') . '/' : $canonical],
+                ['name' => 'Home', 'url' => self::siteUrl() . '/'],
+                ['name' => 'Blog', 'url' => self::siteUrl() . '/blog/'],
+                ['name' => $category->name ?? 'Article', 'url' => $category ? self::siteUrl() . '/blog/' . trim((string)$category->slug, '/') . '/' : $canonical],
                 ['name' => $post->title ?? 'Article', 'url' => $canonical],
             ]),
         ];
@@ -253,13 +255,13 @@ class PublicSeoService
                 'url' => $canonical,
                 'name' => self::firstFilled([$page->meta_title ?? null, $page->title ?? null]),
                 'description' => self::firstFilled([$page->meta_description ?? null, $page->excerpt ?? null]),
-                'isPartOf' => ['@id' => self::WEBSITE_ID],
-                'about' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'isPartOf' => ['@id' => self::websiteId()],
+                'about' => ['@id' => self::localBusinessId()],
                 'breadcrumb' => ['@id' => $canonical . '#breadcrumb'],
                 'inLanguage' => 'en-US',
             ],
             self::breadcrumbNode($canonical, [
-                ['name' => 'Home', 'url' => self::SITE_URL . '/'],
+                ['name' => 'Home', 'url' => self::siteUrl() . '/'],
                 ['name' => $page->title ?? 'Page', 'url' => $canonical],
             ]),
         ];
@@ -268,10 +270,10 @@ class PublicSeoService
             $graph[] = [
                 '@type' => 'Service',
                 '@id' => $canonical . '#service',
-                'name' => self::clean($page->title ?? 'VNV Events Service'),
-                'provider' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'name' => self::clean($page->title ?? 'Tech Lab Miami Service'),
+                'provider' => ['@id' => self::localBusinessId()],
                 'areaServed' => self::defaultAreaServed(false),
-                'serviceType' => self::clean($page->title ?? 'Event services'),
+                'serviceType' => self::clean($page->title ?? 'Technology consulting and education'),
                 'url' => $canonical,
             ];
         }
@@ -296,7 +298,7 @@ class PublicSeoService
         return [
             'title' => self::firstFilled([
                 $topic->seo_title ?? null,
-                ($topic->title ?? '') ? $topic->title . ' | VNV Events Community' : null,
+                ($topic->title ?? '') ? $topic->title . ' | Tech Lab Miami Community' : null,
             ]),
             'description' => $description,
             'canonical' => $canonical,
@@ -304,8 +306,8 @@ class PublicSeoService
                 ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
                 : 'noindex,follow',
             'og_type' => 'article',
-            'og_image' => self::LOGO_URL,
-            'og_image_alt' => self::SITE_NAME . ' community discussion',
+            'og_image' => self::logoUrl(),
+            'og_image_alt' => self::siteName() . ' community discussion',
         ];
     }
 
@@ -322,8 +324,8 @@ class PublicSeoService
                 'url' => $canonical,
                 'name' => self::firstFilled([$topic->seo_title ?? null, $topic->title ?? null]),
                 'description' => self::firstFilled([$topic->seo_description ?? null, $topic->excerpt ?? null]),
-                'isPartOf' => ['@id' => self::WEBSITE_ID],
-                'about' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'isPartOf' => ['@id' => self::websiteId()],
+                'about' => ['@id' => self::localBusinessId()],
                 'breadcrumb' => ['@id' => $canonical . '#breadcrumb'],
                 'inLanguage' => 'en-US',
             ],
@@ -336,14 +338,14 @@ class PublicSeoService
                 'dateModified' => self::dateIso($topic->updated_at ?? $topic->published_at ?? null),
                 'author' => [
                     '@type' => 'Person',
-                    'name' => self::clean(trim(($topic->user_name ?? '') . ' ' . ($topic->user_lastname ?? ''))) ?: self::SITE_NAME,
+                    'name' => self::clean(trim(($topic->user_name ?? '') . ' ' . ($topic->user_lastname ?? ''))) ?: self::siteName(),
                 ],
-                'publisher' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'publisher' => ['@id' => self::localBusinessId()],
                 'mainEntityOfPage' => ['@id' => $canonical . '#webpage'],
             ],
             self::breadcrumbNode($canonical, [
-                ['name' => 'Home', 'url' => self::SITE_URL . '/'],
-                ['name' => 'Forums', 'url' => self::SITE_URL . '/forums/'],
+                ['name' => 'Home', 'url' => self::siteUrl() . '/'],
+                ['name' => 'Forums', 'url' => self::siteUrl() . '/forums/'],
                 ['name' => $topic->title ?? 'Discussion', 'url' => $canonical],
             ]),
         ]);
@@ -352,34 +354,34 @@ class PublicSeoService
     public static function forumListSeo(): array
     {
         return [
-            'title' => 'VNV Events Community Forums | Event Planning Q&A',
-            'description' => 'Public VNV Events community discussions for event planning ideas, venues, rentals, quinceañeras, weddings and corporate events in South Florida.',
-            'canonical' => self::SITE_URL . '/forums/',
+            'title' => 'Tech Lab Miami Community Forums | Event Planning Q&A',
+            'description' => 'Public Tech Lab Miami community discussions for event planning ideas, venues, rentals, quinceañeras, weddings and corporate events in South Florida.',
+            'canonical' => self::siteUrl() . '/forums/',
             'robots' => 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
             'og_type' => 'website',
-            'og_image' => self::LOGO_URL,
-            'og_image_alt' => self::SITE_NAME . ' community forums',
+            'og_image' => self::logoUrl(),
+            'og_image_alt' => self::siteName() . ' community forums',
         ];
     }
 
     public static function defaultInternalLinks(): array
     {
         return [
-            ['label' => 'Home', 'url' => self::SITE_URL . '/'],
-            ['label' => 'Request a Quote', 'url' => self::SITE_URL . '/event-planners/'],
-            ['label' => 'Service Areas', 'url' => self::SITE_URL . '/service-areas-in-south-florida/'],
-            ['label' => 'Corporate Events', 'url' => self::SITE_URL . '/corporate-events/'],
-            ['label' => 'Locations', 'url' => self::SITE_URL . '/locations/'],
+            ['label' => 'Home', 'url' => self::siteUrl() . '/'],
+            ['label' => 'AI Consulting', 'url' => self::siteUrl() . '/services/ai-consulting/'],
+            ['label' => 'Business Automation', 'url' => self::siteUrl() . '/services/business-automation/'],
+            ['label' => 'Resources', 'url' => self::siteUrl() . '/resources/'],
+            ['label' => 'Locations', 'url' => self::siteUrl() . '/locations/'],
         ];
     }
 
     public static function defaultSchema(string $canonical, array $seo = [], string $templateChild = ''): array
     {
         $canonical = self::absoluteUrl($canonical);
-        $title = self::firstFilled([$seo['title'] ?? null, self::SITE_NAME]);
+        $title = self::firstFilled([$seo['title'] ?? null, self::siteName()]);
         $description = self::firstFilled([
             $seo['description'] ?? null,
-            'VNV Events is a full-service event company in South Florida specializing in event planning, catering, decor, floral design, entertainment, rentals, media, staffing, and production.',
+            'Tech Lab Miami is a South Florida technology community and studio focused on practical AI, software, automation, education and business innovation.',
         ]);
 
         $graph = [
@@ -388,11 +390,11 @@ class PublicSeoService
             self::webPageNode($canonical, $title, $description),
         ];
 
-        if ($canonical !== self::SITE_URL . '/') {
+        if ($canonical !== self::siteUrl() . '/') {
             $graph[] = self::breadcrumbNode($canonical, self::breadcrumbsFromCanonical($canonical, $title));
         }
 
-        if ($canonical !== self::SITE_URL . '/' && self::pathLooksLikeService(self::pathFromCanonical($canonical), $title . ' ' . $description . ' ' . $templateChild)) {
+        if ($canonical !== self::siteUrl() . '/' && self::pathLooksLikeService(self::pathFromCanonical($canonical), $title . ' ' . $description . ' ' . $templateChild)) {
             $graph[] = self::serviceNode($canonical, $title, $description);
         }
 
@@ -410,181 +412,46 @@ class PublicSeoService
     private static function organizationNode(): array
     {
         return [
-            '@type' => 'LocalBusiness',
-            '@id' => self::LOCAL_BUSINESS_ID,
-            'name' => self::SITE_NAME,
-            'url' => self::SITE_URL . '/',
-            'telephone' => '+13052045427',
-            'email' => 'info@vnvevents.com',
-            'priceRange' => '$$-$$$$',
-            'additionalType' => [
-                'https://schema.org/EventPlanner',
-                'https://schema.org/FoodEstablishment',
-                'https://schema.org/Florist',
-                'https://schema.org/EntertainmentBusiness',
-            ],
-            'logo' => [
-                '@type' => 'ImageObject',
-                'url' => self::LOGO_URL,
-            ],
-            'image' => self::LOGO_URL,
-            'description' => 'VNV Events LLC provides event planning, catering, decor, floral design, entertainment, rentals, photography, videography, event staffing, and event production services in South Florida.',
-            'address' => [
-                '@type' => 'PostalAddress',
-                'streetAddress' => '10258 NW 47th St',
-                'addressLocality' => 'Sunrise',
-                'addressRegion' => 'FL',
-                'postalCode' => '33351',
-                'addressCountry' => 'US',
-            ],
-            'geo' => [
-                '@type' => 'GeoCoordinates',
-                'address' => '10258 NW 47th St, Sunrise, FL 33351',
-            ],
+            '@type' => 'Organization',
+            '@id' => self::localBusinessId(),
+            'name' => 'Tech Lab Miami',
+            'url' => self::siteUrl() . '/',
+            'logo' => ['@type' => 'ImageObject', 'url' => self::logoUrl()],
+            'image' => self::logoUrl(),
+            'description' => 'Tech Lab Miami is a South Florida technology community and studio focused on practical AI, software, automation, education and business innovation.',
             'areaServed' => self::defaultAreaServed(true),
-            'openingHoursSpecification' => [
-                [
-                    '@type' => 'OpeningHoursSpecification',
-                    'dayOfWeek' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-                    'opens' => '10:00',
-                    'closes' => '17:00',
-                ],
-                [
-                    '@type' => 'OpeningHoursSpecification',
-                    'dayOfWeek' => 'Saturday',
-                    'opens' => '10:00',
-                    'closes' => '14:00',
-                ],
-            ],
-            'contactPoint' => [
-                [
-                    '@type' => 'ContactPoint',
-                    'telephone' => '+13052045427',
-                    'contactType' => 'customer service',
-                    'areaServed' => 'US-FL',
-                    'availableLanguage' => ['English', 'Spanish'],
-                ],
-            ],
-            'makesOffer' => [
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Event planning and coordination']],
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Catering and chef-led food stations']],
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Event rentals, decor and floral design']],
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'DJ, sound, lighting and event production']],
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Photography, videography, photo booths and streaming']],
-                ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Bartending and event staffing']],
-            ],
-            'aggregateRating' => [
-                '@type' => 'AggregateRating',
-                'ratingValue' => '5.0',
-                'bestRating' => '5',
-                'worstRating' => '1',
-                'reviewCount' => '62',
-                'ratingCount' => '62',
-            ],
-            'review' => [
-                [
-                    '@type' => 'Review',
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => '5',
-                        'bestRating' => '5',
-                        'worstRating' => '1',
-                    ],
-                    'author' => [
-                        '@type' => 'Person',
-                        'name' => 'Stacy S',
-                    ],
-                    'reviewBody' => 'Recently hosted a corporate event and Vivian was absolutely perfect to work with. Music, food, vibes and theme were immaculate.',
-                    'publisher' => [
-                        '@type' => 'Organization',
-                        'name' => 'Google Business Profile',
-                        'url' => self::GOOGLE_BUSINESS_PROFILE_URL,
-                    ],
-                ],
-                [
-                    '@type' => 'Review',
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => '5',
-                        'bestRating' => '5',
-                        'worstRating' => '1',
-                    ],
-                    'author' => [
-                        '@type' => 'Person',
-                        'name' => 'Christy R',
-                    ],
-                    'reviewBody' => 'Isabel was amazing to work with and knew exactly what I needed. The pasta station experience made the party more enjoyable and service was top notch.',
-                    'publisher' => [
-                        '@type' => 'Organization',
-                        'name' => 'Google Business Profile',
-                        'url' => self::GOOGLE_BUSINESS_PROFILE_URL,
-                    ],
-                ],
-                [
-                    '@type' => 'Review',
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => '5',
-                        'bestRating' => '5',
-                        'worstRating' => '1',
-                    ],
-                    'author' => [
-                        '@type' => 'Person',
-                        'name' => 'Nicole S',
-                    ],
-                    'reviewBody' => 'The team was incredible. They were attentive to detail and made sure everything was running smoothly.',
-                    'publisher' => [
-                        '@type' => 'Organization',
-                        'name' => 'Google Business Profile',
-                        'url' => self::GOOGLE_BUSINESS_PROFILE_URL,
-                    ],
-                ],
-            ],
-            'sameAs' => [
-                'https://www.instagram.com/vnvevents/',
-                self::GOOGLE_BUSINESS_PROFILE_URL,
+            'knowsAbout' => ['Artificial intelligence', 'Business automation', 'Software development', 'Technology education', 'South Florida technology'],
+            'founder' => [
+                ['@type' => 'Person', 'name' => 'Jonathan Moreno'],
+                ['@type' => 'Person', 'name' => 'Lucas Alvarado'],
             ],
         ];
+
     }
 
-    private static function locationBusinessNode(string $canonical, object $page, string $areaName): array
+    private static function locationServiceNode(string $canonical, object $page, string $areaName): array
     {
         $city = self::clean($page->city ?? '');
         $state = self::clean($page->state ?? '');
         $nameArea = $areaName !== '' ? $areaName : self::firstFilled([$city, $page->title ?? null, 'South Florida']);
 
         return [
-            '@type' => 'LocalBusiness',
-            '@id' => $canonical . '#localbusiness',
-            'name' => 'VNV Events in ' . $nameArea,
+            '@type' => 'Service',
+            '@id' => $canonical . '#service',
+            'name' => 'Technology and AI services in ' . $nameArea,
             'url' => $canonical,
-            'telephone' => '+13052045427',
-            'email' => 'info@vnvevents.com',
             'description' => self::firstFilled([
                 $page->meta_description ?? null,
                 $page->excerpt ?? null,
-                'VNV Events provides event planning, catering, rentals, decor, DJ, staffing and production services in ' . $nameArea . '.',
+                'Tech Lab Miami provides practical AI guidance, business automation, software strategy and technology education in ' . $nameArea . '.',
             ]),
-            'parentOrganization' => ['@id' => self::LOCAL_BUSINESS_ID],
-            'address' => [
-                '@type' => 'PostalAddress',
-                'streetAddress' => '10258 NW 47th St',
-                'addressLocality' => 'Sunrise',
-                'addressRegion' => 'FL',
-                'postalCode' => '33351',
-                'addressCountry' => 'US',
-            ],
+            'provider' => ['@id' => self::localBusinessId()],
             'areaServed' => [[
                 '@type' => $city !== '' ? 'City' : 'AdministrativeArea',
                 'name' => $nameArea,
                 'addressRegion' => $state ?: 'FL',
             ]],
-            'priceRange' => '$$-$$$$',
-            'image' => self::absoluteUrl(self::firstFilled([$page->hero_image ?? null, $page->og_image ?? null, self::LOGO_URL])),
-            'sameAs' => [
-                self::GOOGLE_BUSINESS_PROFILE_URL,
-                'https://www.instagram.com/vnvevents/',
-            ],
+            'image' => self::absoluteUrl(self::firstFilled([$page->hero_image ?? null, $page->og_image ?? null, self::logoUrl()])),
         ];
     }
 
@@ -592,10 +459,10 @@ class PublicSeoService
     {
         return [
             '@type' => 'WebSite',
-            '@id' => self::WEBSITE_ID,
-            'url' => self::SITE_URL . '/',
-            'name' => self::SITE_NAME,
-            'publisher' => ['@id' => self::LOCAL_BUSINESS_ID],
+            '@id' => self::websiteId(),
+            'url' => self::siteUrl() . '/',
+            'name' => self::siteName(),
+            'publisher' => ['@id' => self::localBusinessId()],
             'inLanguage' => 'en-US',
         ];
     }
@@ -608,12 +475,12 @@ class PublicSeoService
             'url' => $canonical,
             'name' => $title,
             'description' => $description,
-            'isPartOf' => ['@id' => self::WEBSITE_ID],
-            'about' => ['@id' => self::LOCAL_BUSINESS_ID],
+            'isPartOf' => ['@id' => self::websiteId()],
+            'about' => ['@id' => self::localBusinessId()],
             'inLanguage' => 'en-US',
         ];
 
-        if ($canonical !== self::SITE_URL . '/') {
+        if ($canonical !== self::siteUrl() . '/') {
             $node['breadcrumb'] = ['@id' => $canonical . '#breadcrumb'];
         }
 
@@ -628,7 +495,7 @@ class PublicSeoService
             'name' => $title,
             'url' => $canonical,
             'description' => $description,
-            'provider' => ['@id' => self::LOCAL_BUSINESS_ID],
+            'provider' => ['@id' => self::localBusinessId()],
             'areaServed' => $areaName
                 ? [['@type' => 'Place', 'name' => $areaName]]
                 : self::defaultAreaServed(false),
@@ -662,7 +529,7 @@ class PublicSeoService
                     'price' => $variationPrice,
                     'availability' => 'https://schema.org/InStock',
                     'itemCondition' => 'https://schema.org/NewCondition',
-                    'seller' => ['@id' => self::LOCAL_BUSINESS_ID],
+                    'seller' => ['@id' => self::localBusinessId()],
                 ];
             }
 
@@ -674,7 +541,7 @@ class PublicSeoService
                 'highPrice' => $highPrice,
                 'offerCount' => max(1, count($offers)),
                 'availability' => $availability,
-                'seller' => ['@id' => self::LOCAL_BUSINESS_ID],
+                'seller' => ['@id' => self::localBusinessId()],
                 'offers' => $offers ?: null,
             ]);
         }
@@ -686,7 +553,7 @@ class PublicSeoService
             'price' => self::moneyValue($product->display_price ?? $product->promo_price ?? $product->price ?? 0),
             'availability' => $availability,
             'itemCondition' => 'https://schema.org/NewCondition',
-            'seller' => ['@id' => self::LOCAL_BUSINESS_ID],
+            'seller' => ['@id' => self::localBusinessId()],
         ];
     }
 
@@ -695,10 +562,10 @@ class PublicSeoService
         $categories = $product->categories ?? [];
         if (is_array($categories) && !empty($categories)) {
             $category = reset($categories);
-            return self::firstFilled([$category->name ?? null, 'VNV Events Services']);
+            return self::firstFilled([$category->name ?? null, 'Tech Lab Miami Services']);
         }
 
-        return 'VNV Events Services';
+        return 'Tech Lab Miami Services';
     }
 
     private static function productCategoryUrl(object $product): string
@@ -708,11 +575,11 @@ class PublicSeoService
             $category = reset($categories);
             $slug = trim((string)($category->slug ?? ''), '/');
             if ($slug !== '') {
-                return self::SITE_URL . '/product-category/' . $slug . '/';
+                return self::siteUrl() . '/product-category/' . $slug . '/';
             }
         }
 
-        return self::SITE_URL . '/store-categories/';
+        return self::siteUrl() . '/store-categories/';
     }
 
     private static function moneyValue($value): string
@@ -841,7 +708,7 @@ class PublicSeoService
             }
         }
 
-        return self::SITE_NAME;
+        return self::siteName();
     }
 
     private static function clean($value): string
@@ -853,15 +720,15 @@ class PublicSeoService
     {
         $url = trim($url);
         if ($url === '') {
-            return self::SITE_URL . '/';
+            return self::siteUrl() . '/';
         }
 
         if (preg_match('#^https?://#i', $url)) {
             $path = parse_url($url, PHP_URL_PATH) ?: '/';
-            return self::SITE_URL . self::normalizePath($path);
+            return self::siteUrl() . self::normalizePath($path);
         }
 
-        return self::SITE_URL . self::normalizePath($url);
+        return self::siteUrl() . self::normalizePath($url);
     }
 
     private static function validCanonical(?string $url): ?string
@@ -873,7 +740,8 @@ class PublicSeoService
 
         if (preg_match('#^https?://#i', $url)) {
             $host = strtolower((string)(parse_url($url, PHP_URL_HOST) ?: ''));
-            if (!in_array($host, ['vnvevents.com', 'www.vnvevents.com'], true)) {
+            $siteHost = strtolower((string)(parse_url(self::siteUrl(), PHP_URL_HOST) ?: ''));
+            if ($host !== $siteHost && $host !== 'www.' . $siteHost) {
                 return null;
             }
         }
@@ -902,7 +770,7 @@ class PublicSeoService
     private static function breadcrumbsFromCanonical(string $canonical, string $title): array
     {
         $path = trim(self::pathFromCanonical($canonical), '/');
-        $items = [['name' => 'Home', 'url' => self::SITE_URL . '/']];
+        $items = [['name' => 'Home', 'url' => self::siteUrl() . '/']];
 
         if ($path === '') {
             return $items;
@@ -915,7 +783,7 @@ class PublicSeoService
             $isLast = $index === count($segments) - 1;
             $items[] = [
                 'name' => $isLast ? $title : self::titleFromSlug($segment),
-                'url' => self::SITE_URL . self::normalizePath($running),
+                'url' => self::siteUrl() . self::normalizePath($running),
             ];
         }
 
@@ -927,10 +795,8 @@ class PublicSeoService
         $special = [
             'blog' => 'Blog',
             'locations' => 'Locations',
-            'vnv-gourmet' => 'VNV Gourmet',
-            'catering-stations-south-florida' => 'Live Catering Stations',
-            'product' => 'Products',
-            'product-category' => 'Product Categories',
+            'software' => 'Software',
+            'resources' => 'Resources',
             'services' => 'Services',
         ];
 
@@ -957,35 +823,17 @@ class PublicSeoService
     {
         return [
             'service',
-            'event',
-            'wedding',
-            'corporate',
-            'production',
-            'catering',
-            'rental',
-            'photo',
-            'photography',
-            'videography',
-            'video',
-            'dj',
-            'floral',
-            'decor',
-            'bartending',
-            'staffing',
-            'quince',
-            'baby shower',
-            'private party',
-            'vnv-gourmet',
-            'pasta station',
-            'paella',
-            'tapas',
-            'pizza station',
-            'taco station',
-            'brunch station',
-            'crepes',
-            'sushi boat',
-            'dessert station',
-            'appetizer',
+            'technology',
+            'artificial intelligence',
+            ' ai ',
+            'automation',
+            'software',
+            'cybersecurity',
+            'data',
+            'digital transformation',
+            'consulting',
+            'workshop',
+            'training',
         ];
     }
 
@@ -993,25 +841,21 @@ class PublicSeoService
     {
         $text = strtolower($text);
         foreach ([
-            'wedding' => 'Wedding planning',
-            'catering' => 'Event catering',
-            'gourmet' => 'Event catering',
-            'dj' => 'DJ services',
-            'photo' => 'Photography and videography',
-            'video' => 'Photography and videography',
-            'floral' => 'Floral design',
-            'decor' => 'Event decor',
-            'rental' => 'Event rentals',
-            'staff' => 'Event staffing',
-            'corporate' => 'Corporate events',
-            'bartending' => 'Bartending',
+            'artificial intelligence' => 'AI consulting',
+            ' ai ' => 'AI consulting',
+            'automation' => 'Business automation',
+            'software' => 'Software strategy and development',
+            'cybersecurity' => 'Cybersecurity guidance',
+            'data' => 'Data and analytics consulting',
+            'workshop' => 'Technology education',
+            'training' => 'Technology education',
         ] as $needle => $type) {
             if (str_contains($text, $needle)) {
                 return $type;
             }
         }
 
-        return 'Event services';
+        return 'Technology consulting';
     }
 
     private static function defaultAreaServed(bool $includeSouthFlorida): array

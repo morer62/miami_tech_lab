@@ -27,7 +27,7 @@ if (\App\Services\LoginService::getSession() !== null) {
 }
 
 $router->get(function () use ($client) {
-    $level = $_GET['level'] ?? null;
+    $level = 5;
     $code = $_GET['code'] ?? null;
     $state = $_GET['state'] ?? $level;
     $fromAffiliate = $_GET['from_affiliate'] ?? null;
@@ -35,12 +35,6 @@ $router->get(function () use ($client) {
     if ($code) {
         handleGoogleCallback($client, $code, $state);
         exit();
-    }
-
-    if (!$level) {
-        return TemplateResponse::render(__DIR__ . "/choose.twig", [
-            "from_affiliate" => $fromAffiliate
-        ]);
     }
 
     $client->setState($level);
@@ -89,7 +83,9 @@ $router->post(function () {
 
     $days = intval($_ENV['FREE_MEMBERSHIP_DAYS']);
     $dueDate = date('Y-m-d', strtotime("+{$days} days"));
-    $level = intval($_POST["level"]);
+    // Public registration is always a client account. Administrative, venue
+    // and team levels can only be created from the authenticated back office.
+    $level = 5;
     $id_owner = null;
 
     if ($level === 5) {
@@ -163,7 +159,7 @@ function handleGoogleCallback($client, $code, $level)
 
         $days = intval($_ENV['FREE_MEMBERSHIP_DAYS']);
         $dueDate = date('Y-m-d', strtotime("+{$days} days"));
-        $level = intval($level ?? 1);
+        $level = 5;
         $id_owner = null;
 
         if ($level === 5) {

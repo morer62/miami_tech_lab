@@ -308,7 +308,7 @@ class TemplateResponse
 
     private static function getCurrentCanonicalUrl(): string
     {
-        $baseUrl = 'https://vnvevents.com';
+        $baseUrl = SiteContext::publicBaseUrl();
         $path = '/';
 
         if (class_exists(\Symfony\Component\HttpFoundation\Request::class)) {
@@ -321,6 +321,15 @@ class TemplateResponse
 
         $path = '/' . ltrim($path, '/');
         $path = preg_replace('#/+#', '/', $path) ?: '/';
+
+        // Local installations live below /miami-tech-lab, while the public
+        // domain serves the application from /. Never leak the local project
+        // directory into production canonicals.
+        $appPath = (string)(parse_url((string)($_ENV['APP_URL'] ?? ''), PHP_URL_PATH) ?: '');
+        $appPath = '/' . trim($appPath, '/');
+        if ($appPath !== '/' && ($path === $appPath || str_starts_with($path, $appPath . '/'))) {
+            $path = substr($path, strlen($appPath)) ?: '/';
+        }
 
         if ($path !== '/') {
             $path = rtrim($path, '/') . '/';

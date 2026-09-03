@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     {% set page_seo = seo|default({}) %}
-    {% set default_title = 'Miami Tech Lab | Technology, AI, Software & Business Innovation' %}
+    {% set default_title = 'Tech Lab Miami | Technology, AI, Software & Business Innovation' %}
     {% set title_value = page_seo.title|default(block('title') is defined ? block('title')|striptags|trim : default_title) %}
 
     <title>{{ title_value ?: default_title }}</title>
@@ -68,17 +68,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {# -------------------------------------------------------
        CORE BRAND / SEO DEFAULTS
        ------------------------------------------------------- #}
-    {% set site_name = 'Miami Tech Lab' %}
-    {% set site_url = 'https://vnvevents.com' %}
+    {% set site_name = 'Tech Lab Miami' %}
+    {% set site_url = 'https://miamitechlab.com' %}
     {% set site_phone_display = '+1 (305) 204-5427' %}
     {% set site_phone_raw = '+13052045427' %}
     {% set site_email = 'info@vnvevents.com' %}
-    {% set site_logo = asset_for('assets/images/planner-hub-logo-negative.png') %}
-   {% set site_favicon = asset_for('assets/images/planner-hub-logo-negative.png') %}
+    {% set site_logo = asset_for('assets/miami-tech-lab/mark.png') %}
+   {% set site_favicon = asset_for('assets/miami-tech-lab/mark.png') %}
 
-    {% set default_description = 'Miami Tech Lab is Miami’s community for technology, AI, software and business innovation, built by operators who create, ship and execute.' %}
+    {% set default_description = 'Tech Lab Miami is Miami’s community for technology, AI, software and business innovation, built by operators who create, ship and execute.' %}
 
-    {% set default_keywords = 'Miami Tech Lab, Miami technology community, Miami AI events, software Miami, technology networking South Florida, AI for business, Miami founders, tech workshops Miami' %}
+    {% set default_keywords = 'Tech Lab Miami, Miami technology community, Miami AI events, software Miami, technology networking South Florida, AI for business, Miami founders, tech workshops Miami' %}
 
     {% set default_og_image = site_logo %}
 
@@ -90,10 +90,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {% set description_value = page_seo.description|default(block('meta_description') is defined ? block('meta_description')|striptags|trim : default_description) %}
     <meta name="description" content="{{ description_value ?: default_description }}">
     <meta name="keywords" content="{% block meta_keywords %}{{ default_keywords }}{% endblock %}">
-    <meta name="author" content="Miami Tech Lab">
-    <meta name="publisher" content="Miami Tech Lab">
-    <meta name="application-name" content="Miami Tech Lab">
-    <meta name="apple-mobile-web-app-title" content="Miami Tech Lab">
+    <meta name="author" content="Tech Lab Miami">
+    <meta name="publisher" content="Tech Lab Miami">
+    <meta name="application-name" content="Tech Lab Miami">
+    <meta name="apple-mobile-web-app-title" content="Tech Lab Miami">
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#1f1307">
     <meta name="color-scheme" content="light only">
@@ -137,7 +137,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     {# -------------------------------------------------------
        OPEN GRAPH / SOCIAL
        ------------------------------------------------------- #}
-    <meta property="og:site_name" content="Miami Tech Lab">
+    <meta property="og:site_name" content="Tech Lab Miami">
     {% set og_type_value = page_seo.og_type|default(block('og_type') is defined ? block('og_type')|striptags|trim : 'website') %}
     {% set og_title_value = page_seo.title|default(block('og_title') is defined ? block('og_title')|striptags|trim : title_value) %}
     {% set og_description_value = page_seo.description|default(block('og_description') is defined ? block('og_description')|striptags|trim : description_value) %}
@@ -148,7 +148,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta property="og:description" content="{{ og_description_value ?: default_description }}">
     <meta property="og:url" content="{{ og_url_value ?: fallback_canonical }}">
     <meta property="og:image" content="{{ og_image_value ?: default_og_image }}">
-    <meta property="og:image:alt" content="{{ page_seo.og_image_alt|default(block('og_image_alt') is defined ? block('og_image_alt')|striptags|trim : 'Miami Tech Lab logo') }}">
+    <meta property="og:image:alt" content="{{ page_seo.og_image_alt|default(block('og_image_alt') is defined ? block('og_image_alt')|striptags|trim : 'Tech Lab Miami logo') }}">
     <meta property="og:locale" content="en_US">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -717,7 +717,7 @@ body::before{
         class="floating-whatsapp"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with VNV Events on WhatsApp">
+        aria-label="Chat with Tech Lab Miami on WhatsApp">
             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
             <span>Chat with us</span>
         </a>
