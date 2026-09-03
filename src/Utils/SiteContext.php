@@ -6,7 +6,7 @@ class SiteContext
 {
     public const DEFAULT_SITE_KEY = 'miamitechlab';
     public const DEFAULT_SITE_NAME = 'Tech Lab Miami';
-    public const DEFAULT_PUBLIC_BASE_URL = 'https://miamitechlab.com';
+    public const DEFAULT_PUBLIC_BASE_URL = 'https://techlabmiami.com';
     public const DEFAULT_BUSINESS_OWNER_ID = 2;
 
     public static function siteKey(): string

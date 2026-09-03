@@ -16,8 +16,8 @@ SET site_name='Tech Lab Miami',
     default_cta_label='Request Technology Support',
     default_cta_url='/support/',
     cloudinary_folder='ophyra-growth-hub/miamitechlab',
-    public_base_url='https://miamitechlab.com',
-    domain='miamitechlab.com',
+    public_base_url='https://techlabmiami.com',
+    domain='techlabmiami.com',
     status='active'
 WHERE id_owner=2 AND site_key='miamitechlab';
 

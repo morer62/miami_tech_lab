@@ -1,35 +1,26 @@
-# VNV Events
+# Tech Lab Miami
 
-VNV Events is a South Florida event planning, production and event services business.
+Tech Lab Miami is a South Florida technology community and studio focused on practical AI, software, automation, education and business innovation.
 
-## Main Event Services
+## Main Technology Services
 
-- Event planning and coordination
-- Corporate event production
-- Weddings and social celebrations
-- Decor, flowers and styling
-- DJ, sound and multimedia
-- Event rentals and staffing
-- Photo booth, video and photography support
+- AI consulting for business operators
+- Business workflow automation
+- Software strategy and digital systems
+- Practical technology education
 
 ## Main Public Pages
 
-- Home: https://miamitechlab.com/
-- Event Planners: https://miamitechlab.com/event-planners/
-- Corporate Events: https://miamitechlab.com/corporate-events/
-- Event Production: https://miamitechlab.com/event-production/
-- Locations: https://miamitechlab.com/locations/
-- Blog: https://miamitechlab.com/blog/
-- FAQ: https://miamitechlab.com/faq/
-- VNV Gourmet: https://miamitechlab.com/vnv-gourmet/
-- Live Catering Stations: https://miamitechlab.com/catering-stations-south-florida/
-- Crepe Station Catering: https://miamitechlab.com/crepes-catering-south-florida/
-- Pasta Station Catering: https://miamitechlab.com/pasta-station-catering-south-florida/
-- Pizza Station Catering: https://miamitechlab.com/pizza-station-catering-south-florida/
-- Paella Catering: https://miamitechlab.com/paella-catering-south-florida/
-- Taco Station Catering: https://miamitechlab.com/taco-station-catering-south-florida/
-- Corporate Catering: https://miamitechlab.com/corporate-catering-south-florida/
-- Store Categories: https://miamitechlab.com/store-categories/
+- Home: https://techlabmiami.com/
+- About: https://techlabmiami.com/about/
+- Community: https://techlabmiami.com/community/
+- Events: https://techlabmiami.com/events/
+- Learning Resources: https://techlabmiami.com/learn/
+- Software and AI Tools: https://techlabmiami.com/software/
+- AI Consulting: https://techlabmiami.com/services/ai-consulting/
+- Business Automation: https://techlabmiami.com/services/business-automation/
+- Locations: https://techlabmiami.com/locations/
+- Blog: https://techlabmiami.com/blog/
 
 ## Main Service Areas
 

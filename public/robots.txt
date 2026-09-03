@@ -10,7 +10,7 @@ Disallow: /order-access
 Disallow: /storage/private/
 
 # Public discovery files
-Host: https://miamitechlab.com
-Sitemap: https://miamitechlab.com/sitemap.xml
-LLMs: https://miamitechlab.com/llms.txt
-LLMs-Full: https://miamitechlab.com/llms-full.txt
+Host: https://techlabmiami.com
+Sitemap: https://techlabmiami.com/sitemap.xml
+LLMs: https://techlabmiami.com/llms.txt
+LLMs-Full: https://techlabmiami.com/llms-full.txt

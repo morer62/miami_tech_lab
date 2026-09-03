@@ -260,7 +260,7 @@
                     </div>
                     <div class="loc-card-actions">
                         <a class="loc-link-btn loc-link-main" href="{{ cardHref }}">View location</a>
-                        <button type="button" data-vnv-open-request class="loc-link-btn loc-link-request">Request</button>
+                        <a href="{{ path('support') }}" class="loc-link-btn loc-link-request">Request support</a>
                     </div>
                 </article>
             {% endfor %}
@@ -341,8 +341,5 @@
 </script>
 {% endif %}
 
-{% include "templates/components/publicEventRequestModal.html.twig" with {
-    request_form_action: "/api/public/event-request"
-} %}
 {% include "templates/layout/publicFooterTech.html.twig" %}
 {% endblock %}
