@@ -460,7 +460,7 @@
         <div class="cms-generation-dialog">
             <div class="cms-generation-spinner" aria-hidden="true"></div>
             <div class="cms-generation-title" id="cms-generation-title" data-generation-title>Generating...</div>
-            <p class="cms-generation-message" data-generation-message>Please keep this page open while VNV Events prepares your content.</p>
+            <p class="cms-generation-message" data-generation-message>Please keep this page open while {{ site_name|default('the site') }} prepares your content.</p>
         </div>
     </div>
     <div class="cms-header">
@@ -545,7 +545,7 @@
                     </div>
                     <div class="cms-field full">
                         <label class="cms-label">Keywords to highlight</label>
-                        <input class="cms-input" data-ai-keywords placeholder="wedding planning, corporate events, Miami">
+                        <input class="cms-input" data-ai-keywords placeholder="AI consulting, business automation, Miami">
                         <div class="cms-help">Optional. Separate keywords with commas.</div>
                     </div>
                     <div class="cms-field full">
@@ -567,7 +567,7 @@
                                 <div class="cms-help">No internal CMS links are available yet.</div>
                             {% endfor %}
                         </div>
-                        <div class="cms-help">Only official VNV Events service pages are suggested here. Blog articles and location pages are intentionally excluded.</div>
+                        <div class="cms-help">Only official service and resource pages for the active site are suggested here. Blog articles and location pages are intentionally excluded.</div>
                     </div>
                 </div>
                 <div class="cms-actions">

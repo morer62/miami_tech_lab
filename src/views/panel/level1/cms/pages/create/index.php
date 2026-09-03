@@ -69,6 +69,23 @@ function cmsCanonicalUrlForRoute(string $route): string
     return SiteContext::publicBaseUrl() . '/' . trim($route, '/') . '/';
 }
 
+function cmsAiBrandProfile(): array
+{
+    if (SiteContext::siteKey() === 'miamitechlab') {
+        return [
+            'name' => 'Tech Lab Miami',
+            'search_context' => 'technology, AI, automation, software and entrepreneurship in South Florida',
+            'visual_context' => 'modern technology consulting, software, automation and founder education',
+        ];
+    }
+
+    return [
+        'name' => SiteContext::siteName(),
+        'search_context' => SiteContext::siteName(),
+        'visual_context' => 'professional services',
+    ];
+}
+
 function cmsShouldUseGeneratedCanonical(string $canonicalUrl, string $contentType, string $slug): bool
 {
     if ($canonicalUrl === '') {
@@ -200,7 +217,8 @@ function cmsTemplateIdForType(array $templates, string $contentType, int $prefer
 
 function cmsBuildAiArticleHtml(array $article, int $imageCount, array $generatedImages = []): string
 {
-    $title = htmlspecialchars((string)($article['title'] ?? 'VNV Events Article'), ENT_QUOTES, 'UTF-8');
+    $brand = cmsAiBrandProfile();
+    $title = htmlspecialchars((string)($article['title'] ?? $brand['name'] . ' Article'), ENT_QUOTES, 'UTF-8');
     $body = trim((string)($article['body_html'] ?? ''));
     $imagePrompts = $article['image_prompts'] ?? [];
     if (!is_array($imagePrompts)) {
@@ -254,12 +272,13 @@ function cmsAiArticleImagePrompts(array $article, array $idea, string $title, in
     $visualDirection = $visualDirections[$directionIndex];
     $uniqueIdentity = substr(hash('sha256', strtolower($title) . '|' . $batchToken . '|' . $batchIndex), 0, 12);
     $angle = trim((string)($idea['angle'] ?? $idea['excerpt'] ?? $article['excerpt'] ?? ''));
+    $brand = cmsAiBrandProfile();
     $thumbnailPrompt = 'Unique thumbnail hero photograph for the article titled "' . $title . '". '
         . ($angle !== '' ? 'Editorial angle: ' . $angle . '. ' : '')
         . 'Visual direction: ' . $visualDirection . '. '
-        . 'Create a distinct VNV Events corporate/event service scene that is clearly different in subject, camera angle, venue, color palette and composition from every other article image in this batch. '
+        . 'Create a distinct ' . $brand['name'] . ' scene about ' . $brand['visual_context'] . ' that is clearly different in subject, camera angle, setting, color palette and composition from every other article image in this batch. '
         . 'Creative identity ' . $uniqueIdentity . ' (use only to enforce variation; never render it as text). '
-        . 'Hyperrealistic professional event photography, no text overlay.';
+        . 'Hyperrealistic professional editorial photography, no text overlay.';
 
     $prompts = [$thumbnailPrompt];
     $seen = [strtolower(preg_replace('/\s+/', ' ', $thumbnailPrompt)) => true];
@@ -292,7 +311,7 @@ function cmsAiArticleImagePrompts(array $article, array $idea, string $title, in
     while (count($prompts) < ($supportingImageCount + 1)) {
         $fallbackIndex = count($prompts);
         $supportDirection = $visualDirections[($directionIndex + $fallbackIndex) % count($visualDirections)];
-        $prompts[] = 'Supporting event photograph for the article titled "' . $title . '", ' . $supportDirection . ', creative identity ' . $uniqueIdentity . '-' . $fallbackIndex . ' must not appear as text, realistic VNV Events service context, hyperrealistic professional photography, no text overlay.';
+        $prompts[] = 'Supporting editorial photograph for the article titled "' . $title . '", ' . $supportDirection . ', creative identity ' . $uniqueIdentity . '-' . $fallbackIndex . ' must not appear as text, realistic ' . $brand['name'] . ' context about ' . $brand['visual_context'] . ', hyperrealistic professional photography, no text overlay.';
     }
 
     return array_slice($prompts, 0, $supportingImageCount + 1);
@@ -309,6 +328,17 @@ function cmsExtendAiRuntime(): void
 
 function cmsServiceInternalLinkCandidates(): array
 {
+    if (SiteContext::siteKey() === 'miamitechlab') {
+        return [
+            ['id' => 'service-ai-consulting', 'title' => 'AI Consulting', 'type' => 'service', 'route' => '/services/ai-consulting/', 'status' => 'PUBLISHED'],
+            ['id' => 'service-business-automation', 'title' => 'Business Automation', 'type' => 'service', 'route' => '/services/business-automation/', 'status' => 'PUBLISHED'],
+            ['id' => 'service-software-strategy', 'title' => 'Software Strategy', 'type' => 'service', 'route' => '/software/', 'status' => 'PUBLISHED'],
+            ['id' => 'service-technology-education', 'title' => 'Technology Education', 'type' => 'service', 'route' => '/learn/', 'status' => 'PUBLISHED'],
+            ['id' => 'community', 'title' => 'Tech Community', 'type' => 'service', 'route' => '/community/', 'status' => 'PUBLISHED'],
+            ['id' => 'events', 'title' => 'Tech Lab Events', 'type' => 'service', 'route' => '/events/', 'status' => 'PUBLISHED'],
+        ];
+    }
+
     return [
         ['id' => 'service-event-planners', 'title' => 'Event Planner & Day Coordinator', 'type' => 'service', 'route' => '/event-planners', 'status' => 'PUBLISHED'],
         ['id' => 'service-catering', 'title' => 'VNV Gourmet Catering', 'type' => 'service', 'route' => '/vnv-gourmet', 'status' => 'PUBLISHED'],
@@ -338,9 +368,9 @@ $router->get(function () {
     $db->query("SELECT c.id,c.title,c.content_type,c.status,r.route
         FROM cms_contents c
         LEFT JOIN cms_routes r ON r.id_content=c.id AND r.is_main=1
-        WHERE c.id_owner=:owner AND c.status IN ('GENERATED','PUBLISHED')
+        WHERE c.id_owner=:owner AND c.site_key=:site_key AND c.status IN ('GENERATED','PUBLISHED')
         ORDER BY c.updated_at DESC LIMIT 300");
-    $db->bind(':owner',$ownerId);$baseContents=$db->fetchAll();
+    $db->bind(':owner',$ownerId);$db->bind(':site_key',SiteContext::siteKey());$baseContents=$db->fetchAll();
 
     return TemplateResponse::render(__DIR__ . "/index.twig", [
         "title" => "Create CMS Page",
@@ -410,11 +440,12 @@ $router->post(function () {
                 throw new Exception('Add a title or body content before generating metadata.');
             }
 
+            $brand = cmsAiBrandProfile();
             $metadata = cmsCallOpenAiJson(
-                'You are an SEO editor for VNV Events LLC. Return valid JSON only.',
+                'You are an SEO editor for ' . $brand['name'] . '. Return valid JSON only.',
                 [
                     'task' => 'Generate CMS metadata from this draft. Required keys: meta_title, meta_description, meta_keywords, og_title, og_description, schema_json, thumbnail_prompt.',
-                    'brand' => 'VNV Events LLC',
+                    'brand' => $brand['name'],
                     'content_type' => $contentType,
                     'title' => $title,
                     'excerpt' => $excerpt,
@@ -426,7 +457,7 @@ $router->post(function () {
                         'meta_title should be concise and click-worthy.',
                         'meta_description should be useful, natural and no longer than 160 characters.',
                         'schema_json should be a valid JSON-LD object appropriate for the content type.',
-                        'thumbnail_prompt must describe hyperrealistic professional event photography for VNV Events, not illustration, cartoon, anime or render, and without text overlays.',
+                        'thumbnail_prompt must describe hyperrealistic professional editorial photography for ' . $brand['name'] . ' in the context of ' . $brand['visual_context'] . ', not illustration, cartoon, anime or render, and without text overlays.',
                     ],
                 ],
                 90
@@ -484,12 +515,13 @@ $router->post(function () {
                 }
             }
 
-            $reference = cmsFetchRemoteReference(($manualTitle !== '' ? $manualTitle : $keywords) . ' VNV Events Miami');
+            $brand = cmsAiBrandProfile();
+            $reference = cmsFetchRemoteReference(($manualTitle !== '' ? $manualTitle : $keywords) . ' ' . $brand['search_context']);
             $ideasPayload = cmsCallOpenAiJson(
-                'You are an editorial strategist for VNV Events. Return compact valid JSON only.',
+                'You are an editorial strategist for ' . $brand['name'] . '. Return compact valid JSON only.',
                 [
                     'task' => 'Generate exactly 5 ideas. Each idea must include title, excerpt, angle, suggested_keywords and reference_note.',
-                    'brand' => 'VNV Events LLC',
+                    'brand' => $brand['name'],
                     'content_type' => $contentType,
                     'category' => $categoryName,
                     'keywords_csv' => $keywords,
@@ -546,28 +578,29 @@ $router->post(function () {
 
             $created = [];
             $failed = [];
+            $brand = cmsAiBrandProfile();
             foreach ($ideas as $idea) {
                 if (!is_array($idea)) {
                     continue;
                 }
 
                 $article = cmsCallOpenAiJson(
-                    'You are a careful SEO content writer for VNV Events. Return valid JSON only.',
+                    'You are a careful SEO content writer for ' . $brand['name'] . '. Return valid JSON only.',
                     [
-                        'task' => 'Generate one CMS-ready draft. Required keys: title, slug, excerpt, body_html, meta_title, meta_description, meta_keywords, schema_json, og_title, og_description, image_prompts. body_html must be clean rich HTML with h2 sections, useful paragraphs, lists and FAQ when helpful. image_prompts must be hyperrealistic professional event photography prompts, not illustration, cartoon, anime or 3D render. No markdown.',
-                        'brand' => 'VNV Events LLC',
+                        'task' => 'Generate one CMS-ready draft. Required keys: title, slug, excerpt, body_html, meta_title, meta_description, meta_keywords, schema_json, og_title, og_description, image_prompts. body_html must be clean rich HTML with h2 sections, useful paragraphs, lists and FAQ when helpful. image_prompts must be hyperrealistic professional editorial photography prompts appropriate to the brand, not illustration, cartoon, anime or 3D render. No markdown.',
+                        'brand' => $brand['name'],
                         'content_type' => $contentType,
                         'idea' => $idea,
                         'keywords_csv' => $keywords,
                         'intent' => $intent,
                         'remote_reference' => $reference,
-                        'selected_vnv_base_content' => $baseContent,
+                        'selected_site_base_content' => $baseContent,
                         'internal_links_to_consider' => $internalLinks,
                         'supporting_image_count' => $supportingImageCount,
                         'thumbnail_required' => $supportingImageCount > 0,
                         'rules' => [
                             'Do not invent prices, addresses, awards, reviews, guarantees, licenses or staff names.',
-                            'Use remote and selected VNV base content as structural/context references only; create a distinct page unless the instruction explicitly requests adaptation.',
+                            'Use remote and selected site base content as structural/context references only; create a distinct page unless the instruction explicitly requests adaptation.',
                             'Visible content must be in English.',
                             'Use selected internal links only when they are contextually relevant. Insert natural anchor text in body_html. Do not force every link.',
                             'Internal link href values must use the provided route exactly.',

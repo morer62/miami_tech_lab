@@ -11,7 +11,7 @@ trait ContentOriginRepositoryTrait
     public function withVnvEventsOrigin(array $data, ?int $userId = null, ?int $ownerId = null): array
     {
         $siteKey = SiteContext::siteKey();
-        $origin = 'vnv_events';
+        $origin = $siteKey;
 
         $defaults = [
             'id_owner' => $ownerId,
@@ -19,7 +19,7 @@ trait ContentOriginRepositoryTrait
             'content_origin' => $origin,
             'origin_site_key' => $siteKey,
             'source_site_key' => $siteKey,
-            'source_platform' => 'vnv_events',
+            'source_platform' => $siteKey,
             'created_by' => $userId,
             'updated_by' => $userId,
         ];
@@ -36,7 +36,7 @@ trait ContentOriginRepositoryTrait
             $data['origin_metadata_json'] = json_encode([
                 'origin' => $origin,
                 'site_key' => $siteKey,
-                'created_in' => 'vnv_events_cms',
+                'created_in' => $siteKey . '_cms',
                 'author_user_id' => $userId,
                 'owner_id' => $ownerId,
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
