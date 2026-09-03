@@ -1,19 +1,19 @@
 {% extends "templates/base.twig" %}
 
 {% block title %}
-    {{ post.meta_title ?: post.title ~ ' | VNV Events Blog' }}
+    {{ post.meta_title ?: post.title ~ ' | Tech Lab Miami' }}
 {% endblock %}
 
 {% block meta_description %}
-    {{ post.meta_description ?: post.excerpt ?: 'VNV Events blog article' }}
+    {{ post.meta_description ?: post.excerpt ?: 'Practical technology guidance from Tech Lab Miami.' }}
 {% endblock %}
 
 {% block meta_keywords %}
-    {{ post.meta_keywords ?: 'VNV Events blog, South Florida events, event planning blog' }}
+    {{ post.meta_keywords ?: 'Tech Lab Miami, artificial intelligence, business automation, software, South Florida technology' }}
 {% endblock %}
 
 {% block canonical %}
-    {{ post.canonical_url ?: ('https://vnvevents.com' ~ route.route) }}
+    {{ post.canonical_url ?: ('https://techlabmiami.com' ~ route.route) }}
 {% endblock %}
 
 {% block og_title %}
@@ -21,19 +21,19 @@
 {% endblock %}
 
 {% block og_description %}
-    {{ post.og_description ?: post.meta_description ?: post.excerpt ?: 'VNV Events blog article' }}
+    {{ post.og_description ?: post.meta_description ?: post.excerpt ?: 'Practical technology guidance from Tech Lab Miami.' }}
 {% endblock %}
 
 {% block og_url %}
-    {{ post.canonical_url ?: ('https://vnvevents.com' ~ route.route) }}
+    {{ post.canonical_url ?: ('https://techlabmiami.com' ~ route.route) }}
 {% endblock %}
 
 {% block og_image %}
-    {{ post.featured_image_url ?: asset_for('assets/images/planner-hub-logo-negative.png') }}
+    {{ post.featured_image_url ?: asset_for('assets/miami-tech-lab/mark.png') }}
 {% endblock %}
 
 {% block body %}
-{% include "templates/layout/publicHeaderVnv.html.twig" %}
+{% include "templates/layout/publicHeaderTech.html.twig" %}
 <style>
     :root{
         --vnv-bg:#f6f1e8;
@@ -329,7 +329,7 @@
                 {% endif %}
 
                 {% if internal_links is defined and internal_links is not empty %}
-                    <nav class="blog-post-back" aria-label="Related VNV Events links">
+                    <nav class="blog-post-back" aria-label="Related Tech Lab Miami links">
                         {% for link in internal_links %}
                             <a href="{{ link.url }}" class="me-2 mb-2">{{ link.label }}</a>
                         {% endfor %}
@@ -347,6 +347,5 @@
         </div>
     </div>
 </section>
-{% include "templates/components/publicEventRequestModal.html.twig" %}
-{% include "templates/layout/publicFooterVnv.html.twig" %}
+{% include "templates/layout/publicFooterTech.html.twig" %}
 {% endblock %}
