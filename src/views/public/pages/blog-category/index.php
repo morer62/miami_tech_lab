@@ -42,7 +42,7 @@ $typeWhere = "1 = 0";
 $categoryRepository = null;
 $categoryTitle = '';
 $categoryLabel = normalize_public_category_type_label($categoryType);
-$perPage = 20;
+$perPage = 12;
 $currentPage = max(1, (int)($_GET['page'] ?? 1));
 $totalItems = 0;
 $totalPages = 1;
@@ -127,8 +127,8 @@ try {
 
     $contentStatusFilter = $hasStatus ? " AND c.status = 'PUBLISHED'" : "";
     $routeStatusFilter = $hasRouteStatus ? " AND r.status = 'ACTIVE'" : "";
-    $contentSiteKeyFilter = $hasContentSiteKey ? " AND c.site_key IN (:content_site_key, 'shared', 'global', 'all_sites')" : "";
-    $routeSiteKeyFilter = $hasRouteSiteKey ? " AND r.site_key IN (:route_site_key, 'shared', 'global', 'all_sites')" : "";
+    $contentSiteKeyFilter = $hasContentSiteKey ? " AND LOWER(c.site_key) = :content_site_key" : "";
+    $routeSiteKeyFilter = $hasRouteSiteKey ? " AND LOWER(r.site_key) = :route_site_key" : "";
 
     $countSql = "
         SELECT COUNT(*) AS total
@@ -193,7 +193,11 @@ try {
     if ($hasRouteSiteKey) {
         $db->bind(':route_site_key', $siteKey);
     }
-    $items = $db->fetchAll() ?: [];
+    $items = array_map(static function ($item) {
+        $row = (array)$item;
+        $row['display_excerpt'] = tech_lab_category_excerpt($row);
+        return (object)$row;
+    }, $db->fetchAll() ?: []);
 } catch (\Throwable $e) {
     $logFile = LocationUtils::getRootLocation() . '/.logs/app_error_' . date('Y-m-d') . '.log';
     error_log(
@@ -271,10 +275,18 @@ function public_category_matches_site(object $category, string $siteKey): bool
         return true;
     }
 
-    return in_array(strtolower(trim((string)$category->site_key)), [
-        $siteKey,
-        'shared',
-        'global',
-        'all_sites',
-    ], true);
+    return strtolower(trim((string)$category->site_key)) === $siteKey;
+}
+
+function tech_lab_category_excerpt(array $item, int $limit = 155): string
+{
+    foreach (['excerpt', 'meta_description', 'description', 'body_html'] as $field) {
+        $value = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string)($item[$field] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        if ($value === '' || str_contains(strtolower($value), 'use this manually entered title as the article direction')) continue;
+        if (mb_strlen($value) <= $limit) return $value;
+        $short = mb_substr($value, 0, $limit + 1);
+        $boundary = mb_strrpos($short, ' ');
+        return rtrim(mb_substr($short, 0, $boundary !== false ? $boundary : $limit), " \t\n\r\0\x0B.,;:") . '…';
+    }
+    return '';
 }

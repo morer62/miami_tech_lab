@@ -2,7 +2,6 @@
 
 use App\Repositories\CmsContentsRepository;
 use App\Repositories\Connection;
-use App\Repositories\ForumTopicRepository;
 use App\Repositories\LocationPagesRepository;
 use App\Services\OphyraGrowthHubClient;
 
@@ -18,8 +17,6 @@ $siteUrl = rtrim((string)($_ENV['PUBLIC_BASE_URL'] ?? $_ENV['SITE_PUBLIC_BASE_UR
 $cmsRepository = new CmsContentsRepository();
 $cmsRepository->db = new Connection();
 $locationRepository = new LocationPagesRepository();
-$forumTopicRepository = new ForumTopicRepository();
-$forumTopicRepository->db = new Connection();
 $growthHubClient = new OphyraGrowthHubClient();
 
 $urls = [
@@ -39,6 +36,26 @@ $urls = [
         'priority' => '0.7',
     ],
 ];
+
+foreach (['about','about/mission','about/team','about/editorial-policy','people','impact','impact/reports','press','press/media-kit','speaking','speaking/topics','shows','guests','events','events/upcoming','events/past','software','community','community/directory','community/foundations','benefits','partners','south-florida','south-florida/sunrise','south-florida/fort-lauderdale','south-florida/miami','south-florida/west-palm-beach','studio'] as $section) {
+    $urls[] = ['loc' => $siteUrl . '/' . $section . '/', 'lastmod' => date('Y-m-d'), 'priority' => '0.7'];
+}
+
+try {
+    $categoryDb = new Connection();
+    $categoryDb->query("SELECT slug,updated_at,created_at FROM cms_categories WHERE id_owner=:owner AND LOWER(site_key)=:site_key AND is_active=1 AND applies_to_blog=1 ORDER BY slug");
+    $categoryDb->bind(':owner', (int)($_ENV['SITE_BUSINESS_USER_ID'] ?? 2));
+    $categoryDb->bind(':site_key', strtolower((string)($_ENV['SITE_KEY'] ?? 'miamitechlab')));
+    foreach ($categoryDb->fetchAll() ?: [] as $category) {
+        $urls[] = [
+            'loc' => $siteUrl . '/blog/' . trim((string)$category->slug, '/') . '/',
+            'lastmod' => date_value($category->updated_at ?? $category->created_at ?? null) ?: date('Y-m-d'),
+            'priority' => '0.7',
+        ];
+    }
+} catch (Throwable $e) {
+    error_log('Sitemap category lookup failed: ' . $e->getMessage());
+}
 
 foreach (growth_hub_entries($growthHubClient, $siteUrl) as $entry) {
     $urls[] = $entry;
@@ -74,18 +91,6 @@ try {
     error_log('Sitemap CMS fallback failed: ' . $e->getMessage());
 }
 
-try {
-    foreach ($forumTopicRepository->getPublishedSitemapEntries() as $topic) {
-        $urls[] = [
-            'loc' => $siteUrl . '/forums/' . trim((string)$topic->slug, '/') . '/',
-            'lastmod' => date_value($topic->updated_at ?? $topic->published_at ?? $topic->created_at ?? null),
-            'priority' => '0.6',
-        ];
-    }
-} catch (Throwable $e) {
-    error_log('Sitemap forum fallback failed: ' . $e->getMessage());
-}
-
 $unique = [];
 foreach ($urls as $url) {
     $unique[$url['loc']] = $url;
@@ -116,7 +121,8 @@ function canonical_url(?string $stored, string $fallbackPath, string $siteUrl): 
 {
     $url = trim((string)$stored);
     if ($url !== '' && preg_match('#^https?://#i', $url)) {
-        return $url;
+        $path = parse_url($url, PHP_URL_PATH) ?: $fallbackPath;
+        return rtrim($siteUrl, '/') . '/' . ltrim($path, '/');
     }
 
     $path = $url !== '' ? $url : $fallbackPath;

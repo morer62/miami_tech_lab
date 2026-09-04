@@ -1,13 +1,12 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    {% set cms_title = cms_page.meta_title ?? cms_page.title ?? 'VNV Events' %}
-    {% set cms_description = cms_page.meta_description ?? 'VNV Events is a full-service luxury event company in South Florida specializing in weddings, corporate events, private parties, catering, DJs, rentals, photo booth services, and event production.' %}
-    {% set cms_keywords = cms_page.meta_keywords ?? 'VNV Events, event planning South Florida, luxury events, weddings, corporate events, catering, DJ services, event rentals, photo booth, event production' %}
-    {% set cms_canonical = cms_page.canonical_url ?? current_canonical_url ?? site_url ?? 'https://vnvevents.com/' %}
-    {% set cms_og_title = cms_page.og_title ?? cms_page.meta_title ?? cms_page.title ?? 'VNV Events | Luxury Event Planning & Services' %}
+    {% set cms_title = cms_page.meta_title ?? cms_page.title ?? 'Tech Lab Miami' %}
+    {% set cms_description = cms_page.meta_description ?? 'Tech Lab Miami connects South Florida builders through practical AI education, original shows, useful software, events and an operator-led community.' %}
+    {% set cms_canonical = cms_page.canonical_url ?? current_canonical_url ?? site_url ?? 'https://techlabmiami.com/' %}
+    {% set cms_og_title = cms_page.og_title ?? cms_page.meta_title ?? cms_page.title ?? 'Tech Lab Miami | South Florida Technology Community' %}
     {% set cms_og_description = cms_page.og_description ?? cms_page.meta_description ?? cms_description %}
-    {% set cms_og_image = cms_page.og_image ?? cms_page.meta_thumbnail ?? asset_for('assets/images/planner-hub-logo-negative.png') %}
+    {% set cms_og_image = cms_page.og_image ?? cms_page.meta_thumbnail ?? asset_for('assets/miami-tech-lab/mark.png') %}
     {% set cms_robots_index = cms_page.robots_index is defined ? cms_page.robots_index : 1 %}
     {% set cms_robots_follow = cms_page.robots_follow is defined ? cms_page.robots_follow : 1 %}
     {% set cms_robots_content = (cms_robots_index ? 'index' : 'noindex') ~ ', ' ~ (cms_robots_follow ? 'follow' : 'nofollow') ~ ', max-image-preview:large, max-snippet:-1, max-video-preview:-1' %}
@@ -45,29 +44,27 @@
     {# -------------------------------------------------------
        CORE BRAND / SEO DEFAULTS
        ------------------------------------------------------- #}
-    {% set site_name = 'VNV Events' %}
-    {% set site_url = 'https://vnvevents.com' %}
+    {% set site_name = 'Tech Lab Miami' %}
+    {% set site_url = 'https://techlabmiami.com' %}
     {% set site_phone_display = '+1 (305) 204-5427' %}
     {% set site_phone_raw = '+13052045427' %}
-    {% set site_email = 'info@vnvevents.com' %}
-    {% set site_logo = asset_for('assets/images/planner-hub-logo-negative.png') %}
-    {% set site_favicon = asset_for('assets/images/planner-hub-logo-negative.png') %}
+    {% set site_email = 'hello@techlabmiami.com' %}
+    {% set site_logo = asset_for('assets/miami-tech-lab/mark.png') %}
+    {% set site_favicon = asset_for('assets/miami-tech-lab/mark.png') %}
 
     <meta name="robots" content="{{ cms_robots_content }}">
     <meta name="googlebot" content="{{ cms_robots_content }}">
     <meta name="bingbot" content="{{ cms_robots_content }}">
 
     <meta name="description" content="{% block meta_description %}{{ cms_description }}{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}{{ cms_keywords }}{% endblock %}">
-    <meta name="author" content="VNV Events">
-    <meta name="publisher" content="VNV Events">
-    <meta name="application-name" content="VNV Events">
-    <meta name="apple-mobile-web-app-title" content="VNV Events">
+    <meta name="author" content="Tech Lab Miami">
+    <meta name="publisher" content="Tech Lab Miami">
+    <meta name="application-name" content="Tech Lab Miami">
+    <meta name="apple-mobile-web-app-title" content="Tech Lab Miami">
     <meta name="format-detection" content="telephone=no">
     <meta name="theme-color" content="#1f1307">
     <meta name="color-scheme" content="light only">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="language" content="English">
     <meta http-equiv="content-language" content="en-US">
 
     {# -------------------------------------------------------
@@ -96,13 +93,13 @@
     {# -------------------------------------------------------
        OPEN GRAPH / SOCIAL
        ------------------------------------------------------- #}
-    <meta property="og:site_name" content="VNV Events">
+    <meta property="og:site_name" content="Tech Lab Miami">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:title" content="{% block og_title %}{{ cms_og_title }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ cms_og_description }}{% endblock %}">
     <meta property="og:url" content="{{ current_canonical_url|default(cms_canonical) }}">
     <meta property="og:image" content="{% block og_image %}{{ cms_og_image }}{% endblock %}">
-    <meta property="og:image:alt" content="{% block og_image_alt %}{{ cms_page.title ?? 'VNV Events page image' }}{% endblock %}">
+    <meta property="og:image:alt" content="{% block og_image_alt %}{{ cms_page.title ?? 'Tech Lab Miami page image' }}{% endblock %}">
     <meta property="og:locale" content="en_US">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -114,17 +111,8 @@
        LOCAL / GEO SIGNALS
        ------------------------------------------------------- #}
     <meta name="geo.region" content="US-FL">
-    <meta name="geo.placename" content="South Florida">
-    <meta name="ICBM" content="26.1224, -80.1373">
-
-    {# -------------------------------------------------------
-       DISCOVERY / AI / INDEXING FRIENDLY HINTS
-       ------------------------------------------------------- #}
-    <meta name="subject" content="Full-service event planning, catering, DJ services, rentals, photo booth services, and event production in South Florida.">
-    <meta name="category" content="Event Planning, Weddings, Corporate Events, Catering, DJ Services, Event Rentals">
-    <meta name="coverage" content="Broward County, Miami-Dade County, Palm Beach County">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
+    <meta name="geo.placename" content="Sunrise, Florida">
+    <meta name="ICBM" content="26.16697, -80.25659">
 
     <style>
       .floating-whatsapp{

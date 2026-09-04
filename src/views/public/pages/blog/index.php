@@ -50,6 +50,20 @@ function vnv_blog_first_existing_column(\App\Repositories\Connection $db, string
     return null;
 }
 
+function tech_lab_blog_excerpt(array $post, int $limit = 155): string
+{
+    $placeholder = 'use this manually entered title as the article direction';
+    foreach (['excerpt', 'meta_description', 'description', 'body_html'] as $field) {
+        $value = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string)($post[$field] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        if ($value === '' || str_contains(strtolower($value), $placeholder)) continue;
+        if (mb_strlen($value) <= $limit) return $value;
+        $short = mb_substr($value, 0, $limit + 1);
+        $boundary = mb_strrpos($short, ' ');
+        return rtrim(mb_substr($short, 0, $boundary !== false ? $boundary : $limit), " \t\n\r\0\x0B.,;:") . '…';
+    }
+    return '';
+}
+
 try {
     $db = new \App\Repositories\Connection();
     $hasCategories = vnv_blog_table_exists($db, 'cms_categories');
@@ -184,7 +198,8 @@ try {
         }
     }
 
-    foreach ($posts as $post) {
+    foreach ($posts as $postIndex => $post) {
+        $posts[$postIndex]['display_excerpt'] = tech_lab_blog_excerpt($post);
         $categoryId = (int)($post['id_cms_category'] ?? $post['id_blog_category'] ?? 0);
         if ($categoryId > 0 && isset($categoriesById[$categoryId])) {
             $categoryIndex = $categoriesById[$categoryId];

@@ -16,7 +16,9 @@ trait SiteScopedRepositoryTrait
 
         $column = $alias !== '' ? "{$alias}.site_key" : 'site_key';
 
-        return " AND ({$column} = :site_key OR {$column} IN ('shared', 'global', 'all_sites'))";
+        // Tech Lab Miami is a hard tenant boundary. Public and panel queries must
+        // never inherit records from VNV Events, The Pasta Station or generic pools.
+        return " AND LOWER({$column}) = :site_key";
     }
 
     protected function publicVisibilitySql(string $entityType, ?string $siteKey = null, string $alias = ''): string

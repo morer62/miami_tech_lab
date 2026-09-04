@@ -24,6 +24,17 @@ final class MiamiTechShowsRepository
         return $this->db->fetchAll();
     }
 
+    public function homeSignal(): object|bool
+    {
+        $this->db->query("SELECT s.slug,s.title,s.tagline,r.title AS signal_title,r.starts_at AS signal_at,'upcoming' AS signal_type FROM mtl_show_recordings r INNER JOIN mtl_shows s ON s.id=r.show_id AND s.site_key=r.site_key WHERE r.site_key=:site_key AND r.starts_at>=NOW() AND r.status IN ('PLANNED','CONFIRMED') AND s.status='PUBLISHED' ORDER BY r.starts_at ASC LIMIT 1");
+        $this->db->bind(':site_key', SiteContext::siteKey());
+        $signal = $this->db->fetchOne();
+        if ($signal) return $signal;
+        $this->db->query("SELECT s.slug,s.title,s.tagline,e.title AS signal_title,e.published_at AS signal_at,'latest' AS signal_type FROM mtl_show_episodes e INNER JOIN mtl_shows s ON s.id=e.show_id AND s.site_key=e.site_key WHERE e.site_key=:site_key AND e.status='PUBLISHED' AND s.status='PUBLISHED' AND (e.published_at IS NULL OR e.published_at<=NOW()) ORDER BY COALESCE(e.published_at,e.created_at) DESC LIMIT 1");
+        $this->db->bind(':site_key', SiteContext::siteKey());
+        return $this->db->fetchOne();
+    }
+
     public function publishedShow(string $slug): object|bool
     {
         $this->db->query("SELECT * FROM mtl_shows WHERE site_key=:site_key AND slug=:slug AND status='PUBLISHED' AND (published_at IS NULL OR published_at <= NOW()) LIMIT 1");

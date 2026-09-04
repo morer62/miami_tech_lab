@@ -3,6 +3,7 @@
 
 {% block title %}Technology Insights | Tech Lab Miami{% endblock %}
 {% block meta_description %}Practical insights about artificial intelligence, automation, software and technology entrepreneurship from Tech Lab Miami.{% endblock %}
+{% block canonical %}https://techlabmiami.com/blog/{% endblock %}
 
 {% block body %}
 {% set placeholderImage = asset_for('assets/miami-tech-lab/mark.png') %}
@@ -590,7 +591,7 @@
                 <div class="vnv-blog-section-head">
                     <div>
                         <h2>Browse by category</h2>
-                        <p>Categories are pulled from the blog setup and use the category image when available, or the first matching article image as a dynamic fallback.</p>
+                        <p>Explore practical ideas for applying technology across South Florida businesses and communities.</p>
                     </div>
                 </div>
 
@@ -611,7 +612,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="vnv-blog-empty">No blog categories are published yet. Once categories and articles are created in the generator, they will appear here automatically.</div>
+                    <div class="vnv-blog-empty">Editorial categories are being prepared. Explore the latest published insights below.</div>
                 {% endif %}
             </div>
         </section>
@@ -621,7 +622,7 @@
                 <div class="vnv-blog-section-head">
                     <div>
                         <h2>Latest articles</h2>
-                        <p>Articles published through the content generator appear here with their public blog routes.</p>
+                        <p>Field-tested perspectives on AI, automation, software, operations and the people building locally.</p>
                     </div>
                 </div>
 
@@ -637,14 +638,14 @@
                                 <div class="vnv-blog-post-body">
                                     <small>{{ post.category_name ?: 'Tech Insight' }}</small>
                                     <h3>{{ post.title }}</h3>
-                                    <p>{{ (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags|length > 140 ? (post.excerpt ?: post.meta_description ?: post.description)|striptags|slice(0, 140) ~ '...' : (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags }}</p>
+                                    {% if post.display_excerpt %}<p>{{ post.display_excerpt }}</p>{% endif %}
                                     <span class="vnv-blog-read-more">Read article</span>
                                 </div>
                             </a>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="vnv-blog-empty">No blog articles are published yet. Add articles in the generator and they will populate this page automatically.</div>
+                    <div class="vnv-blog-empty">New Tech Lab Miami insights are being prepared. Check back soon.</div>
                 {% endif %}
             </div>
         </section>
@@ -668,7 +669,7 @@
                                 <div class="vnv-blog-post-body">
                                     <small>{{ post.category_name ?: 'Tech Insight' }}</small>
                                     <h3>{{ post.title }}</h3>
-                                    <p>{{ (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags|length > 120 ? (post.excerpt ?: post.meta_description ?: post.description)|striptags|slice(0, 120) ~ '...' : (post.excerpt ?: post.meta_description ?: post.description ?: '')|striptags }}</p>
+                                    {% if post.display_excerpt %}<p>{{ post.display_excerpt }}</p>{% endif %}
                                     <span class="vnv-blog-read-more">Read article</span>
                                 </div>
                             </a>

@@ -16,6 +16,8 @@
     {{ category.meta_description ?: category.description ?: (categoryTypeLabel ~ ' results for ' ~ categoryTitle ~ ' at Tech Lab Miami') }}
 {% endblock %}
 
+{% block canonical %}https://techlabmiami.com/blog/{{ category.slug }}/{% endblock %}
+
 {% block body %}
 {% include "templates/layout/publicHeaderTech.html.twig" %}
 <style>
@@ -181,6 +183,7 @@
 
 <section class="blog-cat-shell">
     <div class="container">
+        <nav aria-label="Breadcrumb" style="margin-bottom:18px"><a href="{{ path('') }}">Tech Lab Miami</a> <span aria-hidden="true">/</span> <a href="{{ path('blog') }}">Insights</a> <span aria-hidden="true">/</span> <span aria-current="page">{{ categoryTitle }}</span></nav>
         <div class="blog-cat-hero">
             <div class="blog-cat-hero-content">
                 <div class="blog-cat-eyebrow">{{ categoryTypeLabel }} Category</div>
@@ -209,7 +212,7 @@
                     {% set fallbackRoute = category_type == 'blog' ? '/blog/' ~ item.slug ~ '/' : (category_type == 'location' ? '/locations/' ~ item.slug ~ '/' : '/' ~ item.slug ~ '/') %}
                     {% set itemHref = path((item.main_route ?: fallbackRoute)|trim('/')) %}
                     {% set itemImage = item.featured_image_url|default('') ?: category.featured_image_url|default('') ?: placeholderImage %}
-                    {% set excerpt = item.excerpt ?: item.meta_description ?: '' %}
+                    {% set excerpt = item.display_excerpt|default('') %}
                     {% set searchText = (item.title|default('') ~ ' ' ~ excerpt ~ ' ' ~ categoryTitle ~ ' ' ~ categoryTypeLabel)|lower|trim %}
                     <article class="blog-card" data-blog-category-card data-blog-category-search-text="{{ searchText|e('html_attr') }}">
                         <a class="blog-card-image" href="{{ itemHref }}">
@@ -219,7 +222,7 @@
                             <a class="blog-card-category" href="{{ path(pagination.base_path|trim('/')) }}">{{ categoryTitle }}</a>
                             <a href="{{ itemHref }}"><div class="blog-card-title">{{ item.title }}</div></a>
                             {% if excerpt %}
-                                <div class="blog-card-excerpt">{{ excerpt|striptags|slice(0, 145) }}{% if excerpt|length > 145 %}...{% endif %}</div>
+                                <div class="blog-card-excerpt">{{ excerpt }}</div>
                             {% endif %}
                             <a class="blog-card-cta" href="{{ itemHref }}">{{ itemCtaLabel }}</a>
                         </div>

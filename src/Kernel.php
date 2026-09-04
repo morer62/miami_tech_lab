@@ -166,7 +166,7 @@ class Kernel
 
         // Miami Tech Lab public ecosystem. Nested routes share one content engine
         // while keeping clean, indexable URLs such as /shows/local-tech-lab.
-        $miamiSections = ['shows','events','software','services','community','learn','resources','news','benefits','partners','speakers','people','about','now','directory','membership','media'];
+        $miamiSections = ['shows','events','software','services','community','learn','resources','news','benefits','partners','speakers','speaking','people','guests','about','impact','press','south-florida','studio','now','directory','membership','media'];
         if (in_array($urlViews[0] ?? '', $miamiSections, true)) {
             $GLOBALS['miami_tech_route'] = $slug;
             $hub = $publicRoot . '/pages/miami-tech-hub/index.php';
@@ -248,7 +248,8 @@ class Kernel
             '', 'login', 'logout', 'signup', 'forgot-password', 'reset-password',
             'update-password', 'google-auth', 'shows', 'events', 'software', 'services',
             'community', 'learn', 'blog', 'locations', 'about', 'news',
-            'resources', 'people', 'directory', 'partners', 'benefits', 'now',
+            'resources', 'people', 'guests', 'directory', 'partners', 'benefits',
+            'impact', 'press', 'speaking', 'south-florida', 'studio', 'now',
             'contact', 'support', 'privacy-policy', 'terms-and-conditions',
             'sitemap.xml', 'robots.txt', 'llms.txt'
         ];
@@ -539,8 +540,8 @@ class Kernel
                 }
             }
 
-            // Public CMS generated in Ophyra Growth Hub. VNV Events consumes only
-            // `site_key=vnvevents`; other brand content stays in Ophyra.
+            // Public CMS generated in Ophyra Growth Hub. This application consumes
+            // only `site_key=miamitechlab`; other brand content stays isolated.
             if (count($urlViews) === 1 && $urlViews[0] === 'blog') {
                 $blogIndexView = LocationUtils::getRootLocation()
                     . "/src/views/public/pages/blog/index.php";
@@ -548,6 +549,10 @@ class Kernel
             }
 
             if (count($urlViews) === 2 && $urlViews[0] === 'blog' && !empty($urlViews[1])) {
+                if ($urlViews[1] === 'software-data') {
+                    header('Location: /blog/software-tools/', true, 301);
+                    exit;
+                }
                 $route = '/blog/' . trim($urlViews[1], '/');
                 if ($this->growthHubHasContent($route, 'blog')) {
                     $this->includeGrowthHubContentAndExit($route, 'blog');
@@ -557,6 +562,14 @@ class Kernel
                     $blogPostView = LocationUtils::getRootLocation()
                         . "/src/views/public/pages/blog-post/index.php";
                     $this->includeResolvedFileAndExit($blogPostView);
+                }
+
+                if ($this->publicCategoryExistsForType($urlViews[1], 'blog')) {
+                    $GLOBALS['public_category_type'] = 'blog';
+                    $GLOBALS['public_category_slug'] = $urlViews[1];
+                    $this->includeResolvedFileAndExit(
+                        LocationUtils::getRootLocation() . "/src/views/public/pages/blog-category/index.php"
+                    );
                 }
 
                 http_response_code(404);
