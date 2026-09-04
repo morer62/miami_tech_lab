@@ -709,6 +709,36 @@ body::before{
     <!-- End Google Tag Manager (noscript) -->
 {% endif %}
 
+    <style>
+      .brand-mobile-appbar,.brand-mobile-drawer{display:none}
+      @media (max-width:767px){
+        .brand-mobile-appbar{position:sticky;top:0;z-index:1300;display:grid;grid-template-columns:54px minmax(0,1fr) minmax(112px,1.15fr);gap:8px;align-items:center;padding:10px 12px;background:#0d1020;border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 12px 30px rgba(5,8,24,.28)}
+        .brand-mobile-appbar a,.brand-mobile-appbar button{min-height:46px;border:1px solid rgba(255,255,255,.14);border-radius:15px;display:flex;align-items:center;justify-content:center;font:800 .82rem/1 Inter,system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+        .brand-mobile-menu{background:#171b31;color:#fff;padding:0;flex-direction:column!important;gap:5px}
+        .brand-mobile-menu span{display:block;width:21px;height:2px;border-radius:4px;background:#43dcc3;transition:.2s}
+        .brand-mobile-menu[aria-expanded="true"] span:first-child{transform:translateY(3.5px) rotate(45deg)}
+        .brand-mobile-menu[aria-expanded="true"] span:last-child{transform:translateY(-3.5px) rotate(-45deg)}
+        .brand-mobile-call{background:#171b31;color:#fff}
+        .brand-mobile-primary{background:linear-gradient(135deg,#25b9ff,#7c5cff);color:#fff;border-color:transparent!important}
+        .brand-mobile-drawer{position:fixed;inset:67px 0 auto;z-index:1299;padding:18px 16px 22px;background:#0d1020;color:#fff;box-shadow:0 24px 38px rgba(0,0,0,.34)}
+        .brand-mobile-drawer.is-open{display:block}
+        .brand-mobile-drawer__brand{display:flex;align-items:center;gap:12px;padding:4px 4px 16px;color:#fff;font:900 .82rem/1.2 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+        .brand-mobile-drawer__brand img{width:42px;height:42px;object-fit:contain}
+        .brand-mobile-drawer nav{display:grid!important;grid-template-columns:1fr 1fr;gap:9px}
+        .brand-mobile-drawer nav a{padding:13px 12px;border:1px solid rgba(255,255,255,.12);border-radius:13px;color:#fff;text-decoration:none;font:750 .9rem/1.2 Inter,system-ui,sans-serif;background:rgba(255,255,255,.05)}
+        .nav-shell{display:none!important}
+      }
+    </style>
+    <div class="brand-mobile-appbar" aria-label="Tech Lab Miami mobile navigation">
+      <button class="brand-mobile-menu" type="button" aria-label="Open menu" aria-expanded="false" data-brand-mobile-toggle><span></span><span></span></button>
+      <a class="brand-mobile-call" href="tel:+13052045427"><i class="fa-solid fa-phone" aria-hidden="true"></i>&nbsp; Call</a>
+      <a class="brand-mobile-primary" href="{{ path('signup') }}">Join free</a>
+    </div>
+    <div class="brand-mobile-drawer" data-brand-mobile-drawer>
+      <div class="brand-mobile-drawer__brand"><img src="{{ asset_for('assets/miami-tech-lab/mark.png') }}" alt=""><span>Tech Lab Miami</span></div>
+      <nav aria-label="Tech Lab Miami menu"><a href="{{ path('shows') }}">Shows</a><a href="{{ path('events') }}">Events</a><a href="{{ path('software') }}">Software</a><a href="{{ path('blog') }}">Insights</a><a href="{{ path('locations') }}">Locations</a><a href="{{ path('learn') }}">Learn</a><a href="{{ path('community') }}">Community</a><a href="{{ path('login') }}">Sign in</a></nav>
+    </div>
+
     {% block body %}
     {% endblock %}
 
@@ -815,6 +845,17 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     </script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+      const toggle=document.querySelector('[data-brand-mobile-toggle]');
+      const drawer=document.querySelector('[data-brand-mobile-drawer]');
+      if(!toggle||!drawer)return;
+      const close=()=>{toggle.setAttribute('aria-expanded','false');drawer.classList.remove('is-open')};
+      toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));drawer.classList.toggle('is-open',open)});
+      drawer.querySelectorAll('a').forEach(link=>link.addEventListener('click',close));
+      document.addEventListener('keydown',event=>{if(event.key==='Escape')close()});
+    });
+    </script>
     {% block scripts %}{% endblock %}
 
 </body>
