@@ -62,3 +62,11 @@ public/assets/miami-tech-lab/mark-source.png
 src/views/panel/*/planner-hub/management/orders/cache/
 *.key
 *.pem
+
+
+# SEO files generated independently in each environment
+/public/llms-full.txt
+/public/llms.txt
+/public/sitemap-blog.xml
+/public/sitemap-pages.xml
+/public/sitemap.xml
