@@ -726,7 +726,9 @@ body::before{
         .brand-mobile-drawer__brand img{width:42px;height:42px;object-fit:contain}
         .brand-mobile-drawer nav{display:grid!important;grid-template-columns:1fr 1fr;gap:9px}
         .brand-mobile-drawer nav a{padding:13px 12px;border:1px solid rgba(255,255,255,.12);border-radius:13px;color:#fff;text-decoration:none;font:750 .9rem/1.2 Inter,system-ui,sans-serif;background:rgba(255,255,255,.05)}
-        .nav-shell{display:none!important}
+        .brand-mobile-socials{display:flex;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+        .brand-mobile-socials a{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.07);text-decoration:none}
+        .nav-shell,.tech-public-header{display:none!important}
       }
     </style>
     <div class="brand-mobile-appbar" aria-label="Tech Lab Miami mobile navigation">
@@ -736,7 +738,8 @@ body::before{
     </div>
     <div class="brand-mobile-drawer" data-brand-mobile-drawer>
       <div class="brand-mobile-drawer__brand"><img src="{{ asset_for('assets/miami-tech-lab/mark.png') }}" alt=""><span>Tech Lab Miami</span></div>
-      <nav aria-label="Tech Lab Miami menu"><a href="{{ path('shows') }}">Shows</a><a href="{{ path('events') }}">Events</a><a href="{{ path('software') }}">Software</a><a href="{{ path('blog') }}">Insights</a><a href="{{ path('locations') }}">Locations</a><a href="{{ path('learn') }}">Learn</a><a href="{{ path('community') }}">Community</a><a href="{{ path('login') }}">Sign in</a></nav>
+      <nav aria-label="Tech Lab Miami menu"><a href="{{ path('shows') }}">Shows</a><a href="https://www.youtube.com/@tech-lab-miami" target="_blank" rel="noopener noreferrer">Recordings ↗</a><a href="{{ path('events') }}">Events</a><a href="{{ path('software') }}">Software</a><a href="{{ path('blog') }}">Insights</a><a href="{{ path('locations') }}">Locations</a><a href="{{ path('learn') }}">Learn</a><a href="{{ path('community') }}">Community</a><a href="{{ path('login') }}">Sign in</a></nav>
+      <div class="brand-mobile-socials" aria-label="Tech Lab Miami social media"><a href="https://www.instagram.com/tech_lab_miami" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="https://www.facebook.com/tech.lab.miami" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="https://www.youtube.com/@tech-lab-miami" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a><a href="https://www.linkedin.com/company/tech-lab-miami/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a></div>
     </div>
 
     {% block body %}
