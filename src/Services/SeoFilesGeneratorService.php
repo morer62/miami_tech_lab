@@ -363,13 +363,14 @@ class SeoFilesGeneratorService
             ['/software/', 'Software and AI Tools', 'weekly', 0.8],
             ['/community/', 'Tech Community', 'weekly', 0.7],
             ['/learn/', 'Learning Resources', 'weekly', 0.7],
-            ['/locations/', 'Tech Lab Miami Locations', 'weekly', 0.8],
-            ['/blog/', 'Tech Lab Miami Insights', 'weekly', 0.8],
+            ['/locations/', 'Tech Lab Miami Locations', 'weekly', 0.8, 'location'],
+            ['/blog/', 'Tech Lab Miami Insights', 'weekly', 0.8, 'blog'],
             ['/about/', 'About Tech Lab Miami', 'monthly', 0.6],
         ];
 
-        foreach ($static as [$path, $title, $freq, $priority]) {
-            $entries[] = $this->entry($path, $title, $today, $freq, $priority, 'static');
+        foreach ($static as $definition) {
+            [$path, $title, $freq, $priority] = $definition;
+            $entries[] = $this->entry($path, $title, $today, $freq, $priority, $definition[4] ?? 'static');
         }
 
         $entries = array_merge(
