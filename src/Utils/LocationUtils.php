@@ -6,13 +6,16 @@ class LocationUtils
 {
 
     public static function assetFor(string $uri, array $queryParams = []): string {
-        $queryString = '';
-
-        if (!empty($queryParams)) {
-            $queryString = "?" . http_build_query($queryParams);
+        $uri = ltrim($uri, '/');
+        // Keep long-lived browser caching while invalidating stale CSS/images
+        // automatically whenever a deployed asset changes.
+        $publicFile = self::getRootLocation() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR
+            . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $uri);
+        if (is_file($publicFile) && !array_key_exists('v', $queryParams)) {
+            $queryParams['v'] = (string) filemtime($publicFile);
         }
 
-        $uri = ltrim($uri, '/');
+        $queryString = !empty($queryParams) ? '?' . http_build_query($queryParams) : '';
         return rtrim(self::getBasePath(), '/') . ($uri === '' ? '/' : '/' . $uri) . $queryString;
     }
 
