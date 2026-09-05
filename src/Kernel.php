@@ -230,14 +230,13 @@ class Kernel
         $root = $urlViews[0] ?? '';
         $blockedRoots = [
             'store', 'store-categories', 'product', 'product-category', 'cart',
-            'checkout', 'meal-plans', 'tickets', 'forums', 'forum', 'affiliates',
+            'checkout', 'meal-plans', 'forums', 'forum', 'affiliates',
             'venues', 'vendors', 'vendors-search', 'profiles', 'search',
             'vnv-live', 'vnv-gourmet', 'vnv-sessions', 'vnv-events-productions',
             'event-planners', 'event-production', 'event-staffing', 'corporate-events',
             'wedding-planning', 'party-tents-and-event-rental-services-in-south-florida',
             'photo-booth-rental-video-photography-services-in-south-florida',
-            'bar-calculator-for-parties-and-venues', 'dj-sound-system-requirements-calculator',
-            'tent-and-seating-calculator-vnv-events', 'free-wellness-tools'
+            'free-wellness-tools'
         ];
 
         if (in_array($root, $blockedRoots, true)) {
@@ -251,6 +250,13 @@ class Kernel
             'resources', 'people', 'guests', 'directory', 'partners', 'benefits',
             'impact', 'press', 'speaking', 'south-florida', 'studio', 'now',
             'contact', 'support', 'privacy-policy', 'terms-and-conditions',
+            'dashboard', 'join-tech-lab', 'tickets',
+            'event-budget-calculator', 'party-size-and-space-calculator',
+            'event-drink-calculator', 'cocktail-guide-and-calculator-for-events',
+            'finger-food-appetizer-and-meal-event-calculator',
+            'bar-calculator-for-parties-and-venues', 'tent-and-seating-calculator-vnv-events',
+            'dj-sound-system-requirements-calculator', 'balloon-decoration-pricing-calculator',
+            'flower-decoration-pricing-calculator', 'video-and-photography-services-calculator',
             'sitemap.xml', 'robots.txt', 'llms.txt'
         ];
 

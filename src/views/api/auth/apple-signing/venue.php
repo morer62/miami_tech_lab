@@ -6,6 +6,7 @@ use App\Services\AppleService\AppleSignInService;
 use App\Services\ConfigService;
 use App\Services\HashService;
 use App\Services\LoginService;
+use App\Services\TechLabMembershipService;
 use App\Utils\ErrorLogging;
 use App\Utils\LocationUtils;
 use App\Utils\MessageUtil;
@@ -31,11 +32,12 @@ try {
     $user_id = $userDTO->sub;
     $email = $userDTO->email ?? null;
 
-    $user = $userRepo->getOne(["apple_id" => $user_id]);
+    $user = $userRepo->getOne(["apple_id" => $user_id]) ?: $userRepo->getOne(["email" => $email]);
 
     if ($user) {
-        MessageUtil::setMessage("Account already exists.");
-        LocationUtils::redirectInternal("login");
+        (new TechLabMembershipService())->enroll((int) $user->id);
+        LoginService::authenticateFromUserDbo($user);
+        LocationUtils::redirectInternal('dashboard');
     }
 
     $id_owner = null;
@@ -56,18 +58,19 @@ try {
         'phone_code' => '',
         'phone_validation' => 1,
         'membership_due_date' => $dueDate,
-        'level' => 5,
+        'level' => 2,
         'id_owner' => $id_owner,
         'apple_id' => $user_id,
     ]);
 
     $user_id = $userRepo->getLastId();
     $userRepo->update(["id_owner" => $user_id], ["id" => $user_id]);
+    (new TechLabMembershipService())->enroll((int) $user_id);
 
     $userDbo = $userRepo->getOne(["id" => $user_id]);
     LoginService::authenticateFromUserDbo($userDbo);
-    MessageUtil::setMessage("Account created successfully. \nPlease update your info.");
-    LocationUtils::redirectInternal("panel/settings");
+    MessageUtil::setMessage("Account created successfully.");
+    LocationUtils::redirectInternal('dashboard');
 } catch (Exception $e) {
     ErrorLogging::log($e);
     MessageUtil::setMessage("An exception occurred. Please try again.");

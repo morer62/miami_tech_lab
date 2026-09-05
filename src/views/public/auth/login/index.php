@@ -2,6 +2,7 @@
 
 use App\Services\AppleService\AppleSignInService;
 use App\Services\LoginService;
+use App\Services\TechLabMembershipService;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRolesRepository;
 use App\Utils\LocationUtils;
@@ -21,8 +22,9 @@ $client->addScope("email");
 $client->addScope("profile");
 $client->addScope(Calendar::CALENDAR_EVENTS);
 
-if (\App\Services\LoginService::getSession() !== null) {
-    \App\Utils\LocationUtils::redirectInternal("panel/home");
+if (($sessionUser = \App\Services\LoginService::getSession()) !== null) {
+    $membership = (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId());
+    \App\Utils\LocationUtils::redirectInternal($membership ? 'dashboard' : 'join-tech-lab');
     exit;
 }
 
@@ -79,14 +81,16 @@ $router->post(function () {
             return \App\Utils\JsonResponse::createResponse([
                 "success" => true,
                 "message" => "Login successful",
-                "needs_password_update" => $needsPasswordUpdate
+                "needs_password_update" => $needsPasswordUpdate,
+                "redirect" => $needsPasswordUpdate ? "/update-password" : ((new TechLabMembershipService())->membershipFor((int)$user->id) ? "/dashboard" : "/join-tech-lab")
             ]);
         }
 
         if ($needsPasswordUpdate) {
             LocationUtils::redirectInternal('update-password');
         } else {
-            LocationUtils::redirectInternal('panel/home');
+            $membership=(new TechLabMembershipService())->membershipFor((int)$user->id);
+            LocationUtils::redirectInternal($membership?'dashboard':'join-tech-lab');
         }
     } catch (Exception $e) {
         return $e->getMessage();
@@ -124,7 +128,8 @@ function handleGoogleLogin($client, $code): never
         ]);
 
         LoginService::authenticateFromUserDbo($user);
-        LocationUtils::redirectInternal('panel/home');
+        $membership=(new TechLabMembershipService())->membershipFor((int)$user->id);
+        LocationUtils::redirectInternal($membership?'dashboard':'join-tech-lab');
 
     } catch (Exception $e) {
         MessageUtil::setMessage("Error with Google login: " . $e->getMessage());

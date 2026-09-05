@@ -9,6 +9,9 @@ use App\Repositories\TicketSalesStagesRepository;
 use App\Repositories\VenueEventsRepository;
 use App\Utils\JsonResponse;
 use App\Utils\LocationUtils;
+use App\Services\LoginService;
+use App\Services\TechLabMembershipService;
+use App\Repositories\Connection;
 
 $router = new Router();
 
@@ -23,8 +26,19 @@ $router->get(function () {
     if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
         // Redirigir a registro con parámetros de retorno
         $returnUrl = urlencode('/tickets?event_id=' . $eventId);
-        LocationUtils::redirectInternal("signup?level=5&return_url=" . $returnUrl);
+        LocationUtils::redirectInternal("signup?return_url=" . $returnUrl);
         return;
+    }
+
+    $sessionUser = LoginService::getSession();
+    if ($sessionUser && (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId())) {
+        $db = new Connection();
+        $db->query("SELECT ve.id FROM tech_lab_events te JOIN venue_events ve ON ve.id=te.venue_event_id JOIN venues v ON v.id=ve.venue_id AND v.user_id=2 WHERE te.tenant_key='miamitechlab' AND te.status='PUBLISHED' AND ve.id=:event LIMIT 1");
+        $db->bind(':event', (int) $eventId);
+        if (!$db->fetchOne()) {
+            http_response_code(404);
+            return TemplateResponse::render(__DIR__ . "/not-found.twig");
+        }
     }
 
     $venueEventsRepo = new VenueEventsRepository();
@@ -80,8 +94,18 @@ $router->post(function () {
             return JsonResponse::createResponse([
                 'success' => false,
                 'message' => 'Authentication required',
-                'redirect' => '/signup?level=5'
+                'redirect' => '/signup'
             ]);
+        }
+
+        $sessionUser = LoginService::getSession();
+        if ($sessionUser && (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId())) {
+            $db = new Connection();
+            $db->query("SELECT ve.id FROM ticket_types tt JOIN venue_events_tickets vet ON vet.id=tt.id_venue_event_tickets JOIN venue_events ve ON ve.id=vet.id_venue_event JOIN venues v ON v.id=ve.venue_id AND v.user_id=2 JOIN tech_lab_events te ON te.venue_event_id=ve.id AND te.tenant_key='miamitechlab' AND te.status='PUBLISHED' WHERE tt.id=:ticket_type LIMIT 1");
+            $db->bind(':ticket_type', (int) ($_POST['ticket_type_id'] ?? 0));
+            if (!$db->fetchOne()) {
+                return JsonResponse::createResponse(['success'=>false,'message'=>'This ticket is not available in Tech Lab Miami.'], 403);
+            }
         }
 
         $ticketSalesService = new TicketSalesService();

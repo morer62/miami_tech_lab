@@ -5,7 +5,10 @@ This repository serves **Tech Lab Miami** at `techlabmiami.com`. This file overr
 - Public brand: `Tech Lab Miami` (not Miami Tech Lab, VNV Events, Avomeal or Ophyra).
 - Content scope: `id_owner=2`, `site_key=miamitechlab`.
 - Public Growth Hub content, media and agents must read and write only within that scope.
-- Public signup creates customer/member accounts (`level=5`) only.
+- Public signup creates an identity plus a tenant-scoped Tech Lab membership with
+  operator capability (`role_level=2`). New identities keep legacy `users.level=2`;
+  existing identities retain their original global level and gain the membership
+  without duplication. Authorization must use `ecosystem_memberships.account_id`.
 - VNV store, products, event-service pages, venues, vendors, forums and legacy VNV location records are not public here.
 - Research and internal links come from this site's homepage, public pages, CMS content, sitemap and configured services.
 - Blog and location routes expose only published `miamitechlab` records.

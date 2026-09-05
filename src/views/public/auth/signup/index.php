@@ -4,6 +4,7 @@ use App\Repositories\UserRepository;
 use App\Services\AppleService\AppleSignInService;
 use App\Services\HashService;
 use App\Services\AffiliateService;
+use App\Services\TechLabMembershipService;
 use App\Utils\FormatPhone;
 use App\Utils\LocationUtils;
 use App\Utils\MessageUtil;
@@ -21,13 +22,14 @@ $client->addScope("email");
 $client->addScope("profile");
 $client->addScope("https://www.googleapis.com/auth/calendar.events");
 
-if (\App\Services\LoginService::getSession() !== null) {
-    \App\Utils\LocationUtils::redirectInternal("panel/home");
+if (($sessionUser = \App\Services\LoginService::getSession()) !== null) {
+    $membership = (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId());
+    \App\Utils\LocationUtils::redirectInternal($membership ? 'dashboard' : 'join-tech-lab');
     exit;
 }
 
 $router->get(function () use ($client) {
-    $level = 5;
+    $level = 2;
     $code = $_GET['code'] ?? null;
     $state = $_GET['state'] ?? $level;
     $fromAffiliate = $_GET['from_affiliate'] ?? null;
@@ -83,9 +85,9 @@ $router->post(function () {
 
     $days = intval($_ENV['FREE_MEMBERSHIP_DAYS']);
     $dueDate = date('Y-m-d', strtotime("+{$days} days"));
-    // Public registration is always a client account. Administrative, venue
-    // and team levels can only be created from the authenticated back office.
-    $level = 5;
+    // Tech Lab members receive an operator membership. Tenant authorization
+    // remains in ecosystem_memberships rather than relying on this legacy field.
+    $level = 2;
     $id_owner = null;
 
     if ($level === 5) {
@@ -115,6 +117,7 @@ $router->post(function () {
     if (in_array($level, [2, 3])) {
         $userRepository->update(["id_owner" => $user_id], ["id" => $user_id]);
     }
+    (new TechLabMembershipService())->enroll((int)$user_id);
 
     try {
         $affiliateData = $affiliateService->getAffiliateFromCookie();
@@ -130,12 +133,13 @@ $router->post(function () {
         
         return \App\Utils\JsonResponse::createResponse([
             "success" => true,
-            "message" => "Account created successfully"
+            "message" => "Account created successfully",
+            "redirect" => "/dashboard"
         ]);
     }
     
-    MessageUtil::setMessage("You have been registered successfully");
-    LocationUtils::redirectInternal('login');
+    (new \App\Services\LoginService())->authenticate($_POST["email"], $password);
+    LocationUtils::redirectInternal('dashboard');
 });
 
 function handleGoogleCallback($client, $code, $level)
@@ -152,14 +156,14 @@ function handleGoogleCallback($client, $code, $level)
 
         $existingUser = $userRepository->getOne(["email" => $data->email]);
         if ($existingUser != null) {
-            MessageUtil::setMessage("User already exists");
-            LocationUtils::redirectInternal('signup');
-            return;
+            (new TechLabMembershipService())->enroll((int)$existingUser->id);
+            \App\Services\LoginService::authenticateFromUserDbo($existingUser);
+            LocationUtils::redirectInternal('dashboard');
         }
 
         $days = intval($_ENV['FREE_MEMBERSHIP_DAYS']);
         $dueDate = date('Y-m-d', strtotime("+{$days} days"));
-        $level = 5;
+        $level = 2;
         $id_owner = null;
 
         if ($level === 5) {
@@ -191,6 +195,7 @@ function handleGoogleCallback($client, $code, $level)
         if (in_array($level, [2, 3])) {
             $userRepository->update(["id_owner" => $user_id], ["id" => $user_id]);
         }
+        (new TechLabMembershipService())->enroll((int)$user_id);
 
         try {
             $affiliateData = $affiliateService->getAffiliateFromCookie();
@@ -200,7 +205,9 @@ function handleGoogleCallback($client, $code, $level)
         } catch (\Exception $e) {
         }
 
-        LocationUtils::redirectInternal('login');
+        $created=$userRepository->getOneWithoutOwnership(['id'=>(int)$user_id]);
+        \App\Services\LoginService::authenticateFromUserDbo($created);
+        LocationUtils::redirectInternal('dashboard');
     } catch (Exception $e) {
         MessageUtil::setMessage("Error with Google signup: " . $e->getMessage());
         LocationUtils::redirectInternal('signup');
