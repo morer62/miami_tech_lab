@@ -31,7 +31,8 @@ $router->get(function () {
     }
 
     $sessionUser = LoginService::getSession();
-    if ($sessionUser && (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId())) {
+    if ($sessionUser) {
+        (new TechLabMembershipService())->ensureMembership((int) $sessionUser->getId());
         $db = new Connection();
         $db->query("SELECT ve.id FROM tech_lab_events te JOIN venue_events ve ON ve.id=te.venue_event_id JOIN venues v ON v.id=ve.venue_id AND v.user_id=2 WHERE te.tenant_key='miamitechlab' AND te.status='PUBLISHED' AND ve.id=:event LIMIT 1");
         $db->bind(':event', (int) $eventId);
@@ -99,7 +100,8 @@ $router->post(function () {
         }
 
         $sessionUser = LoginService::getSession();
-        if ($sessionUser && (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId())) {
+        if ($sessionUser) {
+            (new TechLabMembershipService())->ensureMembership((int) $sessionUser->getId());
             $db = new Connection();
             $db->query("SELECT ve.id FROM ticket_types tt JOIN venue_events_tickets vet ON vet.id=tt.id_venue_event_tickets JOIN venue_events ve ON ve.id=vet.id_venue_event JOIN venues v ON v.id=ve.venue_id AND v.user_id=2 JOIN tech_lab_events te ON te.venue_event_id=ve.id AND te.tenant_key='miamitechlab' AND te.status='PUBLISHED' WHERE tt.id=:ticket_type LIMIT 1");
             $db->bind(':ticket_type', (int) ($_POST['ticket_type_id'] ?? 0));

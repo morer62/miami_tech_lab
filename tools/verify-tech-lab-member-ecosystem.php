@@ -62,7 +62,7 @@ if (!in_array('--exercise', $argv, true)) {
     exit(0);
 }
 
-$db->query("SELECT id FROM users WHERE is_active=1 ORDER BY (level=1) DESC,id LIMIT 1");
+$db->query("SELECT id,level FROM users WHERE is_active=1 ORDER BY (level=1) DESC,id LIMIT 1");
 $testUser = $db->fetchOne();
 if (!$testUser) {
     fwrite(STDERR, "FAILED: no active local user is available for the reversible exercise.\n");
@@ -81,8 +81,15 @@ try {
     $membership = $service->enroll((int) $testUser->id);
     $membershipId = (int) $membership->id;
     $data = $service->dashboardData((int) $testUser->id);
-    if ((int) $data['membership']->role_level !== 2 || !$data['software']) {
-        throw new RuntimeException('Level 2 dashboard contract failed.');
+    $expectedRole = (int) $testUser->level === 1 ? 1 : 2;
+    if ((int) $data['membership']->role_level !== $expectedRole || !$data['software']) {
+        throw new RuntimeException('Authenticated dashboard role contract failed.');
+    }
+    $db->query("SELECT status,activated_at,expires_at FROM ecosystem_entitlements WHERE membership_id=:membership AND product_key='ophyra'");
+    $db->bind(':membership', $membershipId);
+    $unactivated = $db->fetchOne();
+    if (!$unactivated || $unactivated->status !== 'GRANTED' || $unactivated->activated_at !== null || $unactivated->expires_at !== null) {
+        throw new RuntimeException('Ophyra was activated before the user opted in.');
     }
     $url = $service->activateOphyra((int) $testUser->id);
     if (!str_contains($url, '/ecosystem/sso?token=')) {
@@ -117,7 +124,7 @@ try {
     if (!$expired || $expired->status !== 'EXPIRED' || $expired->workspace_status !== 'READ_ONLY') {
         throw new RuntimeException('Expiry did not preserve the workspace in read-only mode.');
     }
-    echo "PASS: enrollment, Level 2 dashboard, lazy workspace, one-use SSO and read-only expiry exercised.\n";
+    echo "PASS: direct authenticated dashboard, role preservation, optional Ophyra activation, one-use SSO and read-only expiry exercised.\n";
 } finally {
     if ($membershipId) {
         foreach (['ecosystem_sso_tokens', 'tech_lab_saved_tool_results', 'tech_lab_member_requests', 'tech_lab_event_rsvps', 'ecosystem_entitlements', 'ecosystem_workspaces'] as $table) {

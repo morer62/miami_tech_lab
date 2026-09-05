@@ -12,7 +12,6 @@ $router->get(function(){
     $user=LoginService::getSession();
     if(!$user){LocationUtils::redirectInternal('login?return_url=%2Fdashboard');}
     $service=new TechLabMembershipService();
-    if(!$service->membershipFor((int)$user->getId())){LocationUtils::redirectInternal('join-tech-lab');}
     return TemplateResponse::render(__DIR__.'/index.twig',['user'=>$user]+$service->dashboardData((int)$user->getId()));
 });
 $router->post(function(){

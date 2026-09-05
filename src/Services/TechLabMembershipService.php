@@ -31,12 +31,13 @@ final class TechLabMembershipService
 
     public function enroll(int $userId): object
     {
+        $roleLevel = $this->roleLevelForUser($userId);
         $this->db->beginTransaction();
         try {
             $this->db->query("INSERT INTO ecosystem_memberships(user_id,tenant_key,role_level,status,joined_at) VALUES(:user,:tenant,:role,'ACTIVE',NOW()) ON DUPLICATE KEY UPDATE role_level=VALUES(role_level),status='ACTIVE',updated_at=NOW()");
             $this->db->bind(':user', $userId);
             $this->db->bind(':tenant', self::TENANT);
-            $this->db->bind(':role', self::ROLE_LEVEL);
+            $this->db->bind(':role', $roleLevel);
             $this->db->execute();
 
             $membership = $this->membershipFor($userId);
@@ -57,12 +58,32 @@ final class TechLabMembershipService
         }
     }
 
-    public function dashboardData(int $userId): array
+    /**
+     * This record provisions the private Tech Lab workspace; it is not a paid
+     * membership gate. Ophyra remains optional and starts only on activation.
+     */
+    public function ensureMembership(int $userId): object
     {
         $membership = $this->membershipFor($userId);
+        $roleLevel = $this->roleLevelForUser($userId);
         if (!$membership) {
-            throw new \RuntimeException('Tech Lab Miami membership required.');
+            return $this->enroll($userId);
         }
+        if ((int) $membership->role_level !== $roleLevel) {
+            $this->db->query("UPDATE ecosystem_memberships SET role_level=:role,updated_at=NOW() WHERE id=:membership AND tenant_key=:tenant");
+            $this->db->bind(':role', $roleLevel);
+            $this->db->bind(':membership', (int) $membership->id);
+            $this->db->bind(':tenant', self::TENANT);
+            $this->db->execute();
+            $membership->role_level = $roleLevel;
+        }
+        $this->grantOptionalOphyraAccess((int) $membership->id, $userId);
+        return $membership;
+    }
+
+    public function dashboardData(int $userId): array
+    {
+        $membership = $this->ensureMembership($userId);
 
         $this->expireEntitlements((int)$membership->id);
         $this->db->query("SELECT s.*,e.status entitlement_status,e.activated_at,e.expires_at FROM ecosystem_software_registry s LEFT JOIN ecosystem_entitlements e ON e.membership_id=:membership AND e.product_key=s.product_key WHERE s.tenant_key=:tenant AND s.is_active=1 ORDER BY s.sort_order,s.id");
@@ -94,8 +115,7 @@ final class TechLabMembershipService
 
     public function rsvp(int $userId, int $eventId): void
     {
-        $membership = $this->membershipFor($userId);
-        if (!$membership) throw new \RuntimeException('Membership required.');
+        $membership = $this->ensureMembership($userId);
         $event = $this->one("SELECT ve.id,te.capacity,(SELECT COUNT(*) FROM tech_lab_event_rsvps rr WHERE rr.venue_event_id=ve.id AND rr.status='GOING') rsvp_count FROM tech_lab_events te INNER JOIN venue_events ve ON ve.id=te.venue_event_id INNER JOIN venues v ON v.id=ve.venue_id AND v.user_id=2 WHERE ve.id=:event AND te.tenant_key=:tenant AND te.status='PUBLISHED' AND ve.start_date>=NOW() LIMIT 1", [':event'=>$eventId,':tenant'=>self::TENANT]);
         if (!$event) throw new \RuntimeException('This event is not available.');
         $rsvpStatus = $event->capacity !== null && (int) $event->rsvp_count >= (int) $event->capacity ? 'WAITLISTED' : 'GOING';
@@ -106,9 +126,9 @@ final class TechLabMembershipService
 
     public function saveRequest(int $userId, string $type, int $step, array $payload, bool $submit): void
     {
-        $membership = $this->membershipFor($userId);
+        $membership = $this->ensureMembership($userId);
         $type = strtoupper($type);
-        if (!$membership || !in_array($type,['GUEST','SPONSOR','CONSULTANT'],true)) throw new \RuntimeException('Invalid request.');
+        if (!in_array($type,['GUEST','SPONSOR','CONSULTANT'],true)) throw new \RuntimeException('Invalid request.');
         $status = $submit ? 'SUBMITTED' : 'DRAFT';
         $draft=$this->one("SELECT id FROM tech_lab_member_requests WHERE membership_id=:membership AND request_type=:type AND status='DRAFT' ORDER BY id DESC LIMIT 1",[':membership'=>(int)$membership->id,':type'=>$type]);
         if($draft){
@@ -124,8 +144,8 @@ final class TechLabMembershipService
 
     public function saveToolResult(int $userId, string $tool, array $input, array $result): void
     {
-        $membership=$this->membershipFor($userId);
-        if(!$membership || !in_array($tool,['event-budget','space-capacity'],true)) throw new \RuntimeException('Invalid tool.');
+        $membership=$this->ensureMembership($userId);
+        if(!in_array($tool,['event-budget','space-capacity'],true)) throw new \RuntimeException('Invalid tool.');
         $this->db->query("INSERT INTO tech_lab_saved_tool_results(membership_id,user_id,tool_key,input_json,result_json) VALUES(:membership,:user,:tool,:input,:result)");
         foreach([':membership'=>(int)$membership->id,':user'=>$userId,':tool'=>$tool,':input'=>json_encode($input),':result'=>json_encode($result)] as $key=>$value)$this->db->bind($key,$value);
         $this->db->execute();
@@ -133,8 +153,7 @@ final class TechLabMembershipService
 
     public function activateOphyra(int $userId): string
     {
-        $membership=$this->membershipFor($userId);
-        if(!$membership) throw new \RuntimeException('Membership required.');
+        $membership=$this->ensureMembership($userId);
         $this->db->beginTransaction();
         try {
             $workspace=$this->one("SELECT * FROM ecosystem_workspaces WHERE membership_id=:membership LIMIT 1",[':membership'=>(int)$membership->id]);
@@ -159,6 +178,22 @@ final class TechLabMembershipService
     {
         $this->db->query("UPDATE ecosystem_entitlements e JOIN ecosystem_workspaces w ON w.membership_id=e.membership_id SET e.status='EXPIRED',w.status='READ_ONLY' WHERE e.membership_id=:membership AND e.status='ACTIVE' AND e.expires_at<NOW()");
         $this->db->bind(':membership',$membershipId);$this->db->execute();
+    }
+
+    private function roleLevelForUser(int $userId): int
+    {
+        $user = $this->one('SELECT level FROM users WHERE id=:user LIMIT 1', [':user' => $userId]);
+        if (!$user) throw new \RuntimeException('Tech Lab account not found.');
+        return (int) $user->level === 1 ? 1 : self::ROLE_LEVEL;
+    }
+
+    private function grantOptionalOphyraAccess(int $membershipId, int $userId): void
+    {
+        $this->db->query("INSERT INTO ecosystem_entitlements(membership_id,user_id,product_key,source_tenant,granted_at,status) VALUES(:membership,:user,'ophyra',:tenant,NOW(),'GRANTED') ON DUPLICATE KEY UPDATE status=IF(status='REVOKED','GRANTED',status),updated_at=NOW()");
+        $this->db->bind(':membership', $membershipId);
+        $this->db->bind(':user', $userId);
+        $this->db->bind(':tenant', self::TENANT);
+        $this->db->execute();
     }
 
     private function one(string $sql,array $params): ?object { $this->db->query($sql);foreach($params as $k=>$v)$this->db->bind($k,$v);return $this->db->fetchOne()?:null; }

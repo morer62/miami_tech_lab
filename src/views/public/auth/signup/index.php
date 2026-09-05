@@ -23,8 +23,7 @@ $client->addScope("profile");
 $client->addScope("https://www.googleapis.com/auth/calendar.events");
 
 if (($sessionUser = \App\Services\LoginService::getSession()) !== null) {
-    $membership = (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId());
-    \App\Utils\LocationUtils::redirectInternal($membership ? 'dashboard' : 'join-tech-lab');
+    \App\Utils\LocationUtils::redirectInternal('dashboard');
     exit;
 }
 

@@ -4,9 +4,7 @@ $memberUser = \App\Services\LoginService::getSession();
 if (!$memberUser) {
     \App\Utils\LocationUtils::redirectInternal('login?return_url=' . rawurlencode((string) ($_SERVER['REQUEST_URI'] ?? '/dashboard')));
 }
-if (!(new \App\Services\TechLabMembershipService())->membershipFor((int) $memberUser->getId())) {
-    \App\Utils\LocationUtils::redirectInternal('join-tech-lab');
-}
+(new \App\Services\TechLabMembershipService())->ensureMembership((int) $memberUser->getId());
 
 use App\Utils\Router;
 use App\Utils\TemplateResponse;

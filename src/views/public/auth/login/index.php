@@ -2,7 +2,6 @@
 
 use App\Services\AppleService\AppleSignInService;
 use App\Services\LoginService;
-use App\Services\TechLabMembershipService;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRolesRepository;
 use App\Utils\LocationUtils;
@@ -23,8 +22,7 @@ $client->addScope("profile");
 $client->addScope(Calendar::CALENDAR_EVENTS);
 
 if (($sessionUser = \App\Services\LoginService::getSession()) !== null) {
-    $membership = (new TechLabMembershipService())->membershipFor((int) $sessionUser->getId());
-    \App\Utils\LocationUtils::redirectInternal($membership ? 'dashboard' : 'join-tech-lab');
+    \App\Utils\LocationUtils::redirectInternal('dashboard');
     exit;
 }
 
@@ -82,15 +80,14 @@ $router->post(function () {
                 "success" => true,
                 "message" => "Login successful",
                 "needs_password_update" => $needsPasswordUpdate,
-                "redirect" => $needsPasswordUpdate ? "/update-password" : ((new TechLabMembershipService())->membershipFor((int)$user->id) ? "/dashboard" : "/join-tech-lab")
+                "redirect" => $needsPasswordUpdate ? "/update-password" : "/dashboard"
             ]);
         }
 
         if ($needsPasswordUpdate) {
             LocationUtils::redirectInternal('update-password');
         } else {
-            $membership=(new TechLabMembershipService())->membershipFor((int)$user->id);
-            LocationUtils::redirectInternal($membership?'dashboard':'join-tech-lab');
+            LocationUtils::redirectInternal('dashboard');
         }
     } catch (Exception $e) {
         return $e->getMessage();
@@ -128,8 +125,7 @@ function handleGoogleLogin($client, $code): never
         ]);
 
         LoginService::authenticateFromUserDbo($user);
-        $membership=(new TechLabMembershipService())->membershipFor((int)$user->id);
-        LocationUtils::redirectInternal($membership?'dashboard':'join-tech-lab');
+        LocationUtils::redirectInternal('dashboard');
 
     } catch (Exception $e) {
         MessageUtil::setMessage("Error with Google login: " . $e->getMessage());
