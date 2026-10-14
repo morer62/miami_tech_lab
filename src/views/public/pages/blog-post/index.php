@@ -6,6 +6,7 @@ use App\Repositories\CmsContentsRepository;
 use App\Repositories\CmsRoutesRepository;
 use App\Repositories\Connection;
 use App\Services\PublicSeoService;
+use App\Services\PublicArticleBodySanitizer;
 use App\Utils\TemplateResponse;
 
 $db = new Connection();
@@ -42,6 +43,13 @@ if (!$post) {
     http_response_code(404);
     echo "Post not found";
     exit;
+}
+
+if (!empty($post->body_html)) {
+    $post->body_html = PublicArticleBodySanitizer::sanitize(
+        (string) $post->body_html,
+        (string) ($post->title ?? '')
+    );
 }
 
 $publicType = normalize_public_blog_content_type((string)(
